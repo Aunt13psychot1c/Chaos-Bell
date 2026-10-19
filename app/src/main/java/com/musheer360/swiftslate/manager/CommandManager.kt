@@ -65,6 +65,7 @@ class CommandManager(context: Context) {
         "cut" to "Cut the text to clipboard.",
         "paste" to "Paste from clipboard.",
         "replace" to "Replace text with clipboard content.",
+        "chaos" to "Surprise me: one random effect, taken all the way. ?undo puts it back.",
         "translate:xx" to "Translate text to any language code (e.g. ?translate:es, ?translate:fr)."
     )
 

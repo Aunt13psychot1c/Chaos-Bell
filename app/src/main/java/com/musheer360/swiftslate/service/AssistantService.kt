@@ -283,7 +283,26 @@ class AssistantService : AccessibilityService() {
             return
         }
 
-        when (command.type) {
+        // ?chaos rolls the hat once, then rides an ordinary path: a local effect is a text
+        // replacement with the finished result, an AI effect is an AI command with the
+        // effect's prompt. Undo, haptics and stats all come along for free.
+        var effectiveCommand = command
+        var replacerResult: String? = null
+        if (command.isBuiltIn && command.trigger.endsWith("chaos")) {
+            if (cleanText.isEmpty()) {
+                source.safeRecycle()
+                return
+            }
+            when (val pick = ChaosHat.roll(cleanText)) {
+                is ChaosHat.Pick.Local -> {
+                    effectiveCommand = command.copy(type = CommandType.TEXT_REPLACER)
+                    replacerResult = pick.result
+                }
+                is ChaosHat.Pick.Ai -> effectiveCommand = command.copy(prompt = pick.prompt, type = CommandType.AI)
+            }
+        }
+
+        when (effectiveCommand.type) {
             CommandType.TEXT_REPLACER -> {
                 if (!isProcessing.compareAndSet(false, true)) {
                     source.safeRecycle()
@@ -296,7 +315,7 @@ class AssistantService : AccessibilityService() {
                     val thisJob = coroutineContext[Job]
                     try {
                         withContext(Dispatchers.Main) {
-                            val replacerOk = replaceText(source, precedingText + command.prompt)
+                            val replacerOk = replaceText(source, replacerResult ?: (precedingText + command.prompt))
                             if (!replacerOk) {
                                 // Don't record an undo point, a CONFIRM haptic or a usage stat
                                 // for a replacement the field silently refused.
@@ -338,7 +357,7 @@ class AssistantService : AccessibilityService() {
                 startWatchdog()
                 cancelPendingProcessingReset()
                 currentJob?.cancel()
-                processCommand(source, cleanText, command)
+                processCommand(source, cleanText, effectiveCommand)
             }
         }
     }
