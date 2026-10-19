@@ -55,6 +55,8 @@
     <string name="settings_provider_gemini">Google Gemini</string>
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Egendefinert (OpenAI-kompatibel)</string>
+    <string name="settings_web_search_title">Nettsøk</string>
+    <string name="settings_web_search_desc">La Claude slå opp på nettet når en kommando trenger det</string>
     <string name="settings_model_title">Modell</string>
     <string name="settings_temperature_title">Temperatur</string>
     <string name="settings_endpoint_title">Endepunkt</string>

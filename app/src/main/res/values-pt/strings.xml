@@ -55,6 +55,8 @@
     <string name="settings_provider_gemini">Google Gemini</string>
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Personalizado (compatível com OpenAI)</string>
+    <string name="settings_web_search_title">Pesquisa na web</string>
+    <string name="settings_web_search_desc">Permitir que o Claude pesquise online quando um comando precisar</string>
     <string name="settings_model_title">Modelo</string>
     <string name="settings_temperature_title">Temperatura</string>
     <string name="settings_endpoint_title">Endpoint</string>

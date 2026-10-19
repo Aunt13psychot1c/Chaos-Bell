@@ -55,6 +55,8 @@
     <string name="settings_provider_gemini">Google Gemini</string>
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Poljubno (združljivo z OpenAI)</string>
+    <string name="settings_web_search_title">Iskanje po spletu</string>
+    <string name="settings_web_search_desc">Dovoli Claudu, da išče po spletu, ko ukaz to potrebuje</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Temperatura</string>
     <string name="settings_endpoint_title">Končna točka</string>

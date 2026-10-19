@@ -55,6 +55,8 @@
     <string name="settings_provider_gemini">Google Gemini</string>
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">自定义（兼容 OpenAI）</string>
+    <string name="settings_web_search_title">网页搜索</string>
+    <string name="settings_web_search_desc">当命令需要时，允许 Claude 在线搜索</string>
     <string name="settings_model_title">模型</string>
     <string name="settings_temperature_title">温度</string>
     <string name="settings_endpoint_title">端点</string>

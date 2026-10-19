@@ -55,6 +55,8 @@
     <string name="settings_provider_gemini">Google Gemini</string>
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Користувацький (сумісний з OpenAI)</string>
+    <string name="settings_web_search_title">Пошук в інтернеті</string>
+    <string name="settings_web_search_desc">Дозволити Claude шукати в інтернеті, коли це потрібно команді</string>
     <string name="settings_model_title">Модель</string>
     <string name="settings_temperature_title">Температура</string>
     <string name="settings_endpoint_title">Кінцева точка</string>

@@ -54,7 +54,7 @@
     <string name="settings_provider_gemini">Google Gemini</string>
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Custom (OpenAI Compatible)</string>
-    <string name="settings_provider_anthropic">Anthropic (Claude)</string>
+    <string name="settings_provider_anthropic" translatable="false">Anthropic (Claude)</string>
     <string name="settings_web_search_title">Web search</string>
     <string name="settings_web_search_desc">Let Claude look things up online when a command needs it</string>
     <string name="settings_model_title">Model</string>

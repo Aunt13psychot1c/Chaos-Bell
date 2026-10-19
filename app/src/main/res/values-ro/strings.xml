@@ -55,6 +55,8 @@
     <string name="settings_provider_gemini">Google Gemini</string>
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Personalizat (compatibil OpenAI)</string>
+    <string name="settings_web_search_title">Căutare pe web</string>
+    <string name="settings_web_search_desc">Lasă-l pe Claude să caute online când o comandă are nevoie</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Temperatură</string>
     <string name="settings_endpoint_title">Endpoint</string>

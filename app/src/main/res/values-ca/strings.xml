@@ -55,6 +55,8 @@
     <string name="settings_provider_gemini">Google Gemini</string>
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Personalitzat (compatible amb OpenAI)</string>
+    <string name="settings_web_search_title">Cerca web</string>
+    <string name="settings_web_search_desc">Deixa que Claude busqui a internet quan una ordre ho necessiti</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Temperatura</string>
     <string name="settings_endpoint_title">Punt final</string>

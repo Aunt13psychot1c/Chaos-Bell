@@ -55,6 +55,8 @@
     <string name="settings_provider_gemini">Google Gemini</string>
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">سفارشی (سازگار با OpenAI)</string>
+    <string name="settings_web_search_title">جستجوی وب</string>
+    <string name="settings_web_search_desc">اجازه بده Claude وقتی یک فرمان نیاز دارد، در اینترنت جستجو کند</string>
     <string name="settings_model_title">مدل</string>
     <string name="settings_temperature_title">دما</string>
     <string name="settings_endpoint_title">نقطه پایانی</string>

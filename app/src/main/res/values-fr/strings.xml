@@ -48,6 +48,8 @@
     <string name="settings_provider_gemini">Google Gemini</string>
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Personnalisé (compatible OpenAI)</string>
+    <string name="settings_web_search_title">Recherche web</string>
+    <string name="settings_web_search_desc">Laisser Claude chercher en ligne quand une commande en a besoin</string>
     <string name="settings_model_title">Modèle</string>
     <string name="settings_endpoint_title">Endpoint</string>
     <string name="settings_endpoint_placeholder">https://api.example.com/v1</string>
