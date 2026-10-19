@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Bell アシスタント</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Chaos Bell アシスタント</string>
     <string name="accessibility_service_desc">トリガーコマンドを入力すると、システム全体で AI によるテキスト置換を提供します。</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">カラー</string>
     <string name="colors_welcome_title">Bell の色を選ぶ</string>
     <string name="colors_welcome_desc">設定からいつでも変更できます。</string>
+    <string name="about_me_title">あなたについて</string>
+    <string name="about_me_hint">名前、話し方、好きなこと。Bell は ?talk、?huh、?search で使います。</string>
+    <string name="about_me_forget">最近の会話を忘れる</string>
+    <string name="service_status_paused">一時停止中</string>
+    <string name="service_pause">一時停止</string>
+    <string name="service_resume">再開</string>
     <string name="settings_model_title">モデル</string>
     <string name="settings_temperature_title">温度</string>
     <string name="settings_endpoint_title">エンドポイント</string>

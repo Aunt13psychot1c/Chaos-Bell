@@ -153,11 +153,12 @@ class AnthropicClient {
         apiKey: String,
         model: String,
         temperature: Double,
-        webSearch: Boolean
+        webSearch: Boolean,
+        answerMode: Boolean = false
     ): Result<GenerateResult> = withContext(Dispatchers.IO) {
         var useSearch = webSearch
         var sendTemperature = true
-        var result = doGenerate(prompt, text, apiKey, model, temperature, useSearch, sendTemperature)
+        var result = doGenerate(prompt, text, apiKey, model, temperature, useSearch, sendTemperature, answerMode)
 
         repeat(2) {
             val msg = result.exceptionOrNull()?.message ?: return@repeat
@@ -167,14 +168,14 @@ class AnthropicClient {
                 sendTemperature && isTemperatureRejectedError(msg) -> sendTemperature = false
                 else -> return@repeat
             }
-            result = doGenerate(prompt, text, apiKey, model, temperature, useSearch, sendTemperature)
+            result = doGenerate(prompt, text, apiKey, model, temperature, useSearch, sendTemperature, answerMode)
         }
 
         // Retry once for transient network/server errors (with 1.5s backoff), like the
         // other clients.
         if (result.isFailure && result.exceptionOrNull().isTransientNetwork()) {
             kotlinx.coroutines.delay(1500)
-            result = doGenerate(prompt, text, apiKey, model, temperature, useSearch, sendTemperature)
+            result = doGenerate(prompt, text, apiKey, model, temperature, useSearch, sendTemperature, answerMode)
         }
 
         if (result.isFailure) {
@@ -192,11 +193,12 @@ class AnthropicClient {
         model: String,
         temperature: Double,
         webSearch: Boolean,
-        sendTemperature: Boolean
+        sendTemperature: Boolean,
+        answerMode: Boolean = false
     ): JSONObject = JSONObject().apply {
         put("model", model.replace(Regex("[^a-zA-Z0-9._\\-/: ]"), ""))
         put("max_tokens", MAX_OUTPUT_TOKENS)
-        put("system", ApiClientUtils.SYSTEM_PROMPT_PREFIX + prompt)
+        put("system", ApiClientUtils.systemPrompt(prompt, answerMode))
         put("messages", JSONArray().apply {
             put(JSONObject().apply {
                 put("role", "user")
@@ -222,7 +224,8 @@ class AnthropicClient {
         model: String,
         temperature: Double,
         webSearch: Boolean,
-        sendTemperature: Boolean
+        sendTemperature: Boolean,
+        answerMode: Boolean
     ): Result<GenerateResult> {
         var connection: HttpURLConnection? = null
         return try {
@@ -236,7 +239,7 @@ class AnthropicClient {
             // whole command after 90 seconds, so stay under that.
             connection.readTimeout = if (webSearch) 80_000 else 60_000
 
-            val body = buildRequestBody(prompt, text, model, temperature, webSearch, sendTemperature)
+            val body = buildRequestBody(prompt, text, model, temperature, webSearch, sendTemperature, answerMode)
             connection.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
 
             val code = connection.responseCode

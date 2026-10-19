@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Trợ lý Bell</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Trợ lý Chaos Bell</string>
     <string name="accessibility_service_desc">Cung cấp thay thế văn bản bằng AI trên toàn hệ thống khi nhập lệnh kích hoạt.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Màu sắc</string>
     <string name="colors_welcome_title">Chọn màu cho Bell</string>
     <string name="colors_welcome_desc">Bạn có thể đổi bất cứ lúc nào trong Cài đặt.</string>
+    <string name="about_me_title">Về bạn</string>
+    <string name="about_me_hint">Tên bạn, cách bạn nói chuyện, sở thích của bạn. Bell dùng nó cho ?talk, ?huh và ?search.</string>
+    <string name="about_me_forget">Quên cuộc trò chuyện gần đây</string>
+    <string name="service_status_paused">Đã tạm dừng</string>
+    <string name="service_pause">Tạm dừng</string>
+    <string name="service_resume">Tiếp tục</string>
     <string name="settings_model_title">Mô hình</string>
     <string name="settings_temperature_title">Nhiệt độ</string>
     <string name="settings_endpoint_title">Điểm cuối</string>

@@ -2,6 +2,8 @@ package com.musheer360.swiftslate.manager
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.musheer360.swiftslate.model.PrefKeys
+import com.musheer360.swiftslate.model.ProviderType
 import org.json.JSONArray
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -12,9 +14,26 @@ class KeyManager internal constructor(
     constructor(context: Context) : this(context, AndroidKeystoreCipher())
 
     private val prefs: SharedPreferences = context.getSharedPreferences("secure_keys_prefs", Context.MODE_PRIVATE)
+    private val settings: SharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
     companion object {
-        private const val PREF_KEY_ARRAY = "keys_array"
+        /** The old single pile every provider shared. Sorted into drawers on first read. */
+        private const val LEGACY_KEY_ARRAY = "keys_array"
+
+        /** Each provider keeps its keys in its own drawer, so a Groq key is never sent to Claude. */
+        internal fun drawerFor(provider: String): String = "keys_array_$provider"
+
+        /**
+         * Which provider a key from the old shared pile most likely belongs to, by the prefix
+         * each provider puts on its keys. Null when it is not recognizable (Custom endpoints and
+         * the like): those go to whichever provider is selected.
+         */
+        internal fun guessProvider(key: String): String? = when {
+            key.startsWith("sk-ant-") -> ProviderType.ANTHROPIC
+            key.startsWith("gsk_") -> ProviderType.GROQ
+            key.startsWith("AIza") -> ProviderType.GEMINI
+            else -> null
+        }
         private const val CACHE_TTL_MS = 5_000L
         private const val MAX_KEY_LENGTH = 256
         // Invalid-key marks expire. A 403 is not always the key's fault (e.g. selecting a
@@ -53,6 +72,47 @@ class KeyManager internal constructor(
      */
     @Volatile
     private var cachedCipherText: String? = null
+    /** Provider whose drawer [cachedKeys] came from. Switching provider invalidates the cache. */
+    @Volatile
+    private var cachedProvider: String? = null
+
+    private fun currentProvider(): String = try {
+        ProviderType.sanitize(settings.getString(PrefKeys.PROVIDER_TYPE, null))
+    } catch (_: Exception) {
+        ProviderType.GEMINI
+    }
+
+    /** Reads one stored key list, plaintext (pre-encryption builds) or encrypted. Null if unreadable. */
+    private fun decode(stored: String): List<String>? = try {
+        if (isLegacyPlaintext(stored)) JSONArray(stored).toStringList()
+        else cipher.decrypt(stored)?.let { JSONArray(it).toStringList() }
+    } catch (_: Exception) {
+        null
+    }
+
+    /**
+     * Sorts the old shared pile into per-provider drawers, once. Keys are placed by their
+     * prefix (see [guessProvider]); unrecognizable ones go to the selected provider. The pile
+     * is only removed after every drawer was written, so a Keystore failure loses nothing.
+     */
+    @Synchronized
+    private fun migrateSharedPile() {
+        val stored = prefs.getString(LEGACY_KEY_ARRAY, null) ?: return
+        val legacy = decode(stored) ?: return
+        val fallback = currentProvider()
+        val groups = legacy.groupBy { guessProvider(it) ?: fallback }
+        val editor = prefs.edit()
+        for ((provider, keys) in groups) {
+            val existing = prefs.getString(drawerFor(provider), null)?.let { decode(it) } ?: emptyList()
+            val merged = (existing + keys).distinct()
+            val cipherText = try { cipher.encrypt(JSONArray(merged).toString()) } catch (_: Exception) { return }
+            editor.putString(drawerFor(provider), cipherText)
+        }
+        editor.remove(LEGACY_KEY_ARRAY).commit()
+        cachedKeys = null
+        cachedCipherText = null
+        cachedProvider = null
+    }
 
     val keystoreAvailable: Boolean get() = cipher.available
 
@@ -61,10 +121,21 @@ class KeyManager internal constructor(
 
     @Synchronized
     fun getKeys(): List<String> {
+        migrateSharedPile()
+        // Still there means sorting it failed (Keystore trouble): keep serving the old pile as
+        // before rather than leaving the user with no keys.
+        prefs.getString(LEGACY_KEY_ARRAY, null)?.let { return decode(it) ?: emptyList() }
+        val provider = currentProvider()
+        val drawer = drawerFor(provider)
+        if (provider != cachedProvider) {
+            cachedKeys = null
+            cachedCipherText = null
+            cachedProvider = provider
+        }
         val now = System.currentTimeMillis()
         val cached = cachedKeys
         if (cached != null && now - cacheTimestamp < CACHE_TTL_MS) return cached
-        val stored = prefs.getString(PREF_KEY_ARRAY, null) ?: return emptyList()
+        val stored = prefs.getString(drawer, null) ?: return emptyList()
         // TTL expired but the stored ciphertext is byte-identical, so the plaintext cannot have
         // changed: revalidate the cache rather than paying for another KeyStore decrypt. Without
         // this, every 5s of active typing re-ran AES-GCM on the accessibility service's path.
@@ -76,7 +147,7 @@ class KeyManager internal constructor(
         if (isLegacyPlaintext(stored)) {
             return try {
                 val encrypted = cipher.encrypt(stored)
-                prefs.edit().putString(PREF_KEY_ARRAY, encrypted).commit()
+                prefs.edit().putString(drawer, encrypted).commit()
                 val list = JSONArray(stored).toStringList()
                 cacheKeys(list, encrypted)
                 list
@@ -106,7 +177,7 @@ class KeyManager internal constructor(
         val arr = JSONArray(keys)
         return try {
             val cipherText = cipher.encrypt(arr.toString())
-            prefs.edit().putString(PREF_KEY_ARRAY, cipherText).apply()
+            prefs.edit().putString(drawerFor(currentProvider()), cipherText).apply()
             cacheKeys(keys, cipherText)
             true
         } catch (_: Exception) {

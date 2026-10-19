@@ -32,6 +32,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.musheer360.swiftslate.manager.BellBackup
+import com.musheer360.swiftslate.manager.BellMemory
 import com.musheer360.swiftslate.manager.CommandManager
 import com.musheer360.swiftslate.manager.KeyManager
 import com.musheer360.swiftslate.manager.ProviderModelsCache
@@ -94,6 +96,8 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
     val openAIClient = remember { OpenAICompatibleClient() }
     val geminiClient = remember { GeminiClient() }
     val anthropicClient = remember { AnthropicClient() }
+    val bellMemory = remember { BellMemory(context) }
+    var showAboutMe by remember { mutableStateOf(false) }
 
     var triggerPrefix by remember { mutableStateOf(commandManager.getTriggerPrefix()) }
     var prefixError by remember { mutableStateOf<String?>(null) }
@@ -248,7 +252,8 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                 try {
                     withContext(Dispatchers.IO) {
                         context.contentResolver.openOutputStream(it)?.use { os ->
-                            os.write(commandManager.exportCommands().toByteArray())
+                            // Commands and Bell's memory travel together in one file.
+                            os.write(BellBackup.build(commandManager.exportCommands(), bellMemory.export()).toByteArray())
                         }
                     }
                     backupMessage = exportSuccessMsg
@@ -271,7 +276,10 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                             if (text.length > 1_000_000) null else text
                         } ?: ""
                     }
-                    if (commandManager.importCommands(json)) {
+                    // Reads Bell's backups (commands + memory) and older command-only ones.
+                    val (commandsJson, memoryJson) = try { BellBackup.parse(json) } catch (_: Exception) { json to null }
+                    if (commandManager.importCommands(commandsJson)) {
+                        memoryJson?.let { withContext(Dispatchers.IO) { bellMemory.import(it) } }
                         backupMessage = importSuccessMsg
                         backupSuccess = true
                     } else {
@@ -717,9 +725,25 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     modifier = Modifier.padding(top = rhythm.formGap)
                 )
             }
-            // Bell's colors share this card instead of adding a fifth one: Settings does not
-            // scroll, so every new card would squeeze the About card on short screens.
+            // About you and Bell's colors share this card instead of adding new ones: Settings
+            // does not scroll, so every new card would squeeze the About card on short screens.
             Spacer(modifier = Modifier.height(rhythm.groupGap))
+            SlateDivider()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showAboutMe = true }
+                    .padding(vertical = rhythm.groupGap),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.about_me_title),
+                    fontSize = rhythm.bodySize,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(text = "›", fontSize = rhythm.emphasisSize, color = MaterialTheme.colorScheme.primary)
+            }
             SlateDivider()
             Spacer(modifier = Modifier.height(rhythm.groupGap))
             PaletteSwatchRow(
@@ -837,6 +861,10 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                 )
             }
         }
+    }
+
+    if (showAboutMe) {
+        AboutMeDialog(memory = bellMemory, onClose = { showAboutMe = false })
     }
 
     if (showImportConfirm) {
@@ -961,4 +989,46 @@ private fun DynamicModelDropdown(
             }
         }
     }
+}
+
+/**
+ * Edits Bell's About-me note and can wipe the recent conversation. Both live only on the phone
+ * and are used only by the answer-mode commands (?talk, ?huh, ?search).
+ */
+@Composable
+private fun AboutMeDialog(memory: BellMemory, onClose: () -> Unit) {
+    var text by remember { mutableStateOf(memory.aboutMe) }
+    var forgotten by remember { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(stringResource(R.string.about_me_title)) },
+        text = {
+            Column {
+                Text(stringResource(R.string.about_me_hint), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { if (it.length <= BellMemory.MAX_ABOUT_ME_CHARS) text = it },
+                    minLines = 4,
+                    maxLines = 8,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                TextButton(
+                    onClick = { memory.forgetConversation(); forgotten = true },
+                    enabled = !forgotten
+                ) {
+                    Text(stringResource(R.string.about_me_forget))
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { memory.aboutMe = text.trim(); onClose() }) {
+                Text(stringResource(android.R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onClose) { Text(stringResource(R.string.commands_cancel)) }
+        }
+    )
 }

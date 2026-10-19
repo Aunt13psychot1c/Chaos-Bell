@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.musheer360.swiftslate.R
+import com.musheer360.swiftslate.model.PrefKeys
 import com.musheer360.swiftslate.SwiftSlateApp
 import com.musheer360.swiftslate.manager.CommandManager
 import com.musheer360.swiftslate.manager.KeyManager
@@ -95,6 +96,8 @@ fun DashboardScreen(keyManager: KeyManager, commandManager: CommandManager, stat
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
     var isServiceEnabled by remember { mutableStateOf(checkServiceEnabled(context)) }
+    val settingsPrefs = remember { context.getSharedPreferences("settings", Context.MODE_PRIVATE) }
+    var paused by remember { mutableStateOf(try { settingsPrefs.getBoolean(PrefKeys.PAUSED, false) } catch (_: Exception) { false }) }
     // Not seeded from keyManager.getKeys(): that decrypts through AndroidKeyStore on the main
     // thread. The LaunchedEffect below fills it in on the IO dispatcher, as it already did on
     // every subsequent resume.
@@ -162,14 +165,20 @@ fun DashboardScreen(keyManager: KeyManager, commandManager: CommandManager, stat
                             .size(8.dp)
                             .clip(CircleShape)
                             .background(
-                                if (isServiceEnabled) MaterialTheme.colorScheme.tertiary
-                                else MaterialTheme.colorScheme.error
+                                when {
+                                    !isServiceEnabled -> MaterialTheme.colorScheme.error
+                                    paused -> MaterialTheme.colorScheme.tertiaryContainer
+                                    else -> MaterialTheme.colorScheme.tertiary
+                                }
                             )
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
-                        text = if (isServiceEnabled) stringResource(R.string.service_status_active)
-                        else stringResource(R.string.service_status_inactive),
+                        text = when {
+                            !isServiceEnabled -> stringResource(R.string.service_status_inactive)
+                            paused -> stringResource(R.string.service_status_paused)
+                            else -> stringResource(R.string.service_status_active)
+                        },
                         fontSize = rhythm.emphasisSize,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface
@@ -185,6 +194,20 @@ fun DashboardScreen(keyManager: KeyManager, commandManager: CommandManager, stat
                         modifier = Modifier.heightIn(min = 48.dp)
                     ) {
                         Text(stringResource(R.string.service_enable))
+                    }
+                } else {
+                    // Pause instead of turning the service off: no trip back through Android's
+                    // Accessibility settings, and the keys stay saved.
+                    OutlinedButton(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            paused = !paused
+                            settingsPrefs.edit().putBoolean(PrefKeys.PAUSED, paused).apply()
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.heightIn(min = 48.dp)
+                    ) {
+                        Text(stringResource(if (paused) R.string.service_resume else R.string.service_pause))
                     }
                 }
             }

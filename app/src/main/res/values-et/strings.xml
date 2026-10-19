@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Bell\'i abiline</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Chaos Bell\'i abiline</string>
     <string name="accessibility_service_desc">Pakub süsteemisiseseid AI-põhiseid tekstiasendusi, kui sisestatakse päästikkäske.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Värvid</string>
     <string name="colors_welcome_title">Vali Belli värvid</string>
     <string name="colors_welcome_desc">Saad neid igal ajal seadetes muuta.</string>
+    <string name="about_me_title">Sinust</string>
+    <string name="about_me_hint">Sinu nimi, kuidas sa räägid, mis sind huvitab. Bell kasutab seda käskudes ?talk, ?huh ja ?search.</string>
+    <string name="about_me_forget">Unusta viimane vestlus</string>
+    <string name="service_status_paused">Peatatud</string>
+    <string name="service_pause">Peata</string>
+    <string name="service_resume">Jätka</string>
     <string name="settings_model_title">Mudel</string>
     <string name="settings_temperature_title">Temperatuur</string>
     <string name="settings_endpoint_title">Lõpp-punkt</string>

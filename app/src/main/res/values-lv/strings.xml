@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Bell palīgs</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Chaos Bell palīgs</string>
     <string name="accessibility_service_desc">Nodrošina sistēmas mēroga AI teksta aizstāšanu, kad tiek ierakstītas aktivizējošās komandas.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Krāsas</string>
     <string name="colors_welcome_title">Izvēlies Bell krāsas</string>
     <string name="colors_welcome_desc">Tās jebkurā laikā var mainīt iestatījumos.</string>
+    <string name="about_me_title">Par tevi</string>
+    <string name="about_me_hint">Tavs vārds, kā tu runā, kas tev patīk. Bell to izmanto komandām ?talk, ?huh un ?search.</string>
+    <string name="about_me_forget">Aizmirst nesenu sarunu</string>
+    <string name="service_status_paused">Pauzēts</string>
+    <string name="service_pause">Pauze</string>
+    <string name="service_resume">Turpināt</string>
     <string name="settings_model_title">Modelis</string>
     <string name="settings_temperature_title">Temperatūra</string>
     <string name="settings_endpoint_title">Galapunkts</string>

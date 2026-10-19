@@ -12,7 +12,8 @@ import androidx.compose.ui.graphics.Color
  * two shades, a deeper one that reads on the light background and a softer one that reads on
  * the dark background. All of them are matte on purpose, no neon.
  *
- * Names stay in English in every language: they are names, like paint colors.
+ * The picker shows only the color itself. [displayName] is never drawn; it is what a screen
+ * reader says for each swatch.
  */
 enum class BellPalette(
     val id: String,
@@ -25,11 +26,11 @@ enum class BellPalette(
     val swatch: Color
 ) {
     CLASSIC("classic", "Classic", null, null, Color(0xFF141414)),
-    BRASS("brass", "Brass", Color(0xFF8C6D2C), Color(0xFFC9A55A), Color(0xFFB8954A)),
-    COPPER("copper", "Copper", Color(0xFF9A4F27), Color(0xFFD0784A), Color(0xFFB5653A)),
-    OXBLOOD("oxblood", "Oxblood", Color(0xFF7A1F2B), Color(0xFFC0505E), Color(0xFF7A1F2B)),
-    OLIVE("olive", "Olive", Color(0xFF5C5C2E), Color(0xFFA3A35E), Color(0xFF6B6B3A)),
-    MAUVE("mauve", "Mauve", Color(0xFF8A5577), Color(0xFFC49AB5), Color(0xFFB07A9A));
+    BRASS("brass", "Gold", Color(0xFF8C6D2C), Color(0xFFC9A55A), Color(0xFFB8954A)),
+    COPPER("copper", "Orange", Color(0xFF9A4F27), Color(0xFFD0784A), Color(0xFFB5653A)),
+    OXBLOOD("oxblood", "Red", Color(0xFF7A1F2B), Color(0xFFC0505E), Color(0xFF7A1F2B)),
+    OLIVE("olive", "Green", Color(0xFF5C5C2E), Color(0xFFA3A35E), Color(0xFF6B6B3A)),
+    MAUVE("mauve", "Pink", Color(0xFF8A5577), Color(0xFFC49AB5), Color(0xFFB07A9A));
 
     companion object {
         fun fromId(id: String?): BellPalette = entries.firstOrNull { it.id == id } ?: CLASSIC

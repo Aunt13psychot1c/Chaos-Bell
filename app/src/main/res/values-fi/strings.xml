@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Bell-avustin</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Chaos Bell-avustin</string>
     <string name="accessibility_service_desc">Tarjoaa järjestelmänlaajuisia AI-pohjaisia tekstinkorvauksia, kun käynnistyskomennot kirjoitetaan.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Värit</string>
     <string name="colors_welcome_title">Valitse Bellin värit</string>
     <string name="colors_welcome_desc">Voit vaihtaa niitä milloin tahansa asetuksista.</string>
+    <string name="about_me_title">Sinusta</string>
+    <string name="about_me_hint">Nimesi, miten puhut, mistä pidät. Bell käyttää tätä komennoissa ?talk, ?huh ja ?search.</string>
+    <string name="about_me_forget">Unohda viimeisin keskustelu</string>
+    <string name="service_status_paused">Tauolla</string>
+    <string name="service_pause">Tauko</string>
+    <string name="service_resume">Jatka</string>
     <string name="settings_model_title">Malli</string>
     <string name="settings_temperature_title">Lämpötila</string>
     <string name="settings_endpoint_title">Päätepiste</string>

@@ -114,7 +114,7 @@ class KeyManagerTest {
     @Test
     fun keysAreNotStoredInPlaintext() {
         keyManager.addKey("super-secret-key")
-        val stored = prefs().getString("keys_array", null)
+        val stored = prefs().getString(KeyManager.drawerFor("gemini"), null)
         assertNotNull(stored)
         assertFalse("raw key must not appear in prefs", stored!!.contains("super-secret-key"))
     }
@@ -162,7 +162,8 @@ class KeyManagerTest {
         prefs().edit().putString("keys_array", JSONArray(listOf("old1", "old2")).toString()).commit()
         val migrated = freshManager()
         assertEquals(listOf("old1", "old2"), migrated.getKeys())
-        val stored = prefs().getString("keys_array", null)!!
+        assertNull("the shared pile is gone once sorted", prefs().getString("keys_array", null))
+        val stored = prefs().getString(KeyManager.drawerFor("gemini"), null)!!
         assertFalse("must have been re-encrypted", KeyManager.isLegacyPlaintext(stored))
         assertFalse(stored.contains("old1"))
         // And still readable afterwards.
@@ -173,6 +174,36 @@ class KeyManagerTest {
     fun legacyPlaintextKeys_stillReadableWhenReEncryptionFails() {
         prefs().edit().putString("keys_array", JSONArray(listOf("old1")).toString()).commit()
         assertEquals(listOf("old1"), freshManager(FakeCipher(available = false)).getKeys())
+    }
+
+    // --- per-provider drawers ---
+
+    private fun selectProvider(type: String) {
+        ApplicationProvider.getApplicationContext<android.content.Context>()
+            .getSharedPreferences("settings", 0).edit().putString("provider_type", type).commit()
+    }
+
+    @Test
+    fun eachProviderKeepsItsOwnKeys() {
+        selectProvider("groq")
+        keyManager.addKey("gsk_groqkey")
+        selectProvider("anthropic")
+        keyManager.addKey("sk-ant-claudekey")
+        assertEquals(listOf("sk-ant-claudekey"), keyManager.getKeys())
+        selectProvider("groq")
+        assertEquals(listOf("gsk_groqkey"), keyManager.getKeys())
+    }
+
+    @Test
+    fun sharedPile_isSortedIntoDrawersByKeyPrefix() {
+        selectProvider("custom")
+        prefs().edit().putString("keys_array",
+            JSONArray(listOf("sk-ant-a", "gsk_b", "AIzaC", "my-local-key")).toString()).commit()
+        val manager = freshManager()
+        assertEquals(listOf("my-local-key"), manager.getKeys())
+        selectProvider("anthropic"); assertEquals(listOf("sk-ant-a"), manager.getKeys())
+        selectProvider("groq"); assertEquals(listOf("gsk_b"), manager.getKeys())
+        selectProvider("gemini"); assertEquals(listOf("AIzaC"), manager.getKeys())
     }
 
     // --- getNextKey ---

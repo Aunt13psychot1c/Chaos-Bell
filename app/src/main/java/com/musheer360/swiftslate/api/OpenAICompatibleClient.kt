@@ -284,10 +284,12 @@ class OpenAICompatibleClient {
         useJsonObjectMode: Boolean = false,
         extraParams: Map<String, Any> = emptyMap(),
         searchMode: SearchMode = SearchMode.NONE,
-        searcher: WebSearcher = WebSearcher()
+        searcher: WebSearcher = WebSearcher(),
+        answerMode: Boolean = false,
+        forceSearch: Boolean = false
     ): Result<GenerateResult> = withContext(Dispatchers.IO) {
         if (searchMode == SearchMode.FUNCTION) {
-            val searched = generateWithSearch(prompt, text, apiKey, model, temperature, endpoint, extraParams, searcher)
+            val searched = generateWithSearch(prompt, text, apiKey, model, temperature, endpoint, extraParams, searcher, answerMode, forceSearch)
             if (searched != null) {
                 val cleaned = stripHttpPrefix(searched.map { it.text })
                 val meta = searched.getOrNull()
@@ -296,12 +298,14 @@ class OpenAICompatibleClient {
             // null: this server does not do function calling, so run the command without search.
         }
 
-        var result = doGenerate(prompt, text, apiKey, model, temperature, endpoint, useJsonObjectMode, extraParams)
+        // Answer-mode replies are free-form, so they never go through JSON mode.
+        val jsonMode = useJsonObjectMode && !answerMode
+        var result = doGenerate(prompt, text, apiKey, model, temperature, endpoint, jsonMode, extraParams, answerMode = answerMode)
 
         // Retry once for transient network/server errors (with 1.5s backoff)
         if (result.isFailure && result.exceptionOrNull().isTransientNetwork()) {
             kotlinx.coroutines.delay(1500)
-            result = doGenerate(prompt, text, apiKey, model, temperature, endpoint, useJsonObjectMode, extraParams)
+            result = doGenerate(prompt, text, apiKey, model, temperature, endpoint, jsonMode, extraParams, answerMode = answerMode)
         }
 
         val cleaned = stripHttpPrefix(result.map { it.text })
@@ -326,13 +330,19 @@ class OpenAICompatibleClient {
         temperature: Double,
         endpoint: String,
         extraParams: Map<String, Any>,
-        searcher: WebSearcher
+        searcher: WebSearcher,
+        answerMode: Boolean,
+        forceSearch: Boolean
     ): Result<GenerateResult>? {
         val tools = searchTools()
-        var first = doGenerate(prompt, text, apiKey, model, temperature, endpoint, false, extraParams, tools = tools)
+        // ?search must search: "required" makes the model call the tool on the first round.
+        val firstChoice = if (forceSearch) "required" else "auto"
+        var first = doGenerate(prompt, text, apiKey, model, temperature, endpoint, false, extraParams,
+            tools = tools, toolChoice = firstChoice, answerMode = answerMode)
         if (first.isFailure && first.exceptionOrNull().isTransientNetwork()) {
             kotlinx.coroutines.delay(1500)
-            first = doGenerate(prompt, text, apiKey, model, temperature, endpoint, false, extraParams, tools = tools)
+            first = doGenerate(prompt, text, apiKey, model, temperature, endpoint, false, extraParams,
+                tools = tools, toolChoice = firstChoice, answerMode = answerMode)
         }
         val firstMsg = first.exceptionOrNull()?.message.orEmpty()
         if (first.isFailure && firstMsg.startsWith("HTTP_4") && firstMsg.contains("tool", ignoreCase = true)) return null
@@ -357,7 +367,7 @@ class OpenAICompatibleClient {
         }
         return doGenerate(
             prompt, text, apiKey, model, temperature, endpoint, false, extraParams,
-            tools = tools, toolChoice = "none", followUp = followUp
+            tools = tools, toolChoice = "none", followUp = followUp, answerMode = answerMode
         )
     }
 
@@ -381,7 +391,8 @@ class OpenAICompatibleClient {
         extraParams: Map<String, Any> = emptyMap(),
         tools: JSONArray? = null,
         toolChoice: String = "auto",
-        followUp: JSONArray? = null
+        followUp: JSONArray? = null,
+        answerMode: Boolean = false
     ): Result<GenerateResult> {
         if (EndpointValidator.validate(endpoint) != EndpointValidator.Error.NONE) {
             return Result.failure(Exception("Endpoint must be https:// or an http:// private-LAN address"))
@@ -399,9 +410,9 @@ class OpenAICompatibleClient {
             connection.readTimeout = 60_000
 
             val systemContent = if (withJsonObject) {
-                ApiClientUtils.SYSTEM_PROMPT_PREFIX + prompt + " Respond with JSON: {\"text\": \"your result\"}"
+                ApiClientUtils.systemPrompt(prompt, answerMode) + " Respond with JSON: {\"text\": \"your result\"}"
             } else {
-                ApiClientUtils.SYSTEM_PROMPT_PREFIX + prompt
+                ApiClientUtils.systemPrompt(prompt, answerMode)
             }
 
             val jsonBody = JSONObject().apply {

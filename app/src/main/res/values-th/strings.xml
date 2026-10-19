@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">ผู้ช่วย Bell</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">ผู้ช่วย Chaos Bell</string>
     <string name="accessibility_service_desc">ให้การแทนที่ข้อความด้วย AI ทั่วทั้งระบบเมื่อพิมพ์คำสั่งทริกเกอร์</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">สี</string>
     <string name="colors_welcome_title">เลือกสีของ Bell</string>
     <string name="colors_welcome_desc">คุณเปลี่ยนได้ทุกเมื่อในการตั้งค่า</string>
+    <string name="about_me_title">เกี่ยวกับคุณ</string>
+    <string name="about_me_hint">ชื่อ วิธีพูด และสิ่งที่คุณชอบ Bell ใช้ข้อมูลนี้กับ ?talk, ?huh และ ?search</string>
+    <string name="about_me_forget">ลืมแชทล่าสุด</string>
+    <string name="service_status_paused">หยุดชั่วคราว</string>
+    <string name="service_pause">หยุดชั่วคราว</string>
+    <string name="service_resume">ทำต่อ</string>
     <string name="settings_model_title">โมเดล</string>
     <string name="settings_temperature_title">อุณหภูมิ</string>
     <string name="settings_endpoint_title">เอนด์พอยต์</string>

@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Bell सहायक</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Chaos Bell सहायक</string>
     <string name="accessibility_service_desc">ट्रिगर कमांड टाइप करने पर सिस्टम-व्यापी AI टेक्स्ट प्रतिस्थापन प्रदान करता है।</string>
 
     <!-- Dashboard -->
@@ -53,6 +53,12 @@
     <string name="colors_title">रंग</string>
     <string name="colors_welcome_title">Bell के रंग चुनें</string>
     <string name="colors_welcome_desc">आप इन्हें कभी भी सेटिंग्स में बदल सकते हैं।</string>
+    <string name="about_me_title">आपके बारे में</string>
+    <string name="about_me_hint">आपका नाम, आप कैसे बात करते हैं, आपको क्या पसंद है। Bell इसे ?talk, ?huh और ?search में इस्तेमाल करता है।</string>
+    <string name="about_me_forget">हाल की बातचीत भूलें</string>
+    <string name="service_status_paused">रुका हुआ</string>
+    <string name="service_pause">रोकें</string>
+    <string name="service_resume">फिर शुरू करें</string>
     <string name="settings_model_title">मॉडल</string>
     <string name="settings_endpoint_title">Endpoint</string>
     <string name="settings_endpoint_placeholder">https://api.example.com/v1</string>

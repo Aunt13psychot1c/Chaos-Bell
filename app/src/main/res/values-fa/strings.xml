@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">دستیار Bell</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">دستیار Chaos Bell</string>
     <string name="accessibility_service_desc">هنگام تایپ دستورات محرک، جایگزینی متن مبتنی بر هوش مصنوعی را در سطح سیستم فراهم می‌کند.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">رنگ‌ها</string>
     <string name="colors_welcome_title">رنگ‌های Bell را انتخاب کنید</string>
     <string name="colors_welcome_desc">هر زمان بخواهید می‌توانید آن‌ها را در تنظیمات تغییر دهید.</string>
+    <string name="about_me_title">درباره شما</string>
+    <string name="about_me_hint">نام شما، طرز صحبت و علایقتان. Bell از آن برای ?talk و ?huh و ?search استفاده می‌کند.</string>
+    <string name="about_me_forget">فراموش کردن گفتگوی اخیر</string>
+    <string name="service_status_paused">مکث شده</string>
+    <string name="service_pause">مکث</string>
+    <string name="service_resume">ادامه</string>
     <string name="settings_model_title">مدل</string>
     <string name="settings_temperature_title">دما</string>
     <string name="settings_endpoint_title">نقطه پایانی</string>

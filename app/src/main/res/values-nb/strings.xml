@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Bell-assistent</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Chaos Bell-assistent</string>
     <string name="accessibility_service_desc">Gir systemdekkende AI-teksterstatninger når utløserkommandoer skrives.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Farger</string>
     <string name="colors_welcome_title">Velg Bells farger</string>
     <string name="colors_welcome_desc">Du kan endre dem når som helst i Innstillinger.</string>
+    <string name="about_me_title">Om deg</string>
+    <string name="about_me_hint">Navnet ditt, hvordan du snakker, hva du liker. Bell bruker det til ?talk, ?huh og ?search.</string>
+    <string name="about_me_forget">Glem nylig chat</string>
+    <string name="service_status_paused">Satt på pause</string>
+    <string name="service_pause">Pause</string>
+    <string name="service_resume">Fortsett</string>
     <string name="settings_model_title">Modell</string>
     <string name="settings_temperature_title">Temperatur</string>
     <string name="settings_endpoint_title">Endepunkt</string>

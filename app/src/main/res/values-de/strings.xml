@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Bell Assistent</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Chaos Bell Assistent</string>
     <string name="accessibility_service_desc">Bietet systemweite KI-Textersetzungen, wenn Auslösebefehle eingegeben werden.</string>
 
     <!-- Dashboard -->
@@ -53,6 +53,12 @@
     <string name="colors_title">Farben</string>
     <string name="colors_welcome_title">Wähle die Farben von Bell</string>
     <string name="colors_welcome_desc">Du kannst sie jederzeit in den Einstellungen ändern.</string>
+    <string name="about_me_title">Über dich</string>
+    <string name="about_me_hint">Dein Name, wie du redest, was dich interessiert. Bell nutzt es für ?talk, ?huh und ?search.</string>
+    <string name="about_me_forget">Letzten Chat vergessen</string>
+    <string name="service_status_paused">Pausiert</string>
+    <string name="service_pause">Pausieren</string>
+    <string name="service_resume">Fortsetzen</string>
     <string name="settings_model_title">Modell</string>
     <string name="settings_endpoint_title">Endpoint</string>
     <string name="settings_endpoint_placeholder">https://api.example.com/v1</string>

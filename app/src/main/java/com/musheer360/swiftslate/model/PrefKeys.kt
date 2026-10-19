@@ -31,6 +31,12 @@ object PrefKeys {
     /** Custom (OpenAI-compatible) endpoint base URL. */
     const val CUSTOM_ENDPOINT = "custom_endpoint"
 
+    /**
+     * Bell is paused (Boolean): typed ?commands are ignored and nothing is sent anywhere, but
+     * the accessibility permission and the saved keys stay put, so resuming is one tap.
+     */
+    const val PAUSED = "paused"
+
     /** Sampling temperature (Float). */
     const val TEMPERATURE = "temperature"
 

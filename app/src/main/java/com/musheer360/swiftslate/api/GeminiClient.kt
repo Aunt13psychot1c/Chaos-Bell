@@ -171,12 +171,13 @@ class GeminiClient {
         temperature: Double,
         useStructuredOutput: Boolean = false,
         thinkingLevel: String? = null,
-        webSearch: Boolean = false
+        webSearch: Boolean = false,
+        answerMode: Boolean = false
     ): Result<GenerateResult> = withContext(Dispatchers.IO) {
         // Google Search grounding cannot be combined with structured (JSON) output, so a
         // searching request goes out as plain text.
         var search = webSearch
-        var result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput && !search, thinkingLevel, search)
+        var result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput && !search && !answerMode, thinkingLevel, search, answerMode)
 
         // Models or keys without Google Search grounding answer 400; run the command anyway,
         // just without the search.
@@ -184,13 +185,13 @@ class GeminiClient {
                 it.startsWith("HTTP_400") && (it.contains("search", ignoreCase = true) || it.contains("tool", ignoreCase = true))
             }) {
             search = false
-            result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput, thinkingLevel, search)
+            result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput && !answerMode, thinkingLevel, search, answerMode)
         }
 
         // Retry once for transient network/server errors (with 1.5s backoff)
         if (result.isFailure && result.exceptionOrNull().isTransientNetwork()) {
             kotlinx.coroutines.delay(1500)
-            result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput && !search, thinkingLevel, search)
+            result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput && !search && !answerMode, thinkingLevel, search, answerMode)
         }
 
         val cleaned = stripHttpPrefix(result.map { it.text })
@@ -215,7 +216,8 @@ class GeminiClient {
         temperature: Double,
         withStructured: Boolean,
         thinkingLevel: String? = null,
-        webSearch: Boolean = false
+        webSearch: Boolean = false,
+        answerMode: Boolean = false
     ): Result<GenerateResult> {
         var connection: HttpURLConnection? = null
         return try {
@@ -233,7 +235,7 @@ class GeminiClient {
                 put("systemInstruction", JSONObject().apply {
                     put("parts", JSONArray().apply {
                         put(JSONObject().apply {
-                            put("text", ApiClientUtils.SYSTEM_PROMPT_PREFIX + prompt)
+                            put("text", ApiClientUtils.systemPrompt(prompt, answerMode))
                         })
                     })
                 })

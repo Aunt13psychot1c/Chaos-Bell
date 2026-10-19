@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">مساعد Bell</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">مساعد Chaos Bell</string>
     <string name="accessibility_service_desc">يوفر استبدالات نصية مدعومة بالذكاء الاصطناعي على مستوى النظام عند كتابة أوامر التشغيل.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">الألوان</string>
     <string name="colors_welcome_title">اختر ألوان Bell</string>
     <string name="colors_welcome_desc">يمكنك تغييرها في أي وقت من الإعدادات.</string>
+    <string name="about_me_title">عنك</string>
+    <string name="about_me_hint">اسمك وطريقة كلامك واهتماماتك. يستخدمه Bell في ?talk و?huh و?search.</string>
+    <string name="about_me_forget">انسَ المحادثة الأخيرة</string>
+    <string name="service_status_paused">متوقف مؤقتًا</string>
+    <string name="service_pause">إيقاف مؤقت</string>
+    <string name="service_resume">استئناف</string>
     <string name="settings_model_title">النموذج</string>
     <string name="settings_temperature_title">درجة الحرارة</string>
     <string name="settings_endpoint_title">نقطة النهاية</string>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Asistent Bell</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Asistent Chaos Bell</string>
     <string name="accessibility_service_desc">Oferă înlocuiri de text bazate pe IA la nivel de sistem atunci când sunt tastate comenzi de declanșare.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Culori</string>
     <string name="colors_welcome_title">Alege culorile pentru Bell</string>
     <string name="colors_welcome_desc">Le poți schimba oricând din Setări.</string>
+    <string name="about_me_title">Despre tine</string>
+    <string name="about_me_hint">Numele tău, cum vorbești, ce îți place. Bell folosește asta pentru ?talk, ?huh și ?search.</string>
+    <string name="about_me_forget">Uită conversația recentă</string>
+    <string name="service_status_paused">În pauză</string>
+    <string name="service_pause">Pauză</string>
+    <string name="service_resume">Reia</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Temperatură</string>
     <string name="settings_endpoint_title">Endpoint</string>

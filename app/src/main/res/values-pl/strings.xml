@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Asystent Bell</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Asystent Chaos Bell</string>
     <string name="accessibility_service_desc">Zapewnia ogólnosystemowe zastępowanie tekstu za pomocą AI po wpisaniu poleceń wyzwalających.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Kolory</string>
     <string name="colors_welcome_title">Wybierz kolory Bell</string>
     <string name="colors_welcome_desc">Możesz je zmienić w dowolnej chwili w Ustawieniach.</string>
+    <string name="about_me_title">O tobie</string>
+    <string name="about_me_hint">Twoje imię, jak mówisz, co lubisz. Bell używa tego w ?talk, ?huh i ?search.</string>
+    <string name="about_me_forget">Zapomnij ostatnią rozmowę</string>
+    <string name="service_status_paused">Wstrzymano</string>
+    <string name="service_pause">Wstrzymaj</string>
+    <string name="service_resume">Wznów</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Temperatura</string>
     <string name="settings_endpoint_title">Endpoint</string>

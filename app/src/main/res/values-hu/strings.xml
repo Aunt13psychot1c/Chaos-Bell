@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Bell asszisztens</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Chaos Bell asszisztens</string>
     <string name="accessibility_service_desc">Rendszerszintű AI-alapú szöveghelyettesítéseket biztosít, amikor triggerparancsokat gépel be.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Színek</string>
     <string name="colors_welcome_title">Válaszd ki a Bell színeit</string>
     <string name="colors_welcome_desc">Bármikor módosíthatod őket a Beállításokban.</string>
+    <string name="about_me_title">Rólad</string>
+    <string name="about_me_hint">A neved, hogyan beszélsz, mi érdekel. A Bell a ?talk, ?huh és ?search parancsokhoz használja.</string>
+    <string name="about_me_forget">Legutóbbi beszélgetés törlése</string>
+    <string name="service_status_paused">Szüneteltetve</string>
+    <string name="service_pause">Szünet</string>
+    <string name="service_resume">Folytatás</string>
     <string name="settings_model_title">Modell</string>
     <string name="settings_temperature_title">Hőmérséklet</string>
     <string name="settings_endpoint_title">Végpont</string>

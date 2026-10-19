@@ -19,6 +19,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import com.musheer360.swiftslate.api.GeminiClient
 import com.musheer360.swiftslate.api.OpenAICompatibleClient
 import com.musheer360.swiftslate.manager.CommandManager
+import com.musheer360.swiftslate.model.PrefKeys
 import com.musheer360.swiftslate.manager.KeyManager
 import com.musheer360.swiftslate.manager.StatsManager
 import com.musheer360.swiftslate.model.Command
@@ -189,8 +190,12 @@ class AssistantService : AccessibilityService() {
         }
     }
 
+    private val settingsPrefs by lazy { getSharedPreferences("settings", MODE_PRIVATE) }
+
     private fun handleAccessibilityEvent(event: AccessibilityEvent?) {
         if (event?.eventType != AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED) return
+        // Paused from the Dashboard: ignore typing entirely until resumed.
+        if (try { settingsPrefs.getBoolean(PrefKeys.PAUSED, false) } catch (_: Exception) { false }) return
         if (event.packageName?.toString() == packageName) return
         if (!::keyManager.isInitialized) return
 
@@ -507,7 +512,8 @@ class AssistantService : AccessibilityService() {
                 val outcome = withTimeout(90_000) {
                     runTextCommand(
                         applicationContext, keyManager, client, openAIClient,
-                        command.prompt, text
+                        command.prompt, text,
+                        answerMode = command.answerMode, forceSearch = command.forceSearch
                     ) { spinnerJob = startInlineSpinner(source, originalText) }
                 }
                 // From the first attempt onward the field holds the spinner glyph instead of the

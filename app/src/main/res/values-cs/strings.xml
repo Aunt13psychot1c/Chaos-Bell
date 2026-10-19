@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Asistent Bell</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Asistent Chaos Bell</string>
     <string name="accessibility_service_desc">Poskytuje systémové náhrady textu pomocí AI, když zadáte spouštěcí příkazy.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Barvy</string>
     <string name="colors_welcome_title">Vyber barvy pro Bell</string>
     <string name="colors_welcome_desc">Kdykoli je můžeš změnit v Nastavení.</string>
+    <string name="about_me_title">O tobě</string>
+    <string name="about_me_hint">Tvé jméno, jak mluvíš, co tě baví. Bell to používá pro ?talk, ?huh a ?search.</string>
+    <string name="about_me_forget">Zapomenout nedávný chat</string>
+    <string name="service_status_paused">Pozastaveno</string>
+    <string name="service_pause">Pozastavit</string>
+    <string name="service_resume">Pokračovat</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Teplota</string>
     <string name="settings_endpoint_title">Koncový bod</string>

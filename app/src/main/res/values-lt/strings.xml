@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Bell asistentas</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Chaos Bell asistentas</string>
     <string name="accessibility_service_desc">Teikia visos sistemos dirbtinio intelekto teksto pakeitimus, kai įvedamos aktyvinimo komandos.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Spalvos</string>
     <string name="colors_welcome_title">Pasirinkite Bell spalvas</string>
     <string name="colors_welcome_desc">Jas bet kada galite pakeisti nustatymuose.</string>
+    <string name="about_me_title">Apie tave</string>
+    <string name="about_me_hint">Tavo vardas, kaip kalbi, kas tau patinka. Bell tai naudoja komandoms ?talk, ?huh ir ?search.</string>
+    <string name="about_me_forget">Pamiršti naujausią pokalbį</string>
+    <string name="service_status_paused">Pristabdyta</string>
+    <string name="service_pause">Pristabdyti</string>
+    <string name="service_resume">Tęsti</string>
     <string name="settings_model_title">Modelis</string>
     <string name="settings_temperature_title">Temperatūra</string>
     <string name="settings_endpoint_title">Galinis taškas</string>

@@ -85,7 +85,9 @@ class ProcessTextViewModel(
                     // accessibility service has and this flow does not. Filtered on isBuiltIn, not
                     // on trigger text: the prefix is user-configurable, so matching "?copy" would
                     // silently stop filtering the moment someone changed it.
-                    commandManager.getCommands().filterNot { it.isBuiltIn }
+                    // Answer-mode built-ins (?talk, ?huh, ?search) only need the selected text,
+                    // so they are the exception and stay in the list.
+                    commandManager.getCommands().filterNot { it.isBuiltIn && !it.answerMode }
                 }
             } catch (e: Exception) {
                 // This activity shares the process with the accessibility service — an
@@ -121,7 +123,8 @@ class ProcessTextViewModel(
                     withContext(Dispatchers.IO) {
                         runTextCommand(
                             getApplication<Application>(), keyManager, geminiClient, openAIClient,
-                            command.prompt, selection.text
+                            command.prompt, selection.text,
+                            answerMode = command.answerMode, forceSearch = command.forceSearch
                         )
                     }
                 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Помощник Bell</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Помощник Chaos Bell</string>
     <string name="accessibility_service_desc">Обеспечивает общесистемную замену текста с помощью ИИ при вводе триггерных команд.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Цвета</string>
     <string name="colors_welcome_title">Выберите цвета Bell</string>
     <string name="colors_welcome_desc">Их можно изменить в любое время в настройках.</string>
+    <string name="about_me_title">О тебе</string>
+    <string name="about_me_hint">Твоё имя, как ты говоришь, что тебе нравится. Bell использует это в ?talk, ?huh и ?search.</string>
+    <string name="about_me_forget">Забыть недавний разговор</string>
+    <string name="service_status_paused">На паузе</string>
+    <string name="service_pause">Пауза</string>
+    <string name="service_resume">Продолжить</string>
     <string name="settings_model_title">Модель</string>
     <string name="settings_temperature_title">Температура</string>
     <string name="settings_endpoint_title">Конечная точка</string>

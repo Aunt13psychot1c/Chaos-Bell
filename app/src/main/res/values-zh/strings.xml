@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Bell 助手</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Chaos Bell 助手</string>
     <string name="accessibility_service_desc">在输入触发命令时，提供系统级 AI 文本替换功能。</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">颜色</string>
     <string name="colors_welcome_title">选择 Bell 的颜色</string>
     <string name="colors_welcome_desc">你可以随时在设置中更改。</string>
+    <string name="about_me_title">关于你</string>
+    <string name="about_me_hint">你的名字、说话方式和兴趣。Bell 会在 ?talk、?huh 和 ?search 中使用。</string>
+    <string name="about_me_forget">忘记最近的对话</string>
+    <string name="service_status_paused">已暂停</string>
+    <string name="service_pause">暂停</string>
+    <string name="service_resume">继续</string>
     <string name="settings_model_title">模型</string>
     <string name="settings_temperature_title">温度</string>
     <string name="settings_endpoint_title">端点</string>

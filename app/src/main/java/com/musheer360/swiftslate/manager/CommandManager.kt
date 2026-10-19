@@ -47,6 +47,8 @@ class CommandManager(context: Context) {
         const val MAX_PROMPT_LENGTH = 5_000
         const val MAX_CUSTOM_COMMANDS = 100
 
+        private const val SEARCH_PROMPT = "Search the web for the text and answer it with current, accurate information. Keep the original question first, then give the answer. Name the sites the answer came from at the end."
+
         /**
          * Whether a custom command is storable. Applied by both [saveCustomCommand] and
          * [importCommands]: the limits used to live only in the import path, so the UI could
@@ -67,6 +69,19 @@ class CommandManager(context: Context) {
         "replace" to "Replace text with clipboard content.",
         "chaos" to "Surprise me: one random effect, taken all the way. ?undo puts it back.",
         "translate:xx" to "Translate text to any language code (e.g. ?translate:es, ?translate:fr)."
+    )
+
+    /**
+     * Bell's fixed answer-mode commands. Built in, so they cannot be edited or deleted, and
+     * they win over any custom command with the same trigger.
+     */
+    private data class AnswerDefinition(val name: String, val prompt: String, val forceSearch: Boolean = false)
+
+    private val answerDefinitions = listOf(
+        AnswerDefinition("talk", "The text given to you is a question or request. Answer it directly and fully, like you're talking to a smart adult. Keep the original question, don't add disclaimers or filler. Reply with only your answer. If it's a task, just do it. Sometimes I need things worded correctly if I'm not sure what to say and will ask for help with that. When you reply, keep the original text as reference."),
+        AnswerDefinition("huh", "Explain the text to me. I am smart and curious but new to this exact topic.\nStart with the single most important idea in one plain sentence.\nThen build out from there, in order, so each part rests on the one before it.\nDefine jargon the first time you use it. Never skip past a term assuming I know it.\nUse one real example or comparison if it earns its place.\nTell me why it matters or what it is actually for.\nIf something in the text is wrong, unclear, or does not add up, say so.\nEnd with a short section called STILL FUZZY. In it, name the two things a person would most likely still be confused about after reading your explanation, and answer them.\nKeep the whole thing under 250 words. Never use em dashes or semicolons. Do not ask me questions. Do not offer to continue. Give me the explanation and stop."),
+        AnswerDefinition("search", SEARCH_PROMPT, forceSearch = true),
+        AnswerDefinition("look", SEARCH_PROMPT, forceSearch = true)
     )
 
     // Default AI commands — seeded into custom commands on first run so users can edit/delete them
@@ -132,7 +147,10 @@ class CommandManager(context: Context) {
 
     private fun getBuiltInCommands(): List<Command> {
         val prefix = getTriggerPrefix()
-        return systemDefinitions.map { (name, prompt) -> Command("$prefix$name", prompt, true) }
+        return systemDefinitions.map { (name, prompt) -> Command("$prefix$name", prompt, true) } +
+            answerDefinitions.map { d ->
+                Command("$prefix${d.name}", d.prompt, true, CommandType.AI, answerMode = true, forceSearch = d.forceSearch)
+            }
     }
 
     private fun seedDefaultAiCommands() {
@@ -206,7 +224,12 @@ class CommandManager(context: Context) {
                 migrating = false
             }
         }
-        val result = (getBuiltInCommands() + customCommands).sortedByDescending { it.trigger.length }
+        val builtIns = getBuiltInCommands()
+        val builtInTriggers = builtIns.map { it.trigger }.toSet()
+        // A custom command can never shadow a built-in: findCommand would otherwise pick
+        // whichever came first, and the two would fight over the same trigger.
+        val result = (builtIns + customCommands.filterNot { it.trigger in builtInTriggers })
+            .sortedByDescending { it.trigger.length }
         cachedCommands = result
         cachedCommandsJson = customStr
         cachedPrefix = prefix

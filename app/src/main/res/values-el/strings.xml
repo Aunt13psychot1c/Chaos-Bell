@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Βοηθός Bell</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Βοηθός Chaos Bell</string>
     <string name="accessibility_service_desc">Παρέχει αντικαταστάσεις κειμένου με AI σε όλο το σύστημα όταν πληκτρολογούνται εντολές ενεργοποίησης.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Χρώματα</string>
     <string name="colors_welcome_title">Διάλεξε τα χρώματα του Bell</string>
     <string name="colors_welcome_desc">Μπορείς να τα αλλάξεις όποτε θέλεις από τις Ρυθμίσεις.</string>
+    <string name="about_me_title">Για σένα</string>
+    <string name="about_me_hint">Το όνομά σου, πώς μιλάς, τι σου αρέσει. Το Bell το χρησιμοποιεί για ?talk, ?huh και ?search.</string>
+    <string name="about_me_forget">Ξέχασε την πρόσφατη συζήτηση</string>
+    <string name="service_status_paused">Σε παύση</string>
+    <string name="service_pause">Παύση</string>
+    <string name="service_resume">Συνέχεια</string>
     <string name="settings_model_title">Μοντέλο</string>
     <string name="settings_temperature_title">Θερμοκρασία</string>
     <string name="settings_endpoint_title">Τελικό σημείο</string>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Bell асистент</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Chaos Bell асистент</string>
     <string name="accessibility_service_desc">Омогућава системске замене текста помоћу вештачке интелигенције када се укуцају окидачке наредбе.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Боје</string>
     <string name="colors_welcome_title">Изабери боје за Bell</string>
     <string name="colors_welcome_desc">Можеш их променити било када у Подешавањима.</string>
+    <string name="about_me_title">О теби</string>
+    <string name="about_me_hint">Твоје име, како причаш, шта волиш. Bell то користи за ?talk, ?huh и ?search.</string>
+    <string name="about_me_forget">Заборави недавни разговор</string>
+    <string name="service_status_paused">Паузирано</string>
+    <string name="service_pause">Паузирај</string>
+    <string name="service_resume">Настави</string>
     <string name="settings_model_title">Модел</string>
     <string name="settings_temperature_title">Температура</string>
     <string name="settings_endpoint_title">Крајња тачка</string>

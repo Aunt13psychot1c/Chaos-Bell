@@ -9,6 +9,7 @@ import com.musheer360.swiftslate.api.ApiException
 import com.musheer360.swiftslate.api.GeminiClient
 import com.musheer360.swiftslate.api.SearchMode
 import com.musheer360.swiftslate.api.OpenAICompatibleClient
+import com.musheer360.swiftslate.manager.BellMemory
 import com.musheer360.swiftslate.manager.KeyManager
 import com.musheer360.swiftslate.model.PrefKeys
 import com.musheer360.swiftslate.provider.Providers
@@ -48,6 +49,8 @@ suspend fun runTextCommand(
     prompt: String,
     text: String,
     anthropicClient: AnthropicClient = AnthropicClient(),
+    answerMode: Boolean = false,
+    forceSearch: Boolean = false,
     onFirstAttempt: () -> Unit = {}
 ): CommandOutcome {
     // keys_keystore_error rather than a "reinstall" message: the usual cause is the Keystore key
@@ -64,7 +67,16 @@ suspend fun runTextCommand(
         return CommandOutcome.Unavailable(context.getString(R.string.toast_custom_not_configured))
     }
     val temperature = prefs.getFloat(PrefKeys.TEMPERATURE, DEFAULT_TEMPERATURE).toDouble()
-    val webSearch = prefs.getBoolean(PrefKeys.WEB_SEARCH, true)
+    // ?search always searches, whatever the switch says.
+    val webSearch = forceSearch || prefs.getBoolean(PrefKeys.WEB_SEARCH, true)
+
+    // Answer-mode commands carry Bell's memory (About me + the last few exchanges) ahead of
+    // their own instruction. Rewrite commands never see it.
+    val memory = if (answerMode) BellMemory(context) else null
+    val fullPrompt = if (memory != null) {
+        val block = memory.contextBlock()
+        if (block.isEmpty()) prompt else block + "Instruction: " + prompt
+    } else prompt
     val useStructuredOutput = System.currentTimeMillis() -
         prefs.getLong(PrefKeys.STRUCTURED_OUTPUT_DISABLED_AT, 0L) > STRUCTURED_OUTPUT_RETRY_MS
 
@@ -88,17 +100,18 @@ suspend fun runTextCommand(
 
         val result = when (provider.transport) {
             Transport.OPENAI_COMPAT -> openAIClient.generate(
-                prompt, text, key, model, temperature, endpoint,
+                fullPrompt, text, key, model, temperature, endpoint,
                 useJsonObjectMode = provider.useJsonObjectMode(useStructuredOutput),
                 extraParams = provider.reasoningParams(model),
-                searchMode = if (webSearch) provider.searchMode(model) else SearchMode.NONE)
+                searchMode = if (webSearch) provider.searchMode(model) else SearchMode.NONE,
+                answerMode = answerMode, forceSearch = forceSearch)
             Transport.ANTHROPIC_NATIVE -> anthropicClient.generate(
-                prompt, text, key, model, temperature,
-                webSearch = webSearch)
+                fullPrompt, text, key, model, temperature,
+                webSearch = webSearch, answerMode = answerMode)
             Transport.GEMINI_NATIVE -> geminiClient.generate(
-                prompt, text, key, model, temperature, useStructuredOutput,
+                fullPrompt, text, key, model, temperature, useStructuredOutput,
                 thinkingLevel = provider.thinkingLevel(model),
-                webSearch = webSearch)
+                webSearch = webSearch, answerMode = answerMode)
         }
 
         result.onSuccess { generated ->
@@ -115,6 +128,7 @@ suspend fun runTextCommand(
             } else {
                 generated.text
             }
+            memory?.remember(text, generated.text)
             return CommandOutcome.Success(outputText)
         }
 

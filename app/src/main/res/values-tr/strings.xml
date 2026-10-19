@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Bell Asistanı</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Chaos Bell Asistanı</string>
     <string name="accessibility_service_desc">Tetikleyici komutlar yazıldığında sistem genelinde AI tabanlı metin değiştirmeleri sağlar.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Renkler</string>
     <string name="colors_welcome_title">Bell\'in renklerini seç</string>
     <string name="colors_welcome_desc">Bunları istediğin zaman Ayarlar\'dan değiştirebilirsin.</string>
+    <string name="about_me_title">Hakkında</string>
+    <string name="about_me_hint">Adın, nasıl konuştuğun, nelerden hoşlandığın. Bell bunu ?talk, ?huh ve ?search için kullanır.</string>
+    <string name="about_me_forget">Son sohbeti unut</string>
+    <string name="service_status_paused">Duraklatıldı</string>
+    <string name="service_pause">Duraklat</string>
+    <string name="service_resume">Devam et</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Sıcaklık</string>
     <string name="settings_endpoint_title">Uç Nokta</string>

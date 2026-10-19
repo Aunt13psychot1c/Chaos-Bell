@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">העוזר של Bell</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">העוזר של Chaos Bell</string>
     <string name="accessibility_service_desc">מספק החלפות טקסט מבוססות בינה מלאכותית ברמת המערכת בעת הקלדת פקודות הפעלה.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">צבעים</string>
     <string name="colors_welcome_title">בחר את הצבעים של Bell</string>
     <string name="colors_welcome_desc">אפשר לשנות אותם בכל עת בהגדרות.</string>
+    <string name="about_me_title">עליך</string>
+    <string name="about_me_hint">השם שלך, איך אתה מדבר, מה מעניין אותך. Bell משתמש בזה עבור ?talk, ?huh ו-?search.</string>
+    <string name="about_me_forget">שכח את השיחה האחרונה</string>
+    <string name="service_status_paused">מושהה</string>
+    <string name="service_pause">השהה</string>
+    <string name="service_resume">המשך</string>
     <string name="settings_model_title">מודל</string>
     <string name="settings_temperature_title">טמפרטורה</string>
     <string name="settings_endpoint_title">נקודת קצה</string>

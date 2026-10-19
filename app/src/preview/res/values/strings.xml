@@ -6,6 +6,6 @@
   matter for translation coverage all live in the main source set.
 -->
 <resources>
-    <string name="app_name">Bell Preview</string>
-    <string name="accessibility_service_label">Bell Preview</string>
+    <string name="app_name">Chaos Bell Preview</string>
+    <string name="accessibility_service_label">Chaos Bell Preview</string>
 </resources>

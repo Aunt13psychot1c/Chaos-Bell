@@ -70,25 +70,18 @@ private fun Swatch(palette: BellPalette, selected: Boolean, size: Dp, onClick: (
 }
 
 /**
- * A single compact row of swatches for Settings: the label, the name of the current pick,
- * and one tap-to-pick circle per palette.
+ * A single compact row of swatches for Settings: the label and one tap-to-pick circle per
+ * palette. No color names, just the colors.
  */
 @Composable
 fun PaletteSwatchRow(selected: BellPalette, onPick: (BellPalette) -> Unit) {
     val rhythm = LocalSlateRhythm.current
     Column(modifier = Modifier.fillMaxWidth()) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(
-                text = stringResource(R.string.colors_title),
-                fontSize = rhythm.bodySize,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = selected.displayName,
-                fontSize = rhythm.bodySize,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
+        Text(
+            text = stringResource(R.string.colors_title),
+            fontSize = rhythm.bodySize,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Spacer(modifier = Modifier.height(rhythm.formGap))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -114,18 +107,13 @@ fun FirstLaunchColorPicker(onPick: (BellPalette) -> Unit) {
         text = {
             Column {
                 Text(stringResource(R.string.colors_welcome_desc))
-                Spacer(modifier = Modifier.height(16.dp))
-                BellPalette.entries.forEach { palette ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { highlighted = palette }
-                            .padding(vertical = 6.dp)
-                    ) {
-                        Swatch(palette, palette == highlighted, 28.dp) { highlighted = palette }
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(palette.displayName, color = MaterialTheme.colorScheme.onSurface)
+                Spacer(modifier = Modifier.height(20.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    BellPalette.entries.forEach { palette ->
+                        Swatch(palette, palette == highlighted, 36.dp) { highlighted = palette }
                     }
                 }
             }

@@ -90,9 +90,9 @@ class CommandManagerTest {
     // --- getCommands ---
 
     @Test
-    fun getCommands_returnsSixteenBuiltInByDefault() {
+    fun getCommands_returnsTwentyBuiltInByDefault() {
         val commands = commandManager.getCommands()
-        assertEquals(16, commands.size)
+        assertEquals(20, commands.size)
     }
 
     @Test
@@ -117,7 +117,7 @@ class CommandManagerTest {
     fun getCommands_afterAddingCustom_includesIt() {
         commandManager.saveCustomCommand(Command("?myCmd", "do something"))
         val commands = commandManager.getCommands()
-        assertEquals(17, commands.size)
+        assertEquals(21, commands.size)
         assertTrue(commands.any { it.trigger == "?myCmd" })
     }
 
@@ -354,5 +354,27 @@ class CommandManagerTest {
         assertTrue(commandManager.setTriggerPrefix("/"))
         assertNotNull(commandManager.findCommand("hello /copy"))
         assertNull(commandManager.findCommand("hello ?copy"))
+    }
+
+    @Test
+    fun answerCommands_areBuiltInAndInAnswerMode() {
+        val byTrigger = commandManager.getCommands().associateBy { it.trigger }
+        for (t in listOf("?talk", "?huh", "?search", "?look")) {
+            val cmd = byTrigger.getValue(t)
+            assertTrue(cmd.isBuiltIn)
+            assertTrue(cmd.answerMode)
+        }
+        assertTrue(byTrigger.getValue("?search").forceSearch)
+        assertTrue(byTrigger.getValue("?look").forceSearch)
+        assertFalse(byTrigger.getValue("?talk").forceSearch)
+        assertFalse(byTrigger.getValue("?fix").answerMode)
+    }
+
+    @Test
+    fun customCommand_cannotShadowABuiltIn() {
+        commandManager.importCommands("""[{"trigger":"?talk","prompt":"my own talk","type":"AI"}]""")
+        val talks = commandManager.getCommands().filter { it.trigger == "?talk" }
+        assertEquals(1, talks.size)
+        assertTrue(talks[0].isBuiltIn)
     }
 }

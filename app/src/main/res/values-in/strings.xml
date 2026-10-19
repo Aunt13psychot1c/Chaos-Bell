@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bell</string>
-    <string name="accessibility_service_label">Asisten Bell</string>
+    <string name="app_name">Chaos Bell</string>
+    <string name="accessibility_service_label">Asisten Chaos Bell</string>
     <string name="accessibility_service_desc">Menyediakan penggantian teks berbasis AI di seluruh sistem saat perintah pemicu diketik.</string>
 
     <!-- Dashboard -->
@@ -60,6 +60,12 @@
     <string name="colors_title">Warna</string>
     <string name="colors_welcome_title">Pilih warna Bell</string>
     <string name="colors_welcome_desc">Kamu bisa mengubahnya kapan saja di Setelan.</string>
+    <string name="about_me_title">Tentang kamu</string>
+    <string name="about_me_hint">Namamu, caramu bicara, apa yang kamu suka. Bell memakainya untuk ?talk, ?huh, dan ?search.</string>
+    <string name="about_me_forget">Lupakan obrolan terakhir</string>
+    <string name="service_status_paused">Dijeda</string>
+    <string name="service_pause">Jeda</string>
+    <string name="service_resume">Lanjutkan</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Suhu</string>
     <string name="settings_endpoint_title">Endpoint</string>
