@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">Trợ lý SwiftSlate</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Trợ lý Bell</string>
     <string name="accessibility_service_desc">Cung cấp thay thế văn bản bằng AI trên toàn hệ thống khi nhập lệnh kích hoạt.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Thử lại</string>
     <string name="process_text_copied">Đã sao chép</string>
     <string name="process_text_no_selection">Chưa chọn văn bản</string>
-    <string name="process_text_no_commands">Không có lệnh nào. Hãy thêm một lệnh trong SwiftSlate.</string>
+    <string name="process_text_no_commands">Không có lệnh nào. Hãy thêm một lệnh trong Bell.</string>
     <string name="toast_restore_failed">Không thể khôi phục văn bản gốc</string>
     <string name="toast_nothing_to_undo">Không có gì để hoàn tác</string>
     <string name="toast_undo_failed">Không thể hoàn tác</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates &amp; command descriptions -->
     <string name="update_channel_name">Cập nhật ứng dụng</string>
-    <string name="update_channel_desc">Thông báo khi có phiên bản SwiftSlate mới</string>
-    <string name="update_available_title">Đã có bản cập nhật SwiftSlate</string>
+    <string name="update_channel_desc">Thông báo khi có phiên bản Bell mới</string>
+    <string name="update_available_title">Đã có bản cập nhật Bell</string>
     <string name="update_available_text">Nhấn để xem bản phát hành mới nhất</string>
     <string name="error_input_too_long">Văn bản quá dài so với giới hạn token mỗi phút của mô hình này. Hãy thử lại với văn bản ngắn hơn.</string>
     <string name="note_response_truncated">[Lưu ý: phản hồi có thể bị cắt]</string>
@@ -146,7 +146,7 @@
     <string name="settings_models_need_key">Thêm khóa API ở phía trên để tải danh sách mô hình.</string>
     <string name="settings_models_load_failed">Không thể tải mô hình. Kiểm tra kết nối và khóa API của bạn.</string>
     <string name="settings_models_empty_provider">Không có mô hình nào khả dụng cho khóa API này.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate đã bị gián đoạn</string>
+    <string name="dashboard_service_killed_title">Bell đã bị gián đoạn</string>
     <string name="dashboard_service_killed_message">Dịch vụ nền đã dừng bất ngờ. Hãy bật lại trong cài đặt trợ năng để tiếp tục sử dụng lệnh.</string>
     <string name="dashboard_service_killed_dismiss">Bỏ qua</string>
 </resources>

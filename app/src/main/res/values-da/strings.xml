@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">SwiftSlate-assistent</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Bell-assistent</string>
     <string name="accessibility_service_desc">Giver systemdækkende AI-teksterstatninger, når udløserkommandoer indtastes.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Prøv igen</string>
     <string name="process_text_copied">Kopieret</string>
     <string name="process_text_no_selection">Ingen tekst markeret</string>
-    <string name="process_text_no_commands">Ingen kommandoer tilgængelige. Tilføj en i SwiftSlate.</string>
+    <string name="process_text_no_commands">Ingen kommandoer tilgængelige. Tilføj en i Bell.</string>
     <string name="toast_restore_failed">Den oprindelige tekst kunne ikke gendannes</string>
     <string name="toast_nothing_to_undo">Intet at fortryde</string>
     <string name="toast_undo_failed">Kunne ikke fortryde</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates -->
     <string name="update_channel_name">App-opdateringer</string>
-    <string name="update_channel_desc">Giver besked, når en ny version af SwiftSlate er tilgængelig</string>
-    <string name="update_available_title">SwiftSlate-opdatering tilgængelig</string>
+    <string name="update_channel_desc">Giver besked, når en ny version af Bell er tilgængelig</string>
+    <string name="update_available_title">Bell-opdatering tilgængelig</string>
     <string name="update_available_text">Tryk for at se den nyeste version</string>
 
     <!-- Command descriptions -->
@@ -148,7 +148,7 @@
     <string name="settings_models_need_key">Tilføj en API-nøgle ovenfor for at indlæse modellisten.</string>
     <string name="settings_models_load_failed">Kunne ikke indlæse modeller. Tjek din forbindelse og din API-nøgle.</string>
     <string name="settings_models_empty_provider">Ingen modeller er tilgængelige for denne API-nøgle.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate blev afbrudt</string>
+    <string name="dashboard_service_killed_title">Bell blev afbrudt</string>
     <string name="dashboard_service_killed_message">Baggrundstjenesten stoppede uventet. Aktivér den igen i tilgængelighedsindstillingerne for at fortsætte med at bruge kommandoer.</string>
     <string name="dashboard_service_killed_dismiss">Afvis</string>
 </resources>

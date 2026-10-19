@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">SwiftSlate Assistent</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Bell Assistent</string>
     <string name="accessibility_service_desc">Bietet systemweite KI-Textersetzungen, wenn Auslösebefehle eingegeben werden.</string>
 
     <!-- Dashboard -->
@@ -105,7 +105,7 @@
     <string name="process_text_retry">Erneut versuchen</string>
     <string name="process_text_copied">Kopiert</string>
     <string name="process_text_no_selection">Kein Text ausgewählt</string>
-    <string name="process_text_no_commands">Keine Befehle verfügbar. Füge einen in SwiftSlate hinzu.</string>
+    <string name="process_text_no_commands">Keine Befehle verfügbar. Füge einen in Bell hinzu.</string>
     <string name="toast_restore_failed">Ursprünglicher Text konnte nicht wiederhergestellt werden</string>
     <string name="toast_nothing_to_undo">Nichts zum Rückgängigmachen</string>
     <string name="toast_undo_failed">Rückgängigmachen fehlgeschlagen</string>
@@ -129,8 +129,8 @@
 
     <!-- Updates -->
     <string name="update_channel_name">App-Updates</string>
-    <string name="update_channel_desc">Benachrichtigt, wenn eine neue Version von SwiftSlate verfügbar ist</string>
-    <string name="update_available_title">SwiftSlate-Update verfügbar</string>
+    <string name="update_channel_desc">Benachrichtigt, wenn eine neue Version von Bell verfügbar ist</string>
+    <string name="update_available_title">Bell-Update verfügbar</string>
     <string name="update_available_text">Tippe, um die neueste Version anzuzeigen</string>
 
     <!-- Command descriptions -->
@@ -147,7 +147,7 @@
     <string name="settings_models_need_key">Füge oben einen API-Schlüssel hinzu, um die Modellliste zu laden.</string>
     <string name="settings_models_load_failed">Modelle konnten nicht geladen werden. Prüfe Verbindung und API-Schlüssel.</string>
     <string name="settings_models_empty_provider">Für diesen API-Schlüssel sind keine Modelle verfügbar.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate wurde unterbrochen</string>
+    <string name="dashboard_service_killed_title">Bell wurde unterbrochen</string>
     <string name="dashboard_service_killed_message">Der Hintergrunddienst wurde unerwartet beendet. Aktiviere ihn in den Bedienungshilfen erneut, um Befehle weiter zu verwenden.</string>
     <string name="dashboard_service_killed_dismiss">Schließen</string>
 </resources>

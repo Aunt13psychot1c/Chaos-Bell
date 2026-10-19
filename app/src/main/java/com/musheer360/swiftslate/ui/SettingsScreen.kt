@@ -694,7 +694,7 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     fontSize = rhythm.bodySize,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable(interactionSource = null, indication = null) {
-                        uriHandler.openUri("https://github.com/Musheer360/SwiftSlate/releases/latest")
+                        uriHandler.openUri("https://github.com/Aunt13psychot1c/SwiftSlate/releases/latest")
                     }
                 )
             }

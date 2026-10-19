@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">دستیار SwiftSlate</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">دستیار Bell</string>
     <string name="accessibility_service_desc">هنگام تایپ دستورات محرک، جایگزینی متن مبتنی بر هوش مصنوعی را در سطح سیستم فراهم می‌کند.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">تلاش دوباره</string>
     <string name="process_text_copied">کپی شد</string>
     <string name="process_text_no_selection">هیچ متنی انتخاب نشده است</string>
-    <string name="process_text_no_commands">هیچ فرمانی موجود نیست. یکی در SwiftSlate اضافه کنید.</string>
+    <string name="process_text_no_commands">هیچ فرمانی موجود نیست. یکی در Bell اضافه کنید.</string>
     <string name="toast_restore_failed">بازیابی متن اصلی انجام نشد</string>
     <string name="toast_nothing_to_undo">چیزی برای واگرد وجود ندارد</string>
     <string name="toast_undo_failed">واگرد انجام نشد</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates and command descriptions -->
     <string name="update_channel_name">به‌روزرسانی‌های برنامه</string>
-    <string name="update_channel_desc">هنگامی که نسخه جدیدی از SwiftSlate در دسترس باشد اطلاع می‌دهد</string>
-    <string name="update_available_title">به‌روزرسانی SwiftSlate در دسترس است</string>
+    <string name="update_channel_desc">هنگامی که نسخه جدیدی از Bell در دسترس باشد اطلاع می‌دهد</string>
+    <string name="update_available_title">به‌روزرسانی Bell در دسترس است</string>
     <string name="update_available_text">برای مشاهده آخرین نسخه ضربه بزنید</string>
     <string name="error_input_too_long">متن از محدودیت توکن در دقیقه این مدل بلندتر است. با متن کوتاه‌تری دوباره تلاش کنید.</string>
     <string name="note_response_truncated">[توجه: ممکن است پاسخ ناقص باشد]</string>
@@ -146,7 +146,7 @@
     <string name="settings_models_need_key">برای بارگذاری فهرست مدل‌ها، یک کلید API در بالا اضافه کنید.</string>
     <string name="settings_models_load_failed">بارگذاری مدل‌ها ممکن نشد. اتصال و کلید API خود را بررسی کنید.</string>
     <string name="settings_models_empty_provider">برای این کلید API هیچ مدلی در دسترس نیست.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate متوقف شد</string>
+    <string name="dashboard_service_killed_title">Bell متوقف شد</string>
     <string name="dashboard_service_killed_message">سرویس پس‌زمینه به‌طور غیرمنتظره متوقف شد. برای ادامه استفاده از دستورها، آن را در تنظیمات دسترس‌پذیری دوباره فعال کنید.</string>
     <string name="dashboard_service_killed_dismiss">رد کردن</string>
 </resources>

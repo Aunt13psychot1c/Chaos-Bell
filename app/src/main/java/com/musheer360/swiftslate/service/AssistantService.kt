@@ -632,7 +632,7 @@ class AssistantService : AccessibilityService() {
                             if (wrote) {
                                 lastCopiedText = textToCopy
                                 withContext(Dispatchers.Main) {
-                                    clipboard.setPrimaryClip(ClipData.newPlainText("SwiftSlate", textToCopy))
+                                    clipboard.setPrimaryClip(ClipData.newPlainText("Bell", textToCopy))
                                 }
                                 performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                                 showToast(getString(R.string.toast_copied))
@@ -657,7 +657,7 @@ class AssistantService : AccessibilityService() {
                                 lastOriginalText = precedingText
                                 lastUndoSourceId = sourceId(source)
                                 withContext(Dispatchers.Main) {
-                                    clipboard.setPrimaryClip(ClipData.newPlainText("SwiftSlate", textToCut))
+                                    clipboard.setPrimaryClip(ClipData.newPlainText("Bell", textToCut))
                                 }
                                 performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                                 showToast(getString(R.string.toast_cut))
@@ -836,7 +836,7 @@ class AssistantService : AccessibilityService() {
         // Clipboard fallback: select all + paste (goes through app's input pipeline)
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val oldClip = clipboard.primaryClip
-        val newClip = ClipData.newPlainText("SwiftSlate Result", newText)
+        val newClip = ClipData.newPlainText("Bell Result", newText)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             newClip.description.extras = android.os.PersistableBundle().apply {
                 putBoolean("android.content.extra.IS_SENSITIVE", true)
@@ -903,7 +903,7 @@ class AssistantService : AccessibilityService() {
         try {
             val current = clipboard.primaryClip?.getItemAt(0)?.text?.toString()
             if (current != null && current != ourText) return // user copied something newer
-            val recovered = oldClip ?: lastCopiedText?.let { ClipData.newPlainText("SwiftSlate", it) }
+            val recovered = oldClip ?: lastCopiedText?.let { ClipData.newPlainText("Bell", it) }
             clipboard.setPrimaryClip(recovered ?: ClipData.newPlainText("", ""))
         } catch (_: Exception) {}
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">Pomočnik SwiftSlate</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Pomočnik Bell</string>
     <string name="accessibility_service_desc">Zagotavlja sistemske zamenjave besedila z umetno inteligenco, ko vnesete sprožilne ukaze.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Poskusi znova</string>
     <string name="process_text_copied">Kopirano</string>
     <string name="process_text_no_selection">Besedilo ni izbrano</string>
-    <string name="process_text_no_commands">Ni razpoložljivih ukazov. Dodajte enega v SwiftSlate.</string>
+    <string name="process_text_no_commands">Ni razpoložljivih ukazov. Dodajte enega v Bell.</string>
     <string name="toast_restore_failed">Izvirnega besedila ni bilo mogoče obnoviti</string>
     <string name="toast_nothing_to_undo">Ni ničesar za razveljavitev</string>
     <string name="toast_undo_failed">Razveljavitev ni uspela</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates & command descriptions -->
     <string name="update_channel_name">Posodobitve aplikacije</string>
-    <string name="update_channel_desc">Obvesti, ko je na voljo nova različica SwiftSlate</string>
-    <string name="update_available_title">Na voljo je posodobitev SwiftSlate</string>
+    <string name="update_channel_desc">Obvesti, ko je na voljo nova različica Bell</string>
+    <string name="update_available_title">Na voljo je posodobitev Bell</string>
     <string name="update_available_text">Tapnite za ogled najnovejše različice</string>
     <string name="error_input_too_long">Besedilo je predolgo za omejitev žetonov na minuto tega modela. Poskusite znova s krajšim besedilom.</string>
     <string name="note_response_truncated">[Opomba: odgovor je morda skrajšan]</string>
@@ -146,7 +146,7 @@
     <string name="settings_models_need_key">Za nalaganje seznama modelov dodaj zgoraj ključ API.</string>
     <string name="settings_models_load_failed">Modelov ni bilo mogoče naložiti. Preveri povezavo in ključ API.</string>
     <string name="settings_models_empty_provider">Za ta ključ API ni na voljo noben model.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate je bil prekinjen</string>
+    <string name="dashboard_service_killed_title">Bell je bil prekinjen</string>
     <string name="dashboard_service_killed_message">Storitev v ozadju se je nepričakovano ustavila. Znova jo omogočite v nastavitvah dostopnosti, da boste lahko še naprej uporabljali ukaze.</string>
     <string name="dashboard_service_killed_dismiss">Zapri</string>
 </resources>

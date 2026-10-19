@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">Асистент SwiftSlate</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Асистент Bell</string>
     <string name="accessibility_service_desc">Предоставя системни замествания на текст с изкуствен интелект, когато се въвеждат тригерни команди.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Повторен опит</string>
     <string name="process_text_copied">Копирано</string>
     <string name="process_text_no_selection">Няма избран текст</string>
-    <string name="process_text_no_commands">Няма налични команди. Добавете команда в SwiftSlate.</string>
+    <string name="process_text_no_commands">Няма налични команди. Добавете команда в Bell.</string>
     <string name="toast_restore_failed">Оригиналният текст не можа да бъде възстановен</string>
     <string name="toast_nothing_to_undo">Няма нищо за отмяна</string>
     <string name="toast_undo_failed">Отмяната беше неуспешна</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates -->
     <string name="update_channel_name">Актуализации на приложението</string>
-    <string name="update_channel_desc">Известява, когато е налична нова версия на SwiftSlate</string>
-    <string name="update_available_title">Налична е актуализация на SwiftSlate</string>
+    <string name="update_channel_desc">Известява, когато е налична нова версия на Bell</string>
+    <string name="update_available_title">Налична е актуализация на Bell</string>
     <string name="update_available_text">Докоснете, за да видите последната версия</string>
 
     <!-- Command descriptions -->
@@ -148,7 +148,7 @@
     <string name="settings_models_need_key">Добавете API ключ по-горе, за да заредите списъка с модели.</string>
     <string name="settings_models_load_failed">Моделите не успяха да се заредят. Проверете връзката и API ключа.</string>
     <string name="settings_models_empty_provider">Няма налични модели за този API ключ.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate беше прекъснат</string>
+    <string name="dashboard_service_killed_title">Bell беше прекъснат</string>
     <string name="dashboard_service_killed_message">Фоновата услуга спря неочаквано. Активирайте я отново в настройките за достъпност, за да продължите да използвате командите.</string>
     <string name="dashboard_service_killed_dismiss">Отхвърли</string>
 </resources>

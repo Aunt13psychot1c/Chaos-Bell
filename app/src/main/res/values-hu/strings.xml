@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">SwiftSlate asszisztens</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Bell asszisztens</string>
     <string name="accessibility_service_desc">Rendszerszintű AI-alapú szöveghelyettesítéseket biztosít, amikor triggerparancsokat gépel be.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Újra</string>
     <string name="process_text_copied">Másolva</string>
     <string name="process_text_no_selection">Nincs kijelölt szöveg</string>
-    <string name="process_text_no_commands">Nincs elérhető parancs. Adjon hozzá egyet a SwiftSlate-ben.</string>
+    <string name="process_text_no_commands">Nincs elérhető parancs. Adjon hozzá egyet a Bell-ben.</string>
     <string name="toast_restore_failed">Nem sikerült visszaállítani az eredeti szöveget</string>
     <string name="toast_nothing_to_undo">Nincs mit visszavonni</string>
     <string name="toast_undo_failed">Nem sikerült a visszavonás</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates -->
     <string name="update_channel_name">Alkalmazásfrissítések</string>
-    <string name="update_channel_desc">Értesít, amikor elérhető a SwiftSlate új verziója</string>
-    <string name="update_available_title">SwiftSlate-frissítés érhető el</string>
+    <string name="update_channel_desc">Értesít, amikor elérhető a Bell új verziója</string>
+    <string name="update_available_title">Bell-frissítés érhető el</string>
     <string name="update_available_text">Koppintson a legújabb kiadás megtekintéséhez</string>
     <string name="error_input_too_long">A szöveg túl hosszú ennek a modellnek a percenkénti tokenkorlátjához. Próbáld újra rövidebb szöveggel.</string>
     <string name="note_response_truncated">[Megjegyzés: a válasz csonka lehet]</string>
@@ -146,7 +146,7 @@
     <string name="settings_models_need_key">Adj meg fentebb egy API-kulcsot a modelllista betöltéséhez.</string>
     <string name="settings_models_load_failed">A modelleket nem sikerült betölteni. Ellenőrizd a kapcsolatot és az API-kulcsot.</string>
     <string name="settings_models_empty_provider">Ehhez az API-kulcshoz nincsenek elérhető modellek.</string>
-    <string name="dashboard_service_killed_title">A SwiftSlate megszakadt</string>
+    <string name="dashboard_service_killed_title">A Bell megszakadt</string>
     <string name="dashboard_service_killed_message">A háttérszolgáltatás váratlanul leállt. Engedélyezze újra a kisegítő lehetőségek beállításaiban a parancsok további használatához.</string>
     <string name="dashboard_service_killed_dismiss">Elvetés</string>
 </resources>

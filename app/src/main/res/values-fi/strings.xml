@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">SwiftSlate-avustin</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Bell-avustin</string>
     <string name="accessibility_service_desc">Tarjoaa järjestelmänlaajuisia AI-pohjaisia tekstinkorvauksia, kun käynnistyskomennot kirjoitetaan.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Yritä uudelleen</string>
     <string name="process_text_copied">Kopioitu</string>
     <string name="process_text_no_selection">Tekstiä ei ole valittu</string>
-    <string name="process_text_no_commands">Komentoja ei ole käytettävissä. Lisää komento SwiftSlatessa.</string>
+    <string name="process_text_no_commands">Komentoja ei ole käytettävissä. Lisää komento Bellssa.</string>
     <string name="toast_restore_failed">Alkuperäisen tekstin palauttaminen epäonnistui</string>
     <string name="toast_nothing_to_undo">Ei mitään kumottavaa</string>
     <string name="toast_undo_failed">Kumoaminen epäonnistui</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates and command descriptions -->
     <string name="update_channel_name">Sovelluspäivitykset</string>
-    <string name="update_channel_desc">Ilmoittaa, kun uusi SwiftSlate-versio on saatavilla</string>
-    <string name="update_available_title">SwiftSlate-päivitys saatavilla</string>
+    <string name="update_channel_desc">Ilmoittaa, kun uusi Bell-versio on saatavilla</string>
+    <string name="update_available_title">Bell-päivitys saatavilla</string>
     <string name="update_available_text">Napauta nähdäksesi uusimman version</string>
     <string name="error_input_too_long">Teksti on liian pitkä tämän mallin minuuttikohtaiselle token-rajalle. Yritä uudelleen lyhyemmällä tekstillä.</string>
     <string name="note_response_truncated">[Huomio: vastaus voi olla katkaistu]</string>
@@ -146,7 +146,7 @@
     <string name="settings_models_need_key">Lisää yläpuolelle API-avain ladataksesi mallilistan.</string>
     <string name="settings_models_load_failed">Malleja ei voitu ladata. Tarkista yhteys ja API-avain.</string>
     <string name="settings_models_empty_provider">Tälle API-avaimelle ei ole saatavilla malleja.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate keskeytyi</string>
+    <string name="dashboard_service_killed_title">Bell keskeytyi</string>
     <string name="dashboard_service_killed_message">Taustapalvelu pysähtyi odottamatta. Ota se uudelleen käyttöön esteettömyysasetuksista, jotta voit jatkaa komentojen käyttöä.</string>
     <string name="dashboard_service_killed_dismiss">Sulje</string>
 </resources>

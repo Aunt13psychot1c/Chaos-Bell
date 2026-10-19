@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">SwiftSlate-assistent</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Bell-assistent</string>
     <string name="accessibility_service_desc">Biedt systeembrede AI-tekstvervangingen wanneer triggeropdrachten worden getypt.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Opnieuw proberen</string>
     <string name="process_text_copied">Gekopieerd</string>
     <string name="process_text_no_selection">Geen tekst geselecteerd</string>
-    <string name="process_text_no_commands">Geen opdrachten beschikbaar. Voeg er een toe in SwiftSlate.</string>
+    <string name="process_text_no_commands">Geen opdrachten beschikbaar. Voeg er een toe in Bell.</string>
     <string name="toast_restore_failed">Kon oorspronkelijke tekst niet herstellen</string>
     <string name="toast_nothing_to_undo">Niets om ongedaan te maken</string>
     <string name="toast_undo_failed">Kon niet ongedaan maken</string>
@@ -130,8 +130,8 @@
 
     <!-- Update notifications -->
     <string name="update_channel_name">App-updates</string>
-    <string name="update_channel_desc">Geeft een melding wanneer een nieuwe versie van SwiftSlate beschikbaar is</string>
-    <string name="update_available_title">SwiftSlate-update beschikbaar</string>
+    <string name="update_channel_desc">Geeft een melding wanneer een nieuwe versie van Bell beschikbaar is</string>
+    <string name="update_available_title">Bell-update beschikbaar</string>
     <string name="update_available_text">Tik om de nieuwste release te bekijken</string>
     <string name="error_input_too_long">De tekst is te lang voor de tokenlimiet per minuut van dit model. Probeer het opnieuw met kortere tekst.</string>
     <string name="note_response_truncated">[Let op: antwoord is mogelijk afgekapt]</string>
@@ -146,7 +146,7 @@
     <string name="settings_models_need_key">Voeg hierboven een API-sleutel toe om de modellenlijst te laden.</string>
     <string name="settings_models_load_failed">Kon modellen niet laden. Controleer je verbinding en API-sleutel.</string>
     <string name="settings_models_empty_provider">Geen modellen beschikbaar voor deze API-sleutel.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate is onderbroken</string>
+    <string name="dashboard_service_killed_title">Bell is onderbroken</string>
     <string name="dashboard_service_killed_message">De achtergrondservice is onverwacht gestopt. Schakel deze opnieuw in bij de toegankelijkheidsinstellingen om opdrachten te blijven gebruiken.</string>
     <string name="dashboard_service_killed_dismiss">Sluiten</string>
 </resources>

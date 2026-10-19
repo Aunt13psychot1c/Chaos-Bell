@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">SwiftSlate Asistanı</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Bell Asistanı</string>
     <string name="accessibility_service_desc">Tetikleyici komutlar yazıldığında sistem genelinde AI tabanlı metin değiştirmeleri sağlar.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Tekrar dene</string>
     <string name="process_text_copied">Kopyalandı</string>
     <string name="process_text_no_selection">Metin seçilmedi</string>
-    <string name="process_text_no_commands">Kullanılabilir komut yok. SwiftSlate\'e bir komut ekleyin.</string>
+    <string name="process_text_no_commands">Kullanılabilir komut yok. Bell\'e bir komut ekleyin.</string>
     <string name="toast_restore_failed">Orijinal metin geri yüklenemedi</string>
     <string name="toast_nothing_to_undo">Geri alınacak bir şey yok</string>
     <string name="toast_undo_failed">Geri alınamadı</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates &amp; command descriptions -->
     <string name="update_channel_name">Uygulama Güncellemeleri</string>
-    <string name="update_channel_desc">SwiftSlate\'in yeni bir sürümü kullanıma sunulduğunda bildirir</string>
-    <string name="update_available_title">SwiftSlate güncellemesi mevcut</string>
+    <string name="update_channel_desc">Bell\'in yeni bir sürümü kullanıma sunulduğunda bildirir</string>
+    <string name="update_available_title">Bell güncellemesi mevcut</string>
     <string name="update_available_text">En son sürümü görüntülemek için dokunun</string>
     <string name="error_input_too_long">Metin, bu modelin dakika başına token sınırı için çok uzun. Daha kısa bir metinle tekrar deneyin.</string>
     <string name="note_response_truncated">[Not: yanıt kesilmiş olabilir]</string>
@@ -146,7 +146,7 @@
     <string name="settings_models_need_key">Model listesini yüklemek için yukarıya bir API anahtarı ekleyin.</string>
     <string name="settings_models_load_failed">Modeller yüklenemedi. Bağlantınızı ve API anahtarınızı kontrol edin.</string>
     <string name="settings_models_empty_provider">Bu API anahtarı için kullanılabilir model yok.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate kesintiye uğradı</string>
+    <string name="dashboard_service_killed_title">Bell kesintiye uğradı</string>
     <string name="dashboard_service_killed_message">Arka plan hizmeti beklenmedik şekilde durdu. Komutları kullanmaya devam etmek için erişilebilirlik ayarlarından yeniden etkinleştirin.</string>
     <string name="dashboard_service_killed_dismiss">Kapat</string>
 </resources>

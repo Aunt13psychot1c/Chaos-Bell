@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">SwiftSlate asistent</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Bell asistent</string>
     <string name="accessibility_service_desc">Omogućuje zamjene teksta pomoću AI na razini sustava kada upišete okidačke naredbe.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Pokušaj ponovno</string>
     <string name="process_text_copied">Kopirano</string>
     <string name="process_text_no_selection">Nije odabran tekst</string>
-    <string name="process_text_no_commands">Nema dostupnih naredbi. Dodajte jednu u SwiftSlate.</string>
+    <string name="process_text_no_commands">Nema dostupnih naredbi. Dodajte jednu u Bell.</string>
     <string name="toast_restore_failed">Nije moguće vratiti izvorni tekst</string>
     <string name="toast_nothing_to_undo">Ništa za poništiti</string>
     <string name="toast_undo_failed">Poništavanje nije uspjelo</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates -->
     <string name="update_channel_name">Ažuriranja aplikacije</string>
-    <string name="update_channel_desc">Obavještava kada je dostupna nova verzija aplikacije SwiftSlate</string>
-    <string name="update_available_title">Dostupno je ažuriranje za SwiftSlate</string>
+    <string name="update_channel_desc">Obavještava kada je dostupna nova verzija aplikacije Bell</string>
+    <string name="update_available_title">Dostupno je ažuriranje za Bell</string>
     <string name="update_available_text">Dodirnite za prikaz najnovijeg izdanja</string>
     <string name="error_input_too_long">Tekst je predug za ograničenje tokena po minuti ovog modela. Pokušajte ponovno s kraćim tekstom.</string>
     <string name="note_response_truncated">[Napomena: odgovor je možda skraćen]</string>
@@ -146,7 +146,7 @@
     <string name="settings_models_need_key">Za učitavanje popisa modela dodaj iznad API ključ.</string>
     <string name="settings_models_load_failed">Učitavanje modela nije uspjelo. Provjeri vezu i API ključ.</string>
     <string name="settings_models_empty_provider">Za ovaj API ključ nema dostupnih modela.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate je prekinut</string>
+    <string name="dashboard_service_killed_title">Bell je prekinut</string>
     <string name="dashboard_service_killed_message">Pozadinska usluga neočekivano se zaustavila. Ponovno je omogućite u postavkama pristupačnosti kako biste nastavili koristiti naredbe.</string>
     <string name="dashboard_service_killed_dismiss">Zatvori</string>
 </resources>

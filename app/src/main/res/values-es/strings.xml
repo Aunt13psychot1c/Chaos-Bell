@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">Asistente SwiftSlate</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Asistente Bell</string>
     <string name="accessibility_service_desc">Proporciona reemplazos de texto con IA en todo el sistema al escribir comandos de activación.</string>
 
     <!-- Dashboard -->
@@ -105,7 +105,7 @@
     <string name="process_text_retry">Reintentar</string>
     <string name="process_text_copied">Copiado</string>
     <string name="process_text_no_selection">No hay texto seleccionado</string>
-    <string name="process_text_no_commands">No hay comandos disponibles. Añade uno en SwiftSlate.</string>
+    <string name="process_text_no_commands">No hay comandos disponibles. Añade uno en Bell.</string>
     <string name="toast_restore_failed">No se pudo restaurar el texto original</string>
     <string name="toast_nothing_to_undo">Nada que deshacer</string>
     <string name="toast_undo_failed">No se pudo deshacer</string>
@@ -129,8 +129,8 @@
 
     <!-- Updates and command descriptions -->
     <string name="update_channel_name">Actualizaciones de la app</string>
-    <string name="update_channel_desc">Notifica cuando hay una nueva versión de SwiftSlate disponible</string>
-    <string name="update_available_title">Actualización de SwiftSlate disponible</string>
+    <string name="update_channel_desc">Notifica cuando hay una nueva versión de Bell disponible</string>
+    <string name="update_available_title">Actualización de Bell disponible</string>
     <string name="update_available_text">Toca para ver la última versión</string>
     <string name="error_input_too_long">El texto es demasiado largo para el límite de tokens por minuto de este modelo. Vuelve a intentarlo con un texto más corto.</string>
     <string name="note_response_truncated">[Nota: la respuesta puede estar cortada]</string>
@@ -145,7 +145,7 @@
     <string name="settings_models_need_key">Añade una clave de API arriba para cargar la lista de modelos.</string>
     <string name="settings_models_load_failed">No se pudieron cargar los modelos. Comprueba tu conexión y tu clave de API.</string>
     <string name="settings_models_empty_provider">No hay modelos disponibles para esta clave de API.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate se interrumpió</string>
+    <string name="dashboard_service_killed_title">Bell se interrumpió</string>
     <string name="dashboard_service_killed_message">El servicio en segundo plano se detuvo inesperadamente. Vuelve a activarlo en los ajustes de accesibilidad para seguir usando comandos.</string>
     <string name="dashboard_service_killed_dismiss">Descartar</string>
 </resources>

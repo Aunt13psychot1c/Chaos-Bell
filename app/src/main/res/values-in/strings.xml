@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">Asisten SwiftSlate</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Asisten Bell</string>
     <string name="accessibility_service_desc">Menyediakan penggantian teks berbasis AI di seluruh sistem saat perintah pemicu diketik.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Coba lagi</string>
     <string name="process_text_copied">Disalin</string>
     <string name="process_text_no_selection">Tidak ada teks yang dipilih</string>
-    <string name="process_text_no_commands">Tidak ada perintah yang tersedia. Tambahkan satu di SwiftSlate.</string>
+    <string name="process_text_no_commands">Tidak ada perintah yang tersedia. Tambahkan satu di Bell.</string>
     <string name="toast_restore_failed">Tidak dapat memulihkan teks asli</string>
     <string name="toast_nothing_to_undo">Tidak ada yang bisa dibatalkan</string>
     <string name="toast_undo_failed">Tidak dapat membatalkan</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates -->
     <string name="update_channel_name">Pembaruan Aplikasi</string>
-    <string name="update_channel_desc">Memberi tahu saat versi baru SwiftSlate tersedia</string>
-    <string name="update_available_title">Pembaruan SwiftSlate tersedia</string>
+    <string name="update_channel_desc">Memberi tahu saat versi baru Bell tersedia</string>
+    <string name="update_available_title">Pembaruan Bell tersedia</string>
     <string name="update_available_text">Ketuk untuk melihat rilis terbaru</string>
     <string name="error_input_too_long">Teks terlalu panjang untuk batas token per menit model ini. Coba lagi dengan teks yang lebih pendek.</string>
     <string name="note_response_truncated">[Catatan: respons mungkin terpotong]</string>
@@ -146,7 +146,7 @@
     <string name="settings_models_need_key">Tambahkan kunci API di atas untuk memuat daftar model.</string>
     <string name="settings_models_load_failed">Tidak dapat memuat model. Periksa koneksi dan kunci API Anda.</string>
     <string name="settings_models_empty_provider">Tidak ada model yang tersedia untuk kunci API ini.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate terhenti</string>
+    <string name="dashboard_service_killed_title">Bell terhenti</string>
     <string name="dashboard_service_killed_message">Layanan latar belakang berhenti secara tak terduga. Aktifkan lagi di setelan aksesibilitas untuk terus menggunakan perintah.</string>
     <string name="dashboard_service_killed_dismiss">Abaikan</string>
 </resources>

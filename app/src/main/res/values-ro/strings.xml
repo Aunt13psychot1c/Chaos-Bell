@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">Asistent SwiftSlate</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Asistent Bell</string>
     <string name="accessibility_service_desc">Oferă înlocuiri de text bazate pe IA la nivel de sistem atunci când sunt tastate comenzi de declanșare.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Încearcă din nou</string>
     <string name="process_text_copied">Copiat</string>
     <string name="process_text_no_selection">Niciun text selectat</string>
-    <string name="process_text_no_commands">Nu există comenzi disponibile. Adaugă una în SwiftSlate.</string>
+    <string name="process_text_no_commands">Nu există comenzi disponibile. Adaugă una în Bell.</string>
     <string name="toast_restore_failed">Textul original nu a putut fi restaurat</string>
     <string name="toast_nothing_to_undo">Nimic de anulat</string>
     <string name="toast_undo_failed">Anularea nu a reușit</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates & command descriptions -->
     <string name="update_channel_name">Actualizări ale aplicației</string>
-    <string name="update_channel_desc">Notifică atunci când este disponibilă o versiune nouă a SwiftSlate</string>
-    <string name="update_available_title">Actualizare SwiftSlate disponibilă</string>
+    <string name="update_channel_desc">Notifică atunci când este disponibilă o versiune nouă a Bell</string>
+    <string name="update_available_title">Actualizare Bell disponibilă</string>
     <string name="update_available_text">Atinge pentru a vedea cea mai recentă versiune</string>
     <string name="error_input_too_long">Textul este prea lung pentru limita de tokenuri pe minut a acestui model. Încearcă din nou cu un text mai scurt.</string>
     <string name="note_response_truncated">[Notă: răspunsul poate fi trunchiat]</string>
@@ -146,7 +146,7 @@
     <string name="settings_models_need_key">Adaugă mai sus o cheie API pentru a încărca lista de modele.</string>
     <string name="settings_models_load_failed">Nu s-au putut încărca modelele. Verifică conexiunea și cheia API.</string>
     <string name="settings_models_empty_provider">Nu există modele disponibile pentru această cheie API.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate a fost întrerupt</string>
+    <string name="dashboard_service_killed_title">Bell a fost întrerupt</string>
     <string name="dashboard_service_killed_message">Serviciul din fundal s-a oprit în mod neașteptat. Reactivați-l în setările de accesibilitate pentru a continua să folosiți comenzile.</string>
     <string name="dashboard_service_killed_dismiss">Închide</string>
 </resources>

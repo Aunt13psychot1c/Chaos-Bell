@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">Asystent SwiftSlate</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Asystent Bell</string>
     <string name="accessibility_service_desc">Zapewnia ogólnosystemowe zastępowanie tekstu za pomocą AI po wpisaniu poleceń wyzwalających.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Spróbuj ponownie</string>
     <string name="process_text_copied">Skopiowano</string>
     <string name="process_text_no_selection">Nie wybrano tekstu</string>
-    <string name="process_text_no_commands">Brak dostępnych poleceń. Dodaj polecenie w SwiftSlate.</string>
+    <string name="process_text_no_commands">Brak dostępnych poleceń. Dodaj polecenie w Bell.</string>
     <string name="toast_restore_failed">Nie udało się przywrócić oryginalnego tekstu</string>
     <string name="toast_nothing_to_undo">Nie ma nic do cofnięcia</string>
     <string name="toast_undo_failed">Nie udało się cofnąć</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates & command descriptions -->
     <string name="update_channel_name">Aktualizacje aplikacji</string>
-    <string name="update_channel_desc">Powiadamia, gdy dostępna jest nowa wersja SwiftSlate</string>
-    <string name="update_available_title">Dostępna aktualizacja SwiftSlate</string>
+    <string name="update_channel_desc">Powiadamia, gdy dostępna jest nowa wersja Bell</string>
+    <string name="update_available_title">Dostępna aktualizacja Bell</string>
     <string name="update_available_text">Dotknij, aby zobaczyć najnowszą wersję</string>
     <string name="error_input_too_long">Tekst jest zbyt długi dla limitu tokenów na minutę tego modelu. Spróbuj ponownie z krótszym tekstem.</string>
     <string name="note_response_truncated">[Uwaga: odpowiedź może być skrócona]</string>
@@ -146,7 +146,7 @@
     <string name="settings_models_need_key">Dodaj powyżej klucz API, aby wczytać listę modeli.</string>
     <string name="settings_models_load_failed">Nie udało się wczytać modeli. Sprawdź połączenie i klucz API.</string>
     <string name="settings_models_empty_provider">Brak dostępnych modeli dla tego klucza API.</string>
-    <string name="dashboard_service_killed_title">Aplikacja SwiftSlate została przerwana</string>
+    <string name="dashboard_service_killed_title">Aplikacja Bell została przerwana</string>
     <string name="dashboard_service_killed_message">Usługa działająca w tle nieoczekiwanie się zatrzymała. Włącz ją ponownie w ustawieniach ułatwień dostępu, aby nadal używać poleceń.</string>
     <string name="dashboard_service_killed_dismiss">Zamknij</string>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">Помічник SwiftSlate</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Помічник Bell</string>
     <string name="accessibility_service_desc">Забезпечує загальносистемну заміну тексту за допомогою ШІ при введенні команд-тригерів.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Спробувати ще раз</string>
     <string name="process_text_copied">Скопійовано</string>
     <string name="process_text_no_selection">Текст не вибрано</string>
-    <string name="process_text_no_commands">Немає доступних команд. Додайте команду в SwiftSlate.</string>
+    <string name="process_text_no_commands">Немає доступних команд. Додайте команду в Bell.</string>
     <string name="toast_restore_failed">Не вдалося відновити оригінальний текст</string>
     <string name="toast_nothing_to_undo">Немає чого скасовувати</string>
     <string name="toast_undo_failed">Не вдалося скасувати</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates &amp; command descriptions -->
     <string name="update_channel_name">Оновлення застосунку</string>
-    <string name="update_channel_desc">Сповіщає, коли доступна нова версія SwiftSlate</string>
-    <string name="update_available_title">Доступне оновлення SwiftSlate</string>
+    <string name="update_channel_desc">Сповіщає, коли доступна нова версія Bell</string>
+    <string name="update_available_title">Доступне оновлення Bell</string>
     <string name="update_available_text">Торкніться, щоб переглянути останній випуск</string>
     <string name="error_input_too_long">Текст задовгий для ліміту токенів на хвилину цієї моделі. Спробуйте ще раз із коротшим текстом.</string>
     <string name="note_response_truncated">[Примітка: відповідь може бути обрізана]</string>
@@ -146,7 +146,7 @@
     <string name="settings_models_need_key">Додайте вище API-ключ, щоб завантажити список моделей.</string>
     <string name="settings_models_load_failed">Не вдалося завантажити моделі. Перевірте з\'єднання та API-ключ.</string>
     <string name="settings_models_empty_provider">Для цього API-ключа немає доступних моделей.</string>
-    <string name="dashboard_service_killed_title">SwiftSlate було перервано</string>
+    <string name="dashboard_service_killed_title">Bell було перервано</string>
     <string name="dashboard_service_killed_message">Фонова служба неочікувано зупинилася. Увімкніть її знову в налаштуваннях доступності, щоб продовжувати використовувати команди.</string>
     <string name="dashboard_service_killed_dismiss">Закрити</string>
 </resources>

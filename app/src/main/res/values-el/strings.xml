@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwiftSlate</string>
-    <string name="accessibility_service_label">Βοηθός SwiftSlate</string>
+    <string name="app_name">Bell</string>
+    <string name="accessibility_service_label">Βοηθός Bell</string>
     <string name="accessibility_service_desc">Παρέχει αντικαταστάσεις κειμένου με AI σε όλο το σύστημα όταν πληκτρολογούνται εντολές ενεργοποίησης.</string>
 
     <!-- Dashboard -->
@@ -106,7 +106,7 @@
     <string name="process_text_retry">Δοκιμάστε ξανά</string>
     <string name="process_text_copied">Αντιγράφηκε</string>
     <string name="process_text_no_selection">Δεν έχει επιλεγεί κείμενο</string>
-    <string name="process_text_no_commands">Δεν υπάρχουν διαθέσιμες εντολές. Προσθέστε μία στο SwiftSlate.</string>
+    <string name="process_text_no_commands">Δεν υπάρχουν διαθέσιμες εντολές. Προσθέστε μία στο Bell.</string>
     <string name="toast_restore_failed">Δεν ήταν δυνατή η επαναφορά του αρχικού κειμένου</string>
     <string name="toast_nothing_to_undo">Δεν υπάρχει τίποτα για αναίρεση</string>
     <string name="toast_undo_failed">Δεν ήταν δυνατή η αναίρεση</string>
@@ -130,8 +130,8 @@
 
     <!-- Updates -->
     <string name="update_channel_name">Ενημερώσεις εφαρμογής</string>
-    <string name="update_channel_desc">Ειδοποιεί όταν είναι διαθέσιμη μια νέα έκδοση του SwiftSlate</string>
-    <string name="update_available_title">Διαθέσιμη ενημέρωση SwiftSlate</string>
+    <string name="update_channel_desc">Ειδοποιεί όταν είναι διαθέσιμη μια νέα έκδοση του Bell</string>
+    <string name="update_available_title">Διαθέσιμη ενημέρωση Bell</string>
     <string name="update_available_text">Πατήστε για να δείτε την τελευταία έκδοση</string>
 
     <!-- Command descriptions -->
@@ -148,7 +148,7 @@
     <string name="settings_models_need_key">Προσθέστε ένα κλειδί API παραπάνω για να φορτώσει η λίστα μοντέλων.</string>
     <string name="settings_models_load_failed">Δεν ήταν δυνατή η φόρτωση των μοντέλων. Ελέγξτε τη σύνδεση και το κλειδί API.</string>
     <string name="settings_models_empty_provider">Δεν υπάρχουν διαθέσιμα μοντέλα για αυτό το κλειδί API.</string>
-    <string name="dashboard_service_killed_title">Το SwiftSlate διακόπηκε</string>
+    <string name="dashboard_service_killed_title">Το Bell διακόπηκε</string>
     <string name="dashboard_service_killed_message">Η υπηρεσία παρασκηνίου σταμάτησε απροσδόκητα. Ενεργοποιήστε την ξανά στις ρυθμίσεις προσβασιμότητας για να συνεχίσετε να χρησιμοποιείτε εντολές.</string>
     <string name="dashboard_service_killed_dismiss">Απόρριψη</string>
 </resources>
