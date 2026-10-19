@@ -75,7 +75,7 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
     var anthropicModel by remember { mutableStateOf(prefs.getString(PrefKeys.ANTHROPIC_MODEL, "") ?: "") }
     var anthropicModelExpanded by remember { mutableStateOf(false) }
     var anthropicModelList by remember { mutableStateOf(ProviderModelsCache.get(ProviderType.ANTHROPIC)?.models ?: emptyList()) }
-    var anthropicWebSearch by remember { mutableStateOf(prefs.getBoolean(PrefKeys.ANTHROPIC_WEB_SEARCH, true)) }
+    var webSearch by remember { mutableStateOf(prefs.getBoolean(PrefKeys.WEB_SEARCH, true)) }
 
     var customEndpoint by rememberSaveable { mutableStateOf(prefs.getString(PrefKeys.CUSTOM_ENDPOINT, "") ?: "") }
     var customModel by rememberSaveable { mutableStateOf(prefs.getString(PrefKeys.CUSTOM_MODEL, "") ?: "") }
@@ -449,30 +449,6 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     isFetching = isFetchingAnthropicModels,
                     fetchingText = fetchingModelsMsg
                 )
-                Spacer(modifier = Modifier.height(rhythm.groupGap))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_web_search_title),
-                            fontSize = rhythm.bodySize,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_web_search_desc),
-                            fontSize = rhythm.bodySize,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(rhythm.groupGap))
-                    Switch(
-                        checked = anthropicWebSearch,
-                        onCheckedChange = { on ->
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            anthropicWebSearch = on
-                            prefs.edit().putBoolean(PrefKeys.ANTHROPIC_WEB_SEARCH, on).apply()
-                        }
-                    )
-                }
             } else {
                 Text(
                     text = stringResource(R.string.settings_endpoint_title),
@@ -671,6 +647,31 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                 )
             )
             Spacer(modifier = Modifier.height(rhythm.tightGap))
+            // One switch for every provider: each gets search its own way (Claude and Gemini
+            // built in, Groq compound on its own, everything else through Bell's search).
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.settings_web_search_title),
+                        fontSize = rhythm.bodySize,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = stringResource(R.string.settings_web_search_desc),
+                        fontSize = rhythm.bodySize,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Spacer(modifier = Modifier.width(rhythm.groupGap))
+                Switch(
+                    checked = webSearch,
+                    onCheckedChange = { on ->
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        webSearch = on
+                        prefs.edit().putBoolean(PrefKeys.WEB_SEARCH, on).apply()
+                    }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(rhythm.cardGap))

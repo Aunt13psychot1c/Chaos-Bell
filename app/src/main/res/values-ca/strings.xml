@@ -56,7 +56,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Personalitzat (compatible amb OpenAI)</string>
     <string name="settings_web_search_title">Cerca web</string>
-    <string name="settings_web_search_desc">Deixa que Claude busqui a internet quan una ordre ho necessiti</string>
+    <string name="settings_web_search_desc">Deixa que la IA busqui a internet quan una ordre ho necessiti</string>
     <string name="colors_title">Colors</string>
     <string name="colors_welcome_title">Tria els colors de Bell</string>
     <string name="colors_welcome_desc">Els pots canviar quan vulguis a Configuració.</string>

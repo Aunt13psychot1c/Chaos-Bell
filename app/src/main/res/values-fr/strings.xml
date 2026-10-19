@@ -49,7 +49,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Personnalisé (compatible OpenAI)</string>
     <string name="settings_web_search_title">Recherche web</string>
-    <string name="settings_web_search_desc">Laisser Claude chercher en ligne quand une commande en a besoin</string>
+    <string name="settings_web_search_desc">Laisser l\'IA chercher en ligne quand une commande en a besoin</string>
     <string name="colors_title">Couleurs</string>
     <string name="colors_welcome_title">Choisis les couleurs de Bell</string>
     <string name="colors_welcome_desc">Tu peux les changer à tout moment dans les réglages.</string>

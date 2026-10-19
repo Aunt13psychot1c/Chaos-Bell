@@ -22,8 +22,8 @@ object PrefKeys {
     /** Selected Claude model id for the Anthropic provider. */
     const val ANTHROPIC_MODEL = "anthropic_model"
 
-    /** Whether Claude may search the web while running a command (Boolean, default on). */
-    const val ANTHROPIC_WEB_SEARCH = "anthropic_web_search"
+    /** Whether the AI may search the web while running a command, on every provider (Boolean, default on). */
+    const val WEB_SEARCH = "web_search"
 
     /** Custom (OpenAI-compatible) model id. */
     const val CUSTOM_MODEL = "custom_model"

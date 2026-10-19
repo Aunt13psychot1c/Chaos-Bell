@@ -56,7 +56,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">سفارشی (سازگار با OpenAI)</string>
     <string name="settings_web_search_title">جستجوی وب</string>
-    <string name="settings_web_search_desc">اجازه بده Claude وقتی یک فرمان نیاز دارد، در اینترنت جستجو کند</string>
+    <string name="settings_web_search_desc">اجازه بده هوش مصنوعی وقتی یک فرمان نیاز دارد، در اینترنت جستجو کند</string>
     <string name="colors_title">رنگ‌ها</string>
     <string name="colors_welcome_title">رنگ‌های Bell را انتخاب کنید</string>
     <string name="colors_welcome_desc">هر زمان بخواهید می‌توانید آن‌ها را در تنظیمات تغییر دهید.</string>

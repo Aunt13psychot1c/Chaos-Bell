@@ -1,5 +1,6 @@
 package com.musheer360.swiftslate.provider
 
+import com.musheer360.swiftslate.api.SearchMode
 import com.musheer360.swiftslate.model.GeminiModels
 import com.musheer360.swiftslate.model.GroqModels
 import com.musheer360.swiftslate.model.PrefKeys
@@ -64,6 +65,13 @@ interface ProviderConfig {
      */
     fun useJsonObjectMode(structuredOutputEnabled: Boolean): Boolean = false
 
+    /**
+     * How an OpenAI-compatible request gets web search for [model]. Bell's own search by
+     * default; providers whose models search on their own say so here. Unused by the
+     * Gemini and Anthropic transports, which have search built in.
+     */
+    fun searchMode(model: String): SearchMode = SearchMode.FUNCTION
+
     /** Whether the resolved [model]/[endpoint] are usable (Custom requires both). */
     fun isConfigured(model: String, endpoint: String): Boolean = true
 }
@@ -91,6 +99,10 @@ object GroqConfig : ProviderConfig {
     override fun resolveEndpoint(customEndpoint: String): String = ENDPOINT
     override fun reasoningParams(model: String): Map<String, Any> = GroqModels.reasoningParams(model)
     override fun useJsonObjectMode(structuredOutputEnabled: Boolean): Boolean = structuredOutputEnabled
+    // Groq's compound systems search the web on their own; every other Groq model gets
+    // Bell's search.
+    override fun searchMode(model: String): SearchMode =
+        if (model.startsWith("groq/compound")) SearchMode.NONE else SearchMode.FUNCTION
 }
 
 /** Custom OpenAI-compatible endpoint — user-supplied endpoint and model. */

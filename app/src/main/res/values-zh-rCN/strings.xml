@@ -49,7 +49,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">自定义（OpenAI 兼容）</string>
     <string name="settings_web_search_title">网页搜索</string>
-    <string name="settings_web_search_desc">当命令需要时，允许 Claude 在线搜索</string>
+    <string name="settings_web_search_desc">当命令需要时，允许 AI 在线搜索</string>
     <string name="colors_title">颜色</string>
     <string name="colors_welcome_title">选择 Bell 的颜色</string>
     <string name="colors_welcome_desc">你可以随时在设置中更改。</string>

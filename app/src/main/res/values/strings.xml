@@ -56,7 +56,7 @@
     <string name="settings_provider_custom">Custom (OpenAI Compatible)</string>
     <string name="settings_provider_anthropic" translatable="false">Anthropic (Claude)</string>
     <string name="settings_web_search_title">Web search</string>
-    <string name="settings_web_search_desc">Let Claude look things up online when a command needs it</string>
+    <string name="settings_web_search_desc">Let the AI look things up online when a command needs it</string>
     <string name="colors_title">Colors</string>
     <string name="colors_welcome_title">Pick Bell\'s colors</string>
     <string name="colors_welcome_desc">You can change them anytime in Settings.</string>

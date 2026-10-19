@@ -7,6 +7,7 @@ import com.musheer360.swiftslate.api.ApiClientUtils
 import com.musheer360.swiftslate.api.ApiError
 import com.musheer360.swiftslate.api.ApiException
 import com.musheer360.swiftslate.api.GeminiClient
+import com.musheer360.swiftslate.api.SearchMode
 import com.musheer360.swiftslate.api.OpenAICompatibleClient
 import com.musheer360.swiftslate.manager.KeyManager
 import com.musheer360.swiftslate.model.PrefKeys
@@ -63,6 +64,7 @@ suspend fun runTextCommand(
         return CommandOutcome.Unavailable(context.getString(R.string.toast_custom_not_configured))
     }
     val temperature = prefs.getFloat(PrefKeys.TEMPERATURE, DEFAULT_TEMPERATURE).toDouble()
+    val webSearch = prefs.getBoolean(PrefKeys.WEB_SEARCH, true)
     val useStructuredOutput = System.currentTimeMillis() -
         prefs.getLong(PrefKeys.STRUCTURED_OUTPUT_DISABLED_AT, 0L) > STRUCTURED_OUTPUT_RETRY_MS
 
@@ -88,13 +90,15 @@ suspend fun runTextCommand(
             Transport.OPENAI_COMPAT -> openAIClient.generate(
                 prompt, text, key, model, temperature, endpoint,
                 useJsonObjectMode = provider.useJsonObjectMode(useStructuredOutput),
-                extraParams = provider.reasoningParams(model))
+                extraParams = provider.reasoningParams(model),
+                searchMode = if (webSearch) provider.searchMode(model) else SearchMode.NONE)
             Transport.ANTHROPIC_NATIVE -> anthropicClient.generate(
                 prompt, text, key, model, temperature,
-                webSearch = prefs.getBoolean(PrefKeys.ANTHROPIC_WEB_SEARCH, true))
+                webSearch = webSearch)
             Transport.GEMINI_NATIVE -> geminiClient.generate(
                 prompt, text, key, model, temperature, useStructuredOutput,
-                thinkingLevel = provider.thinkingLevel(model))
+                thinkingLevel = provider.thinkingLevel(model),
+                webSearch = webSearch)
         }
 
         result.onSuccess { generated ->

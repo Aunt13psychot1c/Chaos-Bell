@@ -170,14 +170,27 @@ class GeminiClient {
         model: String,
         temperature: Double,
         useStructuredOutput: Boolean = false,
-        thinkingLevel: String? = null
+        thinkingLevel: String? = null,
+        webSearch: Boolean = false
     ): Result<GenerateResult> = withContext(Dispatchers.IO) {
-        var result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput, thinkingLevel)
+        // Google Search grounding cannot be combined with structured (JSON) output, so a
+        // searching request goes out as plain text.
+        var search = webSearch
+        var result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput && !search, thinkingLevel, search)
+
+        // Models or keys without Google Search grounding answer 400; run the command anyway,
+        // just without the search.
+        if (search && result.exceptionOrNull()?.message.orEmpty().let {
+                it.startsWith("HTTP_400") && (it.contains("search", ignoreCase = true) || it.contains("tool", ignoreCase = true))
+            }) {
+            search = false
+            result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput, thinkingLevel, search)
+        }
 
         // Retry once for transient network/server errors (with 1.5s backoff)
         if (result.isFailure && result.exceptionOrNull().isTransientNetwork()) {
             kotlinx.coroutines.delay(1500)
-            result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput, thinkingLevel)
+            result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput && !search, thinkingLevel, search)
         }
 
         val cleaned = stripHttpPrefix(result.map { it.text })
@@ -201,7 +214,8 @@ class GeminiClient {
         model: String,
         temperature: Double,
         withStructured: Boolean,
-        thinkingLevel: String? = null
+        thinkingLevel: String? = null,
+        webSearch: Boolean = false
     ): Result<GenerateResult> {
         var connection: HttpURLConnection? = null
         return try {
@@ -232,6 +246,11 @@ class GeminiClient {
                         })
                     })
                 })
+                if (webSearch) {
+                    put("tools", JSONArray().apply {
+                        put(JSONObject().apply { put("google_search", JSONObject()) })
+                    })
+                }
                 put("safetySettings", JSONArray().apply {
                     for (cat in arrayOf("HARM_CATEGORY_HARASSMENT", "HARM_CATEGORY_HATE_SPEECH", "HARM_CATEGORY_SEXUALLY_EXPLICIT", "HARM_CATEGORY_DANGEROUS_CONTENT", "HARM_CATEGORY_CIVIC_INTEGRITY")) {
                         put(JSONObject().apply {
@@ -285,7 +304,9 @@ class GeminiClient {
                     val content = candidate.optJSONObject("content")
                     val parts = content?.optJSONArray("parts")
                     if (parts != null && parts.length() > 0) {
-                        var resultText = parts.getJSONObject(0).optString("text", "")
+                        // A grounded (searched) answer can arrive split over several parts, so
+                        // join them; skip any "thought" parts, which are reasoning, not answer.
+                        var resultText = if (webSearch) joinAnswerParts(parts) else parts.getJSONObject(0).optString("text", "")
                         if (resultText.isBlank()) {
                             return Result.failure(Exception("Model returned empty response"))
                         }
@@ -378,5 +399,16 @@ class GeminiClient {
         } finally {
             connection?.disconnect()
         }
+    }
+
+    /** Joins every non-thought text part of a Gemini candidate. */
+    internal fun joinAnswerParts(parts: JSONArray): String {
+        val sb = StringBuilder()
+        for (i in 0 until parts.length()) {
+            val part = parts.optJSONObject(i) ?: continue
+            if (part.optBoolean("thought", false)) continue
+            sb.append(part.optString("text", ""))
+        }
+        return sb.toString()
     }
 }

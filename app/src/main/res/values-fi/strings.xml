@@ -56,7 +56,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Mukautettu (OpenAI-yhteensopiva)</string>
     <string name="settings_web_search_title">Verkkohaku</string>
-    <string name="settings_web_search_desc">Anna Clauden hakea tietoa verkosta, kun komento sitä tarvitsee</string>
+    <string name="settings_web_search_desc">Anna tekoälyn hakea tietoa verkosta, kun komento sitä tarvitsee</string>
     <string name="colors_title">Värit</string>
     <string name="colors_welcome_title">Valitse Bellin värit</string>
     <string name="colors_welcome_desc">Voit vaihtaa niitä milloin tahansa asetuksista.</string>

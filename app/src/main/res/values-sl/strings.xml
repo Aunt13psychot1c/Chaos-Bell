@@ -56,7 +56,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Poljubno (združljivo z OpenAI)</string>
     <string name="settings_web_search_title">Iskanje po spletu</string>
-    <string name="settings_web_search_desc">Dovoli Claudu, da išče po spletu, ko ukaz to potrebuje</string>
+    <string name="settings_web_search_desc">Dovoli UI, da išče po spletu, ko ukaz to potrebuje</string>
     <string name="colors_title">Barve</string>
     <string name="colors_welcome_title">Izberi barve za Bell</string>
     <string name="colors_welcome_desc">Kadar koli jih lahko spremeniš v nastavitvah.</string>

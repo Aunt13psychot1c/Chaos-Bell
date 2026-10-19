@@ -56,7 +56,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Pasirinktinis (suderinamas su OpenAI)</string>
     <string name="settings_web_search_title">Paieška internete</string>
-    <string name="settings_web_search_desc">Leisti Claude ieškoti internete, kai to reikia komandai</string>
+    <string name="settings_web_search_desc">Leisti DI ieškoti internete, kai to reikia komandai</string>
     <string name="colors_title">Spalvos</string>
     <string name="colors_welcome_title">Pasirinkite Bell spalvas</string>
     <string name="colors_welcome_desc">Jas bet kada galite pakeisti nustatymuose.</string>

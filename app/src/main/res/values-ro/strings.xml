@@ -56,7 +56,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Personalizat (compatibil OpenAI)</string>
     <string name="settings_web_search_title">Căutare pe web</string>
-    <string name="settings_web_search_desc">Lasă-l pe Claude să caute online când o comandă are nevoie</string>
+    <string name="settings_web_search_desc">Lasă AI-ul să caute online când o comandă are nevoie</string>
     <string name="colors_title">Culori</string>
     <string name="colors_welcome_title">Alege culorile pentru Bell</string>
     <string name="colors_welcome_desc">Le poți schimba oricând din Setări.</string>

@@ -49,7 +49,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Benutzerdefiniert (OpenAI-kompatibel)</string>
     <string name="settings_web_search_title">Websuche</string>
-    <string name="settings_web_search_desc">Claude darf online nachschlagen, wenn ein Befehl es braucht</string>
+    <string name="settings_web_search_desc">Die KI darf online nachschlagen, wenn ein Befehl es braucht</string>
     <string name="colors_title">Farben</string>
     <string name="colors_welcome_title">Wähle die Farben von Bell</string>
     <string name="colors_welcome_desc">Du kannst sie jederzeit in den Einstellungen ändern.</string>

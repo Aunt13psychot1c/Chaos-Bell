@@ -34,8 +34,21 @@ data class GenerateResult(
      * went straight into the user's text field in every language, and the clients hold no
      * Context to localize it.
      */
-    val truncated: Boolean = false
+    val truncated: Boolean = false,
+    /**
+     * Set when the model answered with a request to run Bell's web search instead of text:
+     * the assistant message carrying the `tool_calls`, cleaned so it can be sent straight back.
+     */
+    val searchRequest: org.json.JSONObject? = null
 )
+
+/** How a request gets web search, decided per provider and model. */
+enum class SearchMode {
+    /** No search, or the model searches on its own (Groq compound). */
+    NONE,
+    /** Bell runs the search herself when the model asks for it through function calling. */
+    FUNCTION
+}
 
 internal object ApiClientUtils {
     // System instruction prepended to every request, followed by the command's own

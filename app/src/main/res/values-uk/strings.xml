@@ -56,7 +56,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Користувацький (сумісний з OpenAI)</string>
     <string name="settings_web_search_title">Пошук в інтернеті</string>
-    <string name="settings_web_search_desc">Дозволити Claude шукати в інтернеті, коли це потрібно команді</string>
+    <string name="settings_web_search_desc">Дозволити ШІ шукати в інтернеті, коли це потрібно команді</string>
     <string name="colors_title">Кольори</string>
     <string name="colors_welcome_title">Оберіть кольори Bell</string>
     <string name="colors_welcome_desc">Їх можна змінити будь-коли в налаштуваннях.</string>

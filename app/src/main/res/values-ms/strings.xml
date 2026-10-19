@@ -56,7 +56,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Tersuai (Serasi OpenAI)</string>
     <string name="settings_web_search_title">Carian web</string>
-    <string name="settings_web_search_desc">Benarkan Claude mencari dalam talian apabila arahan memerlukannya</string>
+    <string name="settings_web_search_desc">Benarkan AI mencari dalam talian apabila arahan memerlukannya</string>
     <string name="colors_title">Warna</string>
     <string name="colors_welcome_title">Pilih warna Bell</string>
     <string name="colors_welcome_desc">Anda boleh menukarnya bila-bila masa dalam Tetapan.</string>

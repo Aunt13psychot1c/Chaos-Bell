@@ -16,6 +16,62 @@ class OpenAICompatibleClient {
     companion object {
         private val HTTP_PREFIX_REGEX = Regex("^HTTP_\\d+:\\s*")
 
+        /** Most searches one command may run, so a chatty model cannot loop forever. */
+        private const val MAX_SEARCHES = 3
+
+        /** The web_search function offered to models when Bell does the searching. */
+        internal fun searchTools(): JSONArray = JSONArray().put(JSONObject().apply {
+            put("type", "function")
+            put("function", JSONObject().apply {
+                put("name", "web_search")
+                put("description", "Search the web for current information. Use it only when the transformation needs facts that are recent or that you do not know.")
+                put("parameters", JSONObject().apply {
+                    put("type", "object")
+                    put("properties", JSONObject().apply {
+                        put("query", JSONObject().apply {
+                            put("type", "string")
+                            put("description", "What to search for")
+                        })
+                    })
+                    put("required", JSONArray().put("query"))
+                })
+            })
+        })
+
+        /**
+         * Rebuilds an assistant message that asked for tools with only the fields every
+         * OpenAI-compatible server accepts back (some add extras like "reasoning" and then
+         * reject them when echoed).
+         */
+        internal fun cleanToolCallMessage(message: JSONObject): JSONObject {
+            val calls = JSONArray()
+            val raw = message.optJSONArray("tool_calls") ?: JSONArray()
+            for (i in 0 until raw.length()) {
+                val call = raw.optJSONObject(i) ?: continue
+                val fn = call.optJSONObject("function") ?: continue
+                calls.put(JSONObject().apply {
+                    put("id", call.optString("id", "call_$i"))
+                    put("type", "function")
+                    put("function", JSONObject().apply {
+                        put("name", fn.optString("name", ""))
+                        put("arguments", fn.optString("arguments", "{}"))
+                    })
+                })
+            }
+            return JSONObject().apply {
+                put("role", "assistant")
+                put("content", message.optString("content", "").let { if (it == "null") "" else it })
+                put("tool_calls", calls)
+            }
+        }
+
+        /** Pulls the search query out of a tool call's JSON arguments. */
+        internal fun queryFromArguments(arguments: String): String = try {
+            JSONObject(arguments).optString("query", "").trim()
+        } catch (_: Exception) {
+            ""
+        }
+
         /** Anthropic API version sent alongside the key on Claude endpoints. */
         private const val ANTHROPIC_VERSION = "2023-06-01"
 
@@ -226,8 +282,20 @@ class OpenAICompatibleClient {
         temperature: Double,
         endpoint: String,
         useJsonObjectMode: Boolean = false,
-        extraParams: Map<String, Any> = emptyMap()
+        extraParams: Map<String, Any> = emptyMap(),
+        searchMode: SearchMode = SearchMode.NONE,
+        searcher: WebSearcher = WebSearcher()
     ): Result<GenerateResult> = withContext(Dispatchers.IO) {
+        if (searchMode == SearchMode.FUNCTION) {
+            val searched = generateWithSearch(prompt, text, apiKey, model, temperature, endpoint, extraParams, searcher)
+            if (searched != null) {
+                val cleaned = stripHttpPrefix(searched.map { it.text })
+                val meta = searched.getOrNull()
+                return@withContext cleaned.map { GenerateResult(it, truncated = meta?.truncated == true) }
+            }
+            // null: this server does not do function calling, so run the command without search.
+        }
+
         var result = doGenerate(prompt, text, apiKey, model, temperature, endpoint, useJsonObjectMode, extraParams)
 
         // Retry once for transient network/server errors (with 1.5s backoff)
@@ -239,6 +307,58 @@ class OpenAICompatibleClient {
         val cleaned = stripHttpPrefix(result.map { it.text })
         val meta = result.getOrNull()
         cleaned.map { GenerateResult(it, meta?.structuredOutputFailed == true, meta?.truncated == true) }
+    }
+
+    /**
+     * Runs a command with Bell's own web search on offer. The model either answers right away
+     * or asks for searches; Bell runs those (up to [MAX_SEARCHES]) and sends the results back
+     * for the final answer.
+     *
+     * Returns null when the server rejects function calling, so the caller can fall back to
+     * a plain request. Search failures never fail the command: the model is told the search
+     * did not work and answers from what it knows.
+     */
+    private suspend fun generateWithSearch(
+        prompt: String,
+        text: String,
+        apiKey: String,
+        model: String,
+        temperature: Double,
+        endpoint: String,
+        extraParams: Map<String, Any>,
+        searcher: WebSearcher
+    ): Result<GenerateResult>? {
+        val tools = searchTools()
+        var first = doGenerate(prompt, text, apiKey, model, temperature, endpoint, false, extraParams, tools = tools)
+        if (first.isFailure && first.exceptionOrNull().isTransientNetwork()) {
+            kotlinx.coroutines.delay(1500)
+            first = doGenerate(prompt, text, apiKey, model, temperature, endpoint, false, extraParams, tools = tools)
+        }
+        val firstMsg = first.exceptionOrNull()?.message.orEmpty()
+        if (first.isFailure && firstMsg.startsWith("HTTP_4") && firstMsg.contains("tool", ignoreCase = true)) return null
+
+        val request = first.getOrNull()?.searchRequest ?: return first
+
+        val followUp = JSONArray().put(request)
+        val calls = request.getJSONArray("tool_calls")
+        for (i in 0 until calls.length()) {
+            val call = calls.getJSONObject(i)
+            val query = queryFromArguments(call.getJSONObject("function").optString("arguments", "{}"))
+            val results = when {
+                i >= MAX_SEARCHES -> "Search limit reached; answer with what you have."
+                query.isEmpty() -> "No search query was given."
+                else -> searcher.search(query).getOrElse { "The search did not work (${it.message}). Answer from what you already know." }
+            }
+            followUp.put(JSONObject().apply {
+                put("role", "tool")
+                put("tool_call_id", call.getString("id"))
+                put("content", results)
+            })
+        }
+        return doGenerate(
+            prompt, text, apiKey, model, temperature, endpoint, false, extraParams,
+            tools = tools, toolChoice = "none", followUp = followUp
+        )
     }
 
     private fun stripHttpPrefix(result: Result<String>): Result<String> {
@@ -258,7 +378,10 @@ class OpenAICompatibleClient {
         temperature: Double,
         endpoint: String,
         withJsonObject: Boolean = false,
-        extraParams: Map<String, Any> = emptyMap()
+        extraParams: Map<String, Any> = emptyMap(),
+        tools: JSONArray? = null,
+        toolChoice: String = "auto",
+        followUp: JSONArray? = null
     ): Result<GenerateResult> {
         if (EndpointValidator.validate(endpoint) != EndpointValidator.Error.NONE) {
             return Result.failure(Exception("Endpoint must be https:// or an http:// private-LAN address"))
@@ -293,7 +416,13 @@ class OpenAICompatibleClient {
                         put("role", "user")
                         put("content", ApiClientUtils.wrapUserText(text))
                     })
+                    // The model's search request and Bell's results, on the second round.
+                    if (followUp != null) for (i in 0 until followUp.length()) put(followUp.get(i))
                 })
+                if (tools != null) {
+                    put("tools", tools)
+                    put("tool_choice", toolChoice)
+                }
                 put("temperature", temperature)
                 if (withJsonObject) {
                     put("response_format", JSONObject().apply {
@@ -325,6 +454,11 @@ class OpenAICompatibleClient {
                     }
 
                     val message = choice.optJSONObject("message")
+                    // The model wants Bell to search before it answers.
+                    if (tools != null && toolChoice != "none" &&
+                        (message?.optJSONArray("tool_calls")?.length() ?: 0) > 0) {
+                        return Result.success(GenerateResult("", searchRequest = cleanToolCallMessage(message!!)))
+                    }
                     var resultText = message?.optString("content", "") ?: ""
                     // Off-catalog reasoning models get no reasoning params (we cannot know
                     // which values they accept), so they run at Groq's default: reasoning ON

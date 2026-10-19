@@ -56,7 +56,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Egyéni (OpenAI-kompatibilis)</string>
     <string name="settings_web_search_title">Webes keresés</string>
-    <string name="settings_web_search_desc">Claude kereshet az interneten, ha egy parancsnak szüksége van rá</string>
+    <string name="settings_web_search_desc">Az MI kereshet az interneten, ha egy parancsnak szüksége van rá</string>
     <string name="colors_title">Színek</string>
     <string name="colors_welcome_title">Válaszd ki a Bell színeit</string>
     <string name="colors_welcome_desc">Bármikor módosíthatod őket a Beállításokban.</string>

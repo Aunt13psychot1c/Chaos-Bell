@@ -56,7 +56,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Kohandatud (OpenAI-ga ühilduv)</string>
     <string name="settings_web_search_title">Veebiotsing</string>
-    <string name="settings_web_search_desc">Luba Claude\'il internetist otsida, kui käsk seda vajab</string>
+    <string name="settings_web_search_desc">Luba tehisarul internetist otsida, kui käsk seda vajab</string>
     <string name="colors_title">Värvid</string>
     <string name="colors_welcome_title">Vali Belli värvid</string>
     <string name="colors_welcome_desc">Saad neid igal ajal seadetes muuta.</string>

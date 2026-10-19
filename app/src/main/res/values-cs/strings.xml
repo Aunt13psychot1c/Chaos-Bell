@@ -56,7 +56,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">Vlastní (kompatibilní s OpenAI)</string>
     <string name="settings_web_search_title">Vyhledávání na webu</string>
-    <string name="settings_web_search_desc">Nech Claude vyhledat informace online, když to příkaz potřebuje</string>
+    <string name="settings_web_search_desc">Nech AI vyhledat informace online, když to příkaz potřebuje</string>
     <string name="colors_title">Barvy</string>
     <string name="colors_welcome_title">Vyber barvy pro Bell</string>
     <string name="colors_welcome_desc">Kdykoli je můžeš změnit v Nastavení.</string>

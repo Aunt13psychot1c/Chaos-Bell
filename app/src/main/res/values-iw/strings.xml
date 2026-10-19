@@ -56,7 +56,7 @@
     <string name="settings_provider_groq">Groq</string>
     <string name="settings_provider_custom">מותאם אישית (תואם ל-OpenAI)</string>
     <string name="settings_web_search_title">חיפוש באינטרנט</string>
-    <string name="settings_web_search_desc">אפשר ל-Claude לחפש ברשת כשפקודה צריכה זאת</string>
+    <string name="settings_web_search_desc">אפשר לבינה המלאכותית לחפש ברשת כשפקודה צריכה זאת</string>
     <string name="colors_title">צבעים</string>
     <string name="colors_welcome_title">בחר את הצבעים של Bell</string>
     <string name="colors_welcome_desc">אפשר לשנות אותם בכל עת בהגדרות.</string>
