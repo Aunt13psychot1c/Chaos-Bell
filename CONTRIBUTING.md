@@ -1,4 +1,4 @@
-# Contributing to SwiftSlate
+# Contributing to Chaos Bell
 
 Thanks for wanting to contribute! Here's everything you need to know.
 
@@ -12,8 +12,8 @@ Thanks for wanting to contribute! Here's everything you need to know.
 ## Development Setup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/SwiftSlate.git
-cd SwiftSlate
+git clone https://github.com/YOUR_USERNAME/Chaos-Bell.git
+cd Chaos-Bell
 ```
 
 Open in Android Studio (latest stable), sync Gradle, and build:
@@ -68,7 +68,7 @@ manual testing on a real device is still essential:
 3. **Verify password fields are skipped** — type a trigger in a password field, nothing should happen
 4. **Test both command types** — AI commands (need API key) and text replacer (offline)
 5. **Check the undo command** — `?undo` should restore previous text
-6. **Test the text-selection popup** — select text in an app, tap SwiftSlate in the Copy/Share
+6. **Test the text-selection popup** — select text in an app, tap Chaos Bell in the Copy/Share
    menu, run a command, and confirm Insert/Copy work — with accessibility enabled and disabled
 7. **Verify on API 23** — if you use any newer API, guard it with a version check
 

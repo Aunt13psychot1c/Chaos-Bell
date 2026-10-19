@@ -27,4 +27,4 @@ This applies to all project spaces: issues, pull requests, discussions, and comm
 
 ## Contact
 
-me@musheer360.com
+aunt13psychot1c@gmail.com

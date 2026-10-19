@@ -2,11 +2,11 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in SwiftSlate, please report it privately:
+If you discover a security vulnerability in Chaos Bell, please report it privately:
 
-**Email:** me@musheer360.com
+**Email:** aunt13psychot1c@gmail.com
 
-**Subject line:** `[SwiftSlate Security] Brief description`
+**Subject line:** `[Chaos Bell Security] Brief description`
 
 Please include:
 - Description of the vulnerability
@@ -14,7 +14,7 @@ Please include:
 - Affected component (e.g., `KeyManager`, `AssistantService`, API clients)
 - Potential impact
 
-I'll acknowledge your report within 48 hours and provide a fix timeline.
+I'll get back to you as soon as I can.
 
 ## Scope
 
