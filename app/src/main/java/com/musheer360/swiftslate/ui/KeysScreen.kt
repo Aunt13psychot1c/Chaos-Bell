@@ -33,6 +33,8 @@ import com.musheer360.swiftslate.api.OpenAICompatibleClient
 import com.musheer360.swiftslate.manager.KeyManager
 import com.musheer360.swiftslate.model.PrefKeys
 import com.musheer360.swiftslate.model.ProviderType
+import com.musheer360.swiftslate.api.AnthropicClient
+import com.musheer360.swiftslate.provider.AnthropicConfig
 import com.musheer360.swiftslate.provider.GroqConfig
 import com.musheer360.swiftslate.ui.components.LocalSlateRhythm
 import com.musheer360.swiftslate.ui.components.ScreenTitle
@@ -60,6 +62,7 @@ fun KeysScreen(keyManager: KeyManager, prefs: SharedPreferences) {
     val scope = rememberCoroutineScope()
     val geminiClient = remember { GeminiClient() }
     val openAIClient = remember { OpenAICompatibleClient() }
+    val anthropicClient = remember { AnthropicClient() }
 
     LaunchedEffect(Unit) {
         keys = withContext(Dispatchers.IO) { keyManager.getKeys() }
@@ -134,6 +137,8 @@ fun KeysScreen(keyManager: KeyManager, prefs: SharedPreferences) {
                                         openAIClient.validateKey(trimmedKey, GroqConfig.ENDPOINT)
                                     providerType == ProviderType.CUSTOM ->
                                         openAIClient.validateKey(trimmedKey, customEndpoint)
+                                    providerType == ProviderType.ANTHROPIC ->
+                                        anthropicClient.validateKey(trimmedKey)
                                     else ->
                                         geminiClient.validateKey(trimmedKey)
                                 }
@@ -187,6 +192,7 @@ fun KeysScreen(keyManager: KeyManager, prefs: SharedPreferences) {
             val (apiKeyUrl, providerName) = when (prefs.getString(PrefKeys.PROVIDER_TYPE, ProviderType.GEMINI) ?: ProviderType.GEMINI) {
                 ProviderType.GROQ -> "https://console.groq.com/keys" to "Groq"
                 ProviderType.CUSTOM -> null to null
+                ProviderType.ANTHROPIC -> AnthropicConfig.API_KEY_URL to "Claude"
                 else -> "https://aistudio.google.com/api-keys" to "Gemini"
             }
             if (apiKeyUrl != null && providerName != null) {

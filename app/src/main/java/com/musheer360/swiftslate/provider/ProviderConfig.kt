@@ -10,8 +10,9 @@ import com.musheer360.swiftslate.model.ProviderType
  * - [GEMINI_NATIVE]: Gemini's own API format (GeminiClient).
  * - [OPENAI_COMPAT]: OpenAI-compatible chat completions (OpenAICompatibleClient),
  *   shared by Groq and Custom.
+ * - [ANTHROPIC_NATIVE]: Claude's own Messages API (AnthropicClient).
  */
-enum class Transport { GEMINI_NATIVE, OPENAI_COMPAT }
+enum class Transport { GEMINI_NATIVE, OPENAI_COMPAT, ANTHROPIC_NATIVE }
 
 /**
  * Per-provider configuration: everything the request pipeline needs to know
@@ -104,11 +105,26 @@ object CustomConfig : ProviderConfig {
         model.isNotBlank() && endpoint.isNotBlank()
 }
 
+/** Anthropic — Claude's own Messages API, fixed endpoint, optional web search. */
+object AnthropicConfig : ProviderConfig {
+    /** Fast and cheap: a good fit for quick keyboard commands. */
+    const val DEFAULT_MODEL = "claude-haiku-5-5"
+    const val API_KEY_URL = "https://platform.claude.com/settings/keys"
+
+    override val type = ProviderType.ANTHROPIC
+    override val transport = Transport.ANTHROPIC_NATIVE
+    override val modelPrefKey = PrefKeys.ANTHROPIC_MODEL
+    override val defaultModel = DEFAULT_MODEL
+    override fun sanitizeModel(stored: String?): String = stored?.trim().orEmpty().ifEmpty { DEFAULT_MODEL }
+    override fun resolveEndpoint(customEndpoint: String): String = ""
+}
+
 /** Registry resolving a stored provider value to its [ProviderConfig]. */
 object Providers {
     fun forType(type: String?): ProviderConfig = when (ProviderType.sanitize(type)) {
         ProviderType.GROQ -> GroqConfig
         ProviderType.CUSTOM -> CustomConfig
+        ProviderType.ANTHROPIC -> AnthropicConfig
         else -> GeminiConfig
     }
 }

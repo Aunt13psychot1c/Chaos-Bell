@@ -15,6 +15,17 @@ class ProviderConfigTest {
         assertSame(GeminiConfig, Providers.forType(ProviderType.GEMINI))
         assertSame(GroqConfig, Providers.forType(ProviderType.GROQ))
         assertSame(CustomConfig, Providers.forType(ProviderType.CUSTOM))
+        assertSame(AnthropicConfig, Providers.forType(ProviderType.ANTHROPIC))
+    }
+
+    @Test
+    fun anthropic_has_its_own_slot() {
+        assertEquals(Transport.ANTHROPIC_NATIVE, AnthropicConfig.transport)
+        assertEquals(PrefKeys.ANTHROPIC_MODEL, AnthropicConfig.modelPrefKey)
+        assertEquals(AnthropicConfig.DEFAULT_MODEL, AnthropicConfig.sanitizeModel(null))
+        assertEquals(AnthropicConfig.DEFAULT_MODEL, AnthropicConfig.sanitizeModel("  "))
+        assertEquals("claude-opus-5-5", AnthropicConfig.sanitizeModel(" claude-opus-5-5 "))
+        assertEquals(ProviderType.ANTHROPIC, ProviderType.sanitize("anthropic"))
     }
 
     @Test

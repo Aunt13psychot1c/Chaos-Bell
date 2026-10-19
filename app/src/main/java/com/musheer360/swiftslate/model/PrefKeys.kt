@@ -10,7 +10,7 @@ package com.musheer360.swiftslate.model
  * stored preferences continue to resolve identically.
  */
 object PrefKeys {
-    /** Active provider ("gemini" | "groq" | "custom") — see [ProviderType]. */
+    /** Active provider ("gemini" | "groq" | "custom" | "anthropic") — see [ProviderType]. */
     const val PROVIDER_TYPE = "provider_type"
 
     /** Selected Gemini model id. */
@@ -18,6 +18,12 @@ object PrefKeys {
 
     /** Selected Groq model id. */
     const val GROQ_MODEL = "groq_model"
+
+    /** Selected Claude model id for the Anthropic provider. */
+    const val ANTHROPIC_MODEL = "anthropic_model"
+
+    /** Whether Claude may search the web while running a command (Boolean, default on). */
+    const val ANTHROPIC_WEB_SEARCH = "anthropic_web_search"
 
     /** Custom (OpenAI-compatible) model id. */
     const val CUSTOM_MODEL = "custom_model"

@@ -2,6 +2,7 @@ package com.musheer360.swiftslate.service
 
 import android.content.Context
 import com.musheer360.swiftslate.R
+import com.musheer360.swiftslate.api.AnthropicClient
 import com.musheer360.swiftslate.api.ApiClientUtils
 import com.musheer360.swiftslate.api.ApiError
 import com.musheer360.swiftslate.api.ApiException
@@ -45,6 +46,7 @@ suspend fun runTextCommand(
     openAIClient: OpenAICompatibleClient,
     prompt: String,
     text: String,
+    anthropicClient: AnthropicClient = AnthropicClient(),
     onFirstAttempt: () -> Unit = {}
 ): CommandOutcome {
     // keys_keystore_error rather than a "reinstall" message: the usual cause is the Keystore key
@@ -87,6 +89,9 @@ suspend fun runTextCommand(
                 prompt, text, key, model, temperature, endpoint,
                 useJsonObjectMode = provider.useJsonObjectMode(useStructuredOutput),
                 extraParams = provider.reasoningParams(model))
+            Transport.ANTHROPIC_NATIVE -> anthropicClient.generate(
+                prompt, text, key, model, temperature,
+                webSearch = prefs.getBoolean(PrefKeys.ANTHROPIC_WEB_SEARCH, true))
             Transport.GEMINI_NATIVE -> geminiClient.generate(
                 prompt, text, key, model, temperature, useStructuredOutput,
                 thinkingLevel = provider.thinkingLevel(model))

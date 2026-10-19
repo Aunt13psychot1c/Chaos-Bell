@@ -18,10 +18,12 @@ object ProviderModelsCache {
 
     @Volatile private var gemini: Entry? = null
     @Volatile private var groq: Entry? = null
+    @Volatile private var anthropic: Entry? = null
 
     fun get(type: String): Entry? = when (type) {
         ProviderType.GEMINI -> gemini
         ProviderType.GROQ -> groq
+        ProviderType.ANTHROPIC -> anthropic
         else -> null
     }
 
@@ -29,6 +31,7 @@ object ProviderModelsCache {
         when (type) {
             ProviderType.GEMINI -> gemini = entry
             ProviderType.GROQ -> groq = entry
+            ProviderType.ANTHROPIC -> anthropic = entry
         }
     }
 }

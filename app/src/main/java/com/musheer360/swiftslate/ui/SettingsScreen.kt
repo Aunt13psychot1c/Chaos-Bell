@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.musheer360.swiftslate.BuildConfig
 import com.musheer360.swiftslate.R
+import com.musheer360.swiftslate.api.AnthropicClient
 import com.musheer360.swiftslate.api.ApiClientUtils
 import com.musheer360.swiftslate.api.GeminiClient
 import com.musheer360.swiftslate.api.OpenAICompatibleClient
@@ -38,6 +39,7 @@ import com.musheer360.swiftslate.model.GeminiModels
 import com.musheer360.swiftslate.model.GroqModels
 import com.musheer360.swiftslate.model.PrefKeys
 import com.musheer360.swiftslate.model.ProviderType
+import com.musheer360.swiftslate.provider.AnthropicConfig
 import com.musheer360.swiftslate.provider.EndpointValidator
 import com.musheer360.swiftslate.provider.GroqConfig
 import com.musheer360.swiftslate.ui.components.LocalSlateRhythm
@@ -68,6 +70,11 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
     var groqModelExpanded by remember { mutableStateOf(false) }
     var groqModelList by remember { mutableStateOf(ProviderModelsCache.get(ProviderType.GROQ)?.models ?: emptyList()) }
 
+    var anthropicModel by remember { mutableStateOf(prefs.getString(PrefKeys.ANTHROPIC_MODEL, "") ?: "") }
+    var anthropicModelExpanded by remember { mutableStateOf(false) }
+    var anthropicModelList by remember { mutableStateOf(ProviderModelsCache.get(ProviderType.ANTHROPIC)?.models ?: emptyList()) }
+    var anthropicWebSearch by remember { mutableStateOf(prefs.getBoolean(PrefKeys.ANTHROPIC_WEB_SEARCH, true)) }
+
     var customEndpoint by rememberSaveable { mutableStateOf(prefs.getString(PrefKeys.CUSTOM_ENDPOINT, "") ?: "") }
     var customModel by rememberSaveable { mutableStateOf(prefs.getString(PrefKeys.CUSTOM_MODEL, "") ?: "") }
     var endpointError by remember { mutableStateOf<String?>(null) }
@@ -80,9 +87,11 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
     var fetchSuccess by remember { mutableStateOf(false) }
     var isFetchingGeminiModels by remember { mutableStateOf(false) }
     var isFetchingGroqModels by remember { mutableStateOf(false) }
+    var isFetchingAnthropicModels by remember { mutableStateOf(false) }
     var apiKeys by remember { mutableStateOf<List<String>>(emptyList()) }
     val openAIClient = remember { OpenAICompatibleClient() }
     val geminiClient = remember { GeminiClient() }
+    val anthropicClient = remember { AnthropicClient() }
 
     var triggerPrefix by remember { mutableStateOf(commandManager.getTriggerPrefix()) }
     var prefixError by remember { mutableStateOf<String?>(null) }
@@ -159,6 +168,30 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
         }
     }
 
+    // Claude's model list comes from Anthropic's own /v1/models, so it gets its own small
+    // fetcher rather than another branch in the Gemini/Groq one above.
+    fun startAnthropicModelFetch() {
+        if (isFetchingAnthropicModels) return
+        val key = apiKeys.firstOrNull() ?: return
+        isFetchingAnthropicModels = true
+        scope.launch {
+            val result = withContext(Dispatchers.IO) { anthropicClient.fetchModels(key) }
+            val models = result.getOrNull().orEmpty()
+            val success = result.isSuccess && models.isNotEmpty()
+            val toCache = if (success) models else (ProviderModelsCache.get(ProviderType.ANTHROPIC)?.models ?: anthropicModelList)
+            ProviderModelsCache.put(ProviderType.ANTHROPIC, ProviderModelsCache.Entry(toCache, attempted = true))
+            isFetchingAnthropicModels = false
+            if (success) {
+                anthropicModelList = models
+                if (anthropicModel.isBlank()) {
+                    val pick = preferredModel(models, AnthropicConfig.DEFAULT_MODEL)
+                    anthropicModel = pick
+                    prefs.edit().putString(PrefKeys.ANTHROPIC_MODEL, pick).apply()
+                }
+            }
+        }
+    }
+
     // Auto-fetch once per session per provider (issue #148): fires when Settings shows
     // a Gemini/Groq provider whose list has never been fetched this process — including
     // the no-key case, so it runs automatically once a first key is added.
@@ -167,6 +200,12 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
             val cached = ProviderModelsCache.get(providerType)
             if (apiKeys.isNotEmpty() && (cached == null || !cached.attempted)) {
                 startModelFetch(providerType)
+            }
+        }
+        if (providerType == ProviderType.ANTHROPIC) {
+            val cached = ProviderModelsCache.get(ProviderType.ANTHROPIC)
+            if (apiKeys.isNotEmpty() && (cached == null || !cached.attempted)) {
+                startAnthropicModelFetch()
             }
         }
     }
@@ -271,6 +310,7 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     value = when (providerType) {
                         ProviderType.GEMINI -> stringResource(R.string.settings_provider_gemini)
                         ProviderType.GROQ -> stringResource(R.string.settings_provider_groq)
+                        ProviderType.ANTHROPIC -> stringResource(R.string.settings_provider_anthropic)
                         else -> stringResource(R.string.settings_provider_custom)
                     },
                     onValueChange = {},
@@ -299,6 +339,15 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             providerType = ProviderType.GROQ
                             prefs.edit().putString(PrefKeys.PROVIDER_TYPE, ProviderType.GROQ).remove(PrefKeys.STRUCTURED_OUTPUT_DISABLED_AT).apply()
+                            providerExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.settings_provider_anthropic)) },
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            providerType = ProviderType.ANTHROPIC
+                            prefs.edit().putString(PrefKeys.PROVIDER_TYPE, ProviderType.ANTHROPIC).remove(PrefKeys.STRUCTURED_OUTPUT_DISABLED_AT).apply()
                             providerExpanded = false
                         }
                     )
@@ -370,6 +419,58 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     isFetching = isFetchingGroqModels,
                     fetchingText = fetchingModelsMsg
                 )
+            } else if (providerType == ProviderType.ANTHROPIC) {
+                Text(
+                    text = stringResource(R.string.settings_model_title),
+                    fontSize = rhythm.bodySize,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(rhythm.formGap))
+                DynamicModelDropdown(
+                    selectedModel = if (apiKeys.isEmpty()) "" else anthropicModel.ifBlank { AnthropicConfig.DEFAULT_MODEL },
+                    enabled = apiKeys.isNotEmpty(),
+                    expanded = anthropicModelExpanded,
+                    onExpandedChange = { isOpening ->
+                        anthropicModelExpanded = isOpening
+                        if (isOpening && apiKeys.isNotEmpty() && !isFetchingAnthropicModels) {
+                            startAnthropicModelFetch()
+                        }
+                    },
+                    models = anthropicModelList,
+                    onSelect = { id ->
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        anthropicModel = id
+                        prefs.edit().putString(PrefKeys.ANTHROPIC_MODEL, id).apply()
+                        anthropicModelExpanded = false
+                    },
+                    onDismiss = { anthropicModelExpanded = false },
+                    isFetching = isFetchingAnthropicModels,
+                    fetchingText = fetchingModelsMsg
+                )
+                Spacer(modifier = Modifier.height(rhythm.groupGap))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.settings_web_search_title),
+                            fontSize = rhythm.bodySize,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = stringResource(R.string.settings_web_search_desc),
+                            fontSize = rhythm.bodySize,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(rhythm.groupGap))
+                    Switch(
+                        checked = anthropicWebSearch,
+                        onCheckedChange = { on ->
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            anthropicWebSearch = on
+                            prefs.edit().putBoolean(PrefKeys.ANTHROPIC_WEB_SEARCH, on).apply()
+                        }
+                    )
+                }
             } else {
                 Text(
                     text = stringResource(R.string.settings_endpoint_title),
