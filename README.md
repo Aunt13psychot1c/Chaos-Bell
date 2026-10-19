@@ -4,6 +4,9 @@
 
 <h1 align="center">Chaos Bell</h1>
 <p align="center"><code>Ch40s B311</code></p>
+<p align="center">
+  <a href="https://github.com/Aunt13psychot1c/Chaos-Bell/actions/workflows/build-my-apk.yml"><img src="https://github.com/Aunt13psychot1c/Chaos-Bell/actions/workflows/build-my-apk.yml/badge.svg" alt="Build My APK"></a>
+</p>
 <p align="center"><b>AI in a box for Android. Type a command anywhere you type, and Bell answers.</b></p>
 
 ---
