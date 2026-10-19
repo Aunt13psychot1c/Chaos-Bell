@@ -15,6 +15,34 @@ class OpenAICompatibleClient {
 
     companion object {
         private val HTTP_PREFIX_REGEX = Regex("^HTTP_\\d+:\\s*")
+
+        /** Anthropic API version sent alongside the key on Claude endpoints. */
+        private const val ANTHROPIC_VERSION = "2023-06-01"
+
+        /**
+         * True for Claude's API. Its OpenAI-compatible /chat/completions accepts a Bearer
+         * key, but its native routes that key validation and the model dropdown hit
+         * (/v1/models) also require `x-api-key` and `anthropic-version`, so without them
+         * adding a Claude key fails with "anthropic-version: header is required".
+         */
+        internal fun isAnthropicHost(host: String?): Boolean {
+            val h = host?.lowercase() ?: return false
+            return h == "anthropic.com" || h.endsWith(".anthropic.com")
+        }
+    }
+
+    /**
+     * Sets the auth headers for [apiKey] (none when blank, for keyless local servers).
+     * Claude endpoints also get `x-api-key` and `anthropic-version`; every other
+     * provider gets exactly the Bearer header it always did.
+     */
+    private fun HttpURLConnection.applyAuth(apiKey: String?) {
+        if (apiKey.isNullOrBlank()) return
+        setRequestProperty("Authorization", "Bearer $apiKey")
+        if (isAnthropicHost(url.host)) {
+            setRequestProperty("x-api-key", apiKey)
+            setRequestProperty("anthropic-version", ANTHROPIC_VERSION)
+        }
     }
 
     suspend fun validateKey(apiKey: String, endpoint: String): Result<String> = withContext(Dispatchers.IO) {
@@ -27,7 +55,7 @@ class OpenAICompatibleClient {
             connection = URL("$baseUrl/models")
                 .openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
-            connection.setRequestProperty("Authorization", "Bearer $apiKey")
+            connection.applyAuth(apiKey)
             connection.connectTimeout = 15_000
             connection.readTimeout = 15_000
 
@@ -88,7 +116,7 @@ class OpenAICompatibleClient {
         return try {
             probe = URL(url).openConnection() as HttpURLConnection
             probe.requestMethod = "GET"
-            probe.setRequestProperty("Authorization", "Bearer $apiKey")
+            probe.applyAuth(apiKey)
             probe.connectTimeout = 15_000
             probe.readTimeout = 15_000
             val code = probe.responseCode
@@ -178,9 +206,7 @@ class OpenAICompatibleClient {
         return try {
             connection = URL(url).openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
-            if (!apiKey.isNullOrBlank()) {
-                connection.setRequestProperty("Authorization", "Bearer $apiKey")
-            }
+            connection.applyAuth(apiKey)
             connection.connectTimeout = 15_000
             connection.readTimeout = 15_000
             val code = connection.responseCode
@@ -244,7 +270,7 @@ class OpenAICompatibleClient {
                 .openConnection() as HttpURLConnection
             connection.requestMethod = "POST"
             connection.setRequestProperty("Content-Type", "application/json")
-            connection.setRequestProperty("Authorization", "Bearer $apiKey")
+            connection.applyAuth(apiKey)
             connection.doOutput = true
             connection.connectTimeout = 30_000
             connection.readTimeout = 60_000
