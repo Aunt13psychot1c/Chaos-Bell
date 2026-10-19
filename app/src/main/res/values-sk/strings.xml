@@ -57,6 +57,9 @@
     <string name="settings_provider_custom">Vlastný (kompatibilný s OpenAI)</string>
     <string name="settings_web_search_title">Vyhľadávanie na webe</string>
     <string name="settings_web_search_desc">Nechaj Claude vyhľadávať online, keď to príkaz potrebuje</string>
+    <string name="colors_title">Farby</string>
+    <string name="colors_welcome_title">Vyber farby pre Bell</string>
+    <string name="colors_welcome_desc">Kedykoľvek ich môžeš zmeniť v Nastaveniach.</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Teplota</string>
     <string name="settings_endpoint_title">Koncový bod</string>

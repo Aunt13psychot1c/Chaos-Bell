@@ -56,6 +56,7 @@ import com.musheer360.swiftslate.ui.components.SlateCard
 import com.musheer360.swiftslate.ui.components.SlateItemCard
 import com.musheer360.swiftslate.ui.components.SlateToast
 import com.musheer360.swiftslate.ui.components.SlateToastTokens
+import com.musheer360.swiftslate.ui.theme.PaletteStore
 import com.musheer360.swiftslate.ui.theme.SwiftSlateTheme
 import kotlinx.coroutines.delay
 
@@ -91,6 +92,7 @@ class ProcessTextActivity : ComponentActivity() {
             null
         }
 
+        PaletteStore.load(getSharedPreferences("settings", MODE_PRIVATE))
         setContent {
             SwiftSlateTheme {
                 ProcessTextRoot(

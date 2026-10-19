@@ -57,6 +57,9 @@
     <string name="settings_provider_custom">Niestandardowy (zgodny z OpenAI)</string>
     <string name="settings_web_search_title">Wyszukiwanie w sieci</string>
     <string name="settings_web_search_desc">Pozwól Claude szukać w internecie, gdy polecenie tego wymaga</string>
+    <string name="colors_title">Kolory</string>
+    <string name="colors_welcome_title">Wybierz kolory Bell</string>
+    <string name="colors_welcome_desc">Możesz je zmienić w dowolnej chwili w Ustawieniach.</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Temperatura</string>
     <string name="settings_endpoint_title">Endpoint</string>

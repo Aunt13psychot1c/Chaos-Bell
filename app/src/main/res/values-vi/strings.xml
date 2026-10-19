@@ -57,6 +57,9 @@
     <string name="settings_provider_custom">Tùy chỉnh (tương thích OpenAI)</string>
     <string name="settings_web_search_title">Tìm kiếm web</string>
     <string name="settings_web_search_desc">Cho phép Claude tra cứu trực tuyến khi lệnh cần</string>
+    <string name="colors_title">Màu sắc</string>
+    <string name="colors_welcome_title">Chọn màu cho Bell</string>
+    <string name="colors_welcome_desc">Bạn có thể đổi bất cứ lúc nào trong Cài đặt.</string>
     <string name="settings_model_title">Mô hình</string>
     <string name="settings_temperature_title">Nhiệt độ</string>
     <string name="settings_endpoint_title">Điểm cuối</string>

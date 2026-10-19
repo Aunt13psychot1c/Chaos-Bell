@@ -57,6 +57,9 @@
     <string name="settings_provider_custom">Brugerdefineret (OpenAI-kompatibel)</string>
     <string name="settings_web_search_title">Websøgning</string>
     <string name="settings_web_search_desc">Lad Claude slå ting op online, når en kommando har brug for det</string>
+    <string name="colors_title">Farver</string>
+    <string name="colors_welcome_title">Vælg Bells farver</string>
+    <string name="colors_welcome_desc">Du kan altid ændre dem i Indstillinger.</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Temperatur</string>
     <string name="settings_endpoint_title">Endpoint</string>

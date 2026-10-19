@@ -57,6 +57,9 @@
     <string name="settings_provider_custom">Pielāgots (saderīgs ar OpenAI)</string>
     <string name="settings_web_search_title">Meklēšana tīmeklī</string>
     <string name="settings_web_search_desc">Ļaut Claude meklēt tiešsaistē, ja komandai tas vajadzīgs</string>
+    <string name="colors_title">Krāsas</string>
+    <string name="colors_welcome_title">Izvēlies Bell krāsas</string>
+    <string name="colors_welcome_desc">Tās jebkurā laikā var mainīt iestatījumos.</string>
     <string name="settings_model_title">Modelis</string>
     <string name="settings_temperature_title">Temperatūra</string>
     <string name="settings_endpoint_title">Galapunkts</string>

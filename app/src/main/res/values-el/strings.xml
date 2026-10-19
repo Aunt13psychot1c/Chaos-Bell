@@ -57,6 +57,9 @@
     <string name="settings_provider_custom">Προσαρμοσμένο (συμβατό με OpenAI)</string>
     <string name="settings_web_search_title">Αναζήτηση στο web</string>
     <string name="settings_web_search_desc">Επίτρεψε στο Claude να ψάχνει online όταν το χρειάζεται μια εντολή</string>
+    <string name="colors_title">Χρώματα</string>
+    <string name="colors_welcome_title">Διάλεξε τα χρώματα του Bell</string>
+    <string name="colors_welcome_desc">Μπορείς να τα αλλάξεις όποτε θέλεις από τις Ρυθμίσεις.</string>
     <string name="settings_model_title">Μοντέλο</string>
     <string name="settings_temperature_title">Θερμοκρασία</string>
     <string name="settings_endpoint_title">Τελικό σημείο</string>

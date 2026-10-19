@@ -57,6 +57,9 @@
     <string name="settings_provider_custom">Mukautettu (OpenAI-yhteensopiva)</string>
     <string name="settings_web_search_title">Verkkohaku</string>
     <string name="settings_web_search_desc">Anna Clauden hakea tietoa verkosta, kun komento sitä tarvitsee</string>
+    <string name="colors_title">Värit</string>
+    <string name="colors_welcome_title">Valitse Bellin värit</string>
+    <string name="colors_welcome_desc">Voit vaihtaa niitä milloin tahansa asetuksista.</string>
     <string name="settings_model_title">Malli</string>
     <string name="settings_temperature_title">Lämpötila</string>
     <string name="settings_endpoint_title">Päätepiste</string>

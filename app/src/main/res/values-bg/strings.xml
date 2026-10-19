@@ -57,6 +57,9 @@
     <string name="settings_provider_custom">Потребителски (съвместим с OpenAI)</string>
     <string name="settings_web_search_title">Търсене в мрежата</string>
     <string name="settings_web_search_desc">Позволи на Claude да търси онлайн, когато командата го изисква</string>
+    <string name="colors_title">Цветове</string>
+    <string name="colors_welcome_title">Изберете цветовете на Bell</string>
+    <string name="colors_welcome_desc">Можете да ги промените по всяко време от Настройки.</string>
     <string name="settings_model_title">Модел</string>
     <string name="settings_temperature_title">Температура</string>
     <string name="settings_endpoint_title">Крайна точка</string>

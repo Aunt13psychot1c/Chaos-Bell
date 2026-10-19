@@ -38,7 +38,9 @@ import com.musheer360.swiftslate.ui.KeysScreen
 import com.musheer360.swiftslate.ui.SettingsScreen
 import com.musheer360.swiftslate.ui.components.LocalSlateRhythm
 import com.musheer360.swiftslate.ui.components.SlateRhythm
+import com.musheer360.swiftslate.ui.theme.PaletteStore
 import com.musheer360.swiftslate.ui.theme.SwiftSlateTheme
+import com.musheer360.swiftslate.ui.components.FirstLaunchColorPicker
 
 enum class Tab(@param:StringRes val titleRes: Int, val icon: ImageVector) {
     Dashboard(R.string.dashboard_title, Icons.Default.Home),
@@ -51,6 +53,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        PaletteStore.load(getSharedPreferences("settings", MODE_PRIVATE))
         setContent {
             SwiftSlateTheme {
                 SwiftSlateMainScreen()
@@ -86,6 +89,12 @@ fun SwiftSlateMainScreen(vm: SwiftSlateViewModel = viewModel()) {
                 // the accessibility service (#125).
             }
         }
+    }
+
+    // One-time "pick your colors" on a fresh install. Answered once, never shown again;
+    // Settings > Colors changes it afterwards.
+    if (!PaletteStore.chosen) {
+        FirstLaunchColorPicker(onPick = { PaletteStore.choose(vm.prefs, it) })
     }
 
     Scaffold(

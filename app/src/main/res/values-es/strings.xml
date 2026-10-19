@@ -50,6 +50,9 @@
     <string name="settings_provider_custom">Personalizado (compatible con OpenAI)</string>
     <string name="settings_web_search_title">Búsqueda web</string>
     <string name="settings_web_search_desc">Deja que Claude busque en internet cuando un comando lo necesite</string>
+    <string name="colors_title">Colores</string>
+    <string name="colors_welcome_title">Elige los colores de Bell</string>
+    <string name="colors_welcome_desc">Puedes cambiarlos cuando quieras en Ajustes.</string>
     <string name="settings_model_title">Modelo</string>
     <string name="settings_endpoint_title">Endpoint</string>
     <string name="settings_endpoint_placeholder">https://api.example.com/v1</string>

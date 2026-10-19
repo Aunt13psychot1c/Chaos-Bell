@@ -57,6 +57,9 @@
     <string name="settings_provider_custom">Özel (OpenAI Uyumlu)</string>
     <string name="settings_web_search_title">Web araması</string>
     <string name="settings_web_search_desc">Bir komut gerektirdiğinde Claude\'un internette arama yapmasına izin ver</string>
+    <string name="colors_title">Renkler</string>
+    <string name="colors_welcome_title">Bell\'in renklerini seç</string>
+    <string name="colors_welcome_desc">Bunları istediğin zaman Ayarlar\'dan değiştirebilirsin.</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Sıcaklık</string>
     <string name="settings_endpoint_title">Uç Nokta</string>

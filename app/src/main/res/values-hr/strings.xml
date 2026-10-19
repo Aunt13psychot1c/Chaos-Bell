@@ -57,6 +57,9 @@
     <string name="settings_provider_custom">Prilagođeno (kompatibilno s OpenAI)</string>
     <string name="settings_web_search_title">Pretraživanje weba</string>
     <string name="settings_web_search_desc">Dopusti Claudeu da traži na internetu kad naredba to zahtijeva</string>
+    <string name="colors_title">Boje</string>
+    <string name="colors_welcome_title">Odaberi boje za Bell</string>
+    <string name="colors_welcome_desc">Možeš ih promijeniti bilo kada u Postavkama.</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Temperatura</string>
     <string name="settings_endpoint_title">Krajnja točka</string>

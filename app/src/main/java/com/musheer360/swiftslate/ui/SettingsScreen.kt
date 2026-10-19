@@ -43,6 +43,8 @@ import com.musheer360.swiftslate.provider.AnthropicConfig
 import com.musheer360.swiftslate.provider.EndpointValidator
 import com.musheer360.swiftslate.provider.GroqConfig
 import com.musheer360.swiftslate.ui.components.LocalSlateRhythm
+import com.musheer360.swiftslate.ui.components.PaletteSwatchRow
+import com.musheer360.swiftslate.ui.theme.PaletteStore
 import com.musheer360.swiftslate.ui.components.ScreenTitle
 import com.musheer360.swiftslate.ui.components.SlateCard
 import com.musheer360.swiftslate.ui.components.SlateDivider
@@ -714,6 +716,18 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     modifier = Modifier.padding(top = rhythm.formGap)
                 )
             }
+            // Bell's colors share this card instead of adding a fifth one: Settings does not
+            // scroll, so every new card would squeeze the About card on short screens.
+            Spacer(modifier = Modifier.height(rhythm.groupGap))
+            SlateDivider()
+            Spacer(modifier = Modifier.height(rhythm.groupGap))
+            PaletteSwatchRow(
+                selected = PaletteStore.current,
+                onPick = { palette ->
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    PaletteStore.choose(prefs, palette)
+                }
+            )
         }
 
         Spacer(modifier = Modifier.height(rhythm.cardGap))

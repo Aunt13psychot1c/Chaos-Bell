@@ -57,6 +57,9 @@
     <string name="settings_provider_custom">Personalitzat (compatible amb OpenAI)</string>
     <string name="settings_web_search_title">Cerca web</string>
     <string name="settings_web_search_desc">Deixa que Claude busqui a internet quan una ordre ho necessiti</string>
+    <string name="colors_title">Colors</string>
+    <string name="colors_welcome_title">Tria els colors de Bell</string>
+    <string name="colors_welcome_desc">Els pots canviar quan vulguis a Configuració.</string>
     <string name="settings_model_title">Model</string>
     <string name="settings_temperature_title">Temperatura</string>
     <string name="settings_endpoint_title">Punt final</string>

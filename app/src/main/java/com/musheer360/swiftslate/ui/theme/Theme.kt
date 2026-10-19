@@ -7,7 +7,9 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
@@ -52,7 +54,8 @@ fun SwiftSlateTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val base = if (darkTheme) DarkColorScheme else LightColorScheme
+    val colorScheme = base.withAccent(PaletteStore.current, darkTheme)
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -66,5 +69,20 @@ fun SwiftSlateTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         content = content
+    )
+}
+
+/**
+ * Lays the chosen [palette]'s accent over [this] scheme. Only the accent family changes, so
+ * backgrounds, text, errors and the green "it worked" color stay exactly as they were.
+ */
+internal fun ColorScheme.withAccent(palette: BellPalette, darkTheme: Boolean): ColorScheme {
+    val accent = (if (darkTheme) palette.darkAccent else palette.lightAccent) ?: return this
+    return copy(
+        primary = accent,
+        onPrimary = if (darkTheme) Color(0xFF000000) else Color(0xFFFFFFFF),
+        // A faint wash of the accent for the selected tab's pill and similar containers.
+        primaryContainer = lerp(surface, accent, 0.22f),
+        onPrimaryContainer = onSurface
     )
 }

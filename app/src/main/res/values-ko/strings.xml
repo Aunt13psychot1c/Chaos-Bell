@@ -57,6 +57,9 @@
     <string name="settings_provider_custom">사용자 지정 (OpenAI 호환)</string>
     <string name="settings_web_search_title">웹 검색</string>
     <string name="settings_web_search_desc">명령에 필요할 때 Claude가 온라인에서 찾아볼 수 있게 합니다</string>
+    <string name="colors_title">색상</string>
+    <string name="colors_welcome_title">Bell의 색상을 고르세요</string>
+    <string name="colors_welcome_desc">설정에서 언제든지 바꿀 수 있습니다.</string>
     <string name="settings_model_title">모델</string>
     <string name="settings_temperature_title">온도</string>
     <string name="settings_endpoint_title">엔드포인트</string>

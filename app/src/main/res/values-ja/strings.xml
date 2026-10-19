@@ -57,6 +57,9 @@
     <string name="settings_provider_custom">カスタム（OpenAI 互換）</string>
     <string name="settings_web_search_title">ウェブ検索</string>
     <string name="settings_web_search_desc">コマンドに必要なときは Claude がオンラインで調べられるようにする</string>
+    <string name="colors_title">カラー</string>
+    <string name="colors_welcome_title">Bell の色を選ぶ</string>
+    <string name="colors_welcome_desc">設定からいつでも変更できます。</string>
     <string name="settings_model_title">モデル</string>
     <string name="settings_temperature_title">温度</string>
     <string name="settings_endpoint_title">エンドポイント</string>
