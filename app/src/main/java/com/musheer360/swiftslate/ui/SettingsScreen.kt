@@ -1,5 +1,6 @@
 package com.musheer360.swiftslate.ui
 
+import com.musheer360.swiftslate.ui.processtext.ProcessTextActivity
 import android.content.SharedPreferences
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -743,6 +744,27 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
             ) {
                 Text(
                     text = stringResource(R.string.about_me_title),
+                    fontSize = rhythm.bodySize,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(text = "›", fontSize = rhythm.emphasisSize, color = MaterialTheme.colorScheme.primary)
+            }
+            SlateDivider()
+            // Fold-out chat: opens Bell's mini chat right here, since commands don't run
+            // inside her own app.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        context.startActivity(ProcessTextActivity.chatIntent(context))
+                    }
+                    .padding(vertical = rhythm.groupGap),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "💬 Chat with Bell",
                     fontSize = rhythm.bodySize,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f)

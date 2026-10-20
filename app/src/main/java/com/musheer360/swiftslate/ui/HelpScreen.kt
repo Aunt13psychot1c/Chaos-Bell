@@ -1,5 +1,6 @@
 package com.musheer360.swiftslate.ui
 
+import com.musheer360.swiftslate.ui.processtext.ProcessTextActivity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -54,6 +55,7 @@ private const val MANUAL_URL = "https://github.com/Aunt13psychot1c/Chaos-Bell/bl
 private enum class HelpAction(val label: String) {
     ACCESSIBILITY("Open Accessibility settings"),
     APP_INFO("Open Bell's app info"),
+    ASK_BELL("💬 Ask Bell"),
 }
 
 private class HelpSection(
@@ -176,11 +178,25 @@ private val SECTIONS = listOf(
             "• Your keys are locked with your phone's built-in encryption.",
             "• No tracking, no ads, no analytics. The code is public for anyone to check."
         )
+    ),
+    HelpSection(
+        "🙋 Still stuck? Ask Bell",
+        listOf(
+            "Tap Ask Bell and type your question like you'd ask a friend. She reads this whole Help page first, so she can walk you through her own setup step by step.",
+            "She needs at least one API key to talk. No key yet? Open \"Set her up (one time)\" above first."
+        ),
+        listOf(HelpAction.ASK_BELL)
     )
 )
 
+/** The Help page as plain text, handed to Bell when someone taps Ask Bell. */
+private val MANUAL_TEXT: String by lazy {
+    SECTIONS.joinToString("\n\n") { section -> section.title + "\n" + section.lines.joinToString("\n") }
+}
+
 private fun openSettings(context: Context, action: HelpAction) {
     val intent = when (action) {
+        HelpAction.ASK_BELL -> ProcessTextActivity.chatIntent(context, MANUAL_TEXT)
         HelpAction.ACCESSIBILITY -> Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
         HelpAction.APP_INFO -> Intent(
             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,

@@ -1,6 +1,10 @@
 package com.musheer360.swiftslate.ui.processtext
 
-data class Selection(val text: String, val readOnly: Boolean)
+/**
+ * [chatMode] opens the popup straight into an empty chat (from Settings or Help) instead of the
+ * command list. Then [text] is optional background for Bell, like the Help manual.
+ */
+data class Selection(val text: String, val readOnly: Boolean, val chatMode: Boolean = false)
 
 sealed interface Rejection {
     /** Extra absent, or blank/invisible-only after normalization. */

@@ -72,6 +72,18 @@ import kotlinx.coroutines.delay
  */
 class ProcessTextActivity : ComponentActivity() {
 
+    companion object {
+        /** Opens the popup straight into an empty chat with Bell (Settings, Help). */
+        const val EXTRA_CHAT_MODE = "com.musheer360.swiftslate.CHAT_MODE"
+        /** Optional background text Bell reads first, like the Help manual. */
+        const val EXTRA_CHAT_BACKGROUND = "com.musheer360.swiftslate.CHAT_BACKGROUND"
+
+        fun chatIntent(context: Context, background: String = ""): Intent =
+            Intent(context, ProcessTextActivity::class.java)
+                .putExtra(EXTRA_CHAT_MODE, true)
+                .putExtra(EXTRA_CHAT_BACKGROUND, background)
+    }
+
     private var resultDelivered = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,7 +97,16 @@ class ProcessTextActivity : ComponentActivity() {
                 ?.takeIf { it.containsKey(Intent.EXTRA_PROCESS_TEXT_READONLY) }
                 ?.getBoolean(Intent.EXTRA_PROCESS_TEXT_READONLY)
         )
-        val selection = parsed.getOrNull()
+        val chatMode = intent?.getBooleanExtra(EXTRA_CHAT_MODE, false) == true
+        val selection = if (chatMode) {
+            Selection(
+                text = intent?.getStringExtra(EXTRA_CHAT_BACKGROUND).orEmpty(),
+                readOnly = true,
+                chatMode = true
+            )
+        } else {
+            parsed.getOrNull()
+        }
         // Rendered in the sheet rather than as a toast: the app draws all of its own transient
         // UI, and an unusable selection is worth an explicit dismiss rather than a message that
         // disappears on its own.
