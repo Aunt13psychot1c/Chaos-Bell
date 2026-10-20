@@ -92,7 +92,12 @@ private fun clearCrashMarker(context: Context) {
 }
 
 @Composable
-fun DashboardScreen(keyManager: KeyManager, commandManager: CommandManager, statsManager: StatsManager) {
+fun DashboardScreen(
+    keyManager: KeyManager,
+    commandManager: CommandManager,
+    statsManager: StatsManager,
+    onHelp: () -> Unit = {}
+) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
     var isServiceEnabled by remember { mutableStateOf(checkServiceEnabled(context)) }
@@ -150,7 +155,23 @@ fun DashboardScreen(keyManager: KeyManager, commandManager: CommandManager, stat
             .graphicsLayer { }
             .padding(horizontal = rhythm.screenPaddingH, vertical = rhythm.screenPaddingV)
     ) {
-        ScreenTitle(stringResource(R.string.dashboard_title))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top
+        ) {
+            Box(modifier = Modifier.weight(1f)) {
+                ScreenTitle(stringResource(R.string.dashboard_title))
+            }
+            // Opens Bell's built-in manual (HelpScreen).
+            TextButton(onClick = onHelp) {
+                Text(
+                    text = "?",
+                    fontSize = rhythm.titleSize,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
 
         // Service status + API keys
         SlateCard {

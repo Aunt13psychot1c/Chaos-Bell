@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.musheer360.swiftslate.ui.CommandsScreen
 import com.musheer360.swiftslate.ui.DashboardScreen
+import com.musheer360.swiftslate.ui.HelpScreen
+import com.musheer360.swiftslate.ui.PREF_HELP_SEEN
 import com.musheer360.swiftslate.ui.KeysScreen
 import com.musheer360.swiftslate.ui.SettingsScreen
 import com.musheer360.swiftslate.ui.components.LocalSlateRhythm
@@ -97,6 +99,29 @@ fun SwiftSlateMainScreen(vm: SwiftSlateViewModel = viewModel()) {
         FirstLaunchColorPicker(onPick = { PaletteStore.choose(vm.prefs, it) })
     }
 
+    // Bell's manual: opens on its own once, right after the color pick on a fresh install,
+    // and any time after that from the "?" on the Dashboard.
+    var showHelp by rememberSaveable { mutableStateOf(false) }
+    var helpFirstRun by rememberSaveable {
+        mutableStateOf(
+            try {
+                !context.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean(PREF_HELP_SEEN, false)
+            } catch (_: Exception) { false }
+        )
+    }
+    if (PaletteStore.chosen && (showHelp || helpFirstRun)) {
+        HelpScreen(firstRun = helpFirstRun, onClose = {
+            if (helpFirstRun) {
+                try {
+                    context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+                        .edit().putBoolean(PREF_HELP_SEEN, true).apply()
+                } catch (_: Exception) { }
+            }
+            helpFirstRun = false
+            showHelp = false
+        })
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
@@ -134,7 +159,7 @@ fun SwiftSlateMainScreen(vm: SwiftSlateViewModel = viewModel()) {
             Tab.entries.associateWith { tab ->
                 movableContentOf {
                     when (tab) {
-                        Tab.Dashboard -> DashboardScreen(vm.keyManager, vm.commandManager, vm.statsManager)
+                        Tab.Dashboard -> DashboardScreen(vm.keyManager, vm.commandManager, vm.statsManager, onHelp = { showHelp = true })
                         Tab.Keys -> KeysScreen(vm.keyManager, vm.prefs)
                         Tab.Commands -> CommandsScreen(vm.commandManager)
                         Tab.Settings -> SettingsScreen(vm.commandManager, vm.prefs, vm.keyManager)

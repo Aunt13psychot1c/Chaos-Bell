@@ -8,6 +8,7 @@
   <a href="https://github.com/Aunt13psychot1c/Chaos-Bell/actions/workflows/build-my-apk.yml"><img src="https://github.com/Aunt13psychot1c/Chaos-Bell/actions/workflows/build-my-apk.yml/badge.svg" alt="Build My APK"></a>
 </p>
 <p align="center"><b>AI in a box for Android. Type a command anywhere you type, and Bell answers.</b></p>
+<p align="center">📖 <b><a href="MANUAL.md">Read the step-by-step manual</a></b> · ⬇️ <b><a href="https://github.com/Aunt13psychot1c/Chaos-Bell/releases/latest">Download the latest APK</a></b></p>
 
 ---
 
