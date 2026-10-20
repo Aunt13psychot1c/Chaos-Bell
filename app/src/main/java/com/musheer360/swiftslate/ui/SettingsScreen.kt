@@ -4,6 +4,8 @@ import android.content.SharedPreferences
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -300,6 +302,9 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
         modifier = Modifier
             .fillMaxSize()
             .graphicsLayer { }
+            // Scrolls so a taller Card 1 (Custom adds an Endpoint field) never pushes
+            // the cards below it off the bottom of the screen.
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = rhythm.screenPaddingH, vertical = rhythm.screenPaddingV)
     ) {
         ScreenTitle(stringResource(R.string.settings_title))
@@ -773,7 +778,7 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         backupMessage = null
-                        exportLauncher.launch("swiftslate-commands.json")
+                        exportLauncher.launch("chaos-bell-commands.json")
                     },
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.weight(1f).heightIn(min = 48.dp)
@@ -804,24 +809,10 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
 
         Spacer(modifier = Modifier.height(rhythm.cardGap))
 
-        // Card 4: About. The only weighted child, so its bottom edge lands flush
-        // screenPaddingV above the nav bar exactly like the last card on every
-        // other tab, and it absorbs whatever slack the rhythm above did not take.
-        //
-        // That slack is split rather than pooled. The two text groups each sit in
-        // an equally weighted half, so the divider lands on the card's midline and
-        // each group is centred within its own half. Pooling it instead — whether
-        // as weighted spacers hugging the divider (which opened a ~104 dp void on
-        // tall screens) or as one centred block (which left dead space above the
-        // version line and below the sponsor line) — is what this replaces.
-        SlateCard(
-            modifier = Modifier.weight(1f),
-            fillHeight = true
-        ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center
-            ) {
+        // Card 4: About. Settings scrolls now, so this is a normal-height card
+        // instead of a weighted one that stretched to fill the leftover space.
+        SlateCard {
+            Column {
                 Text(
                     text = stringResource(R.string.app_name) + " v" + BuildConfig.VERSION_NAME,
                     fontSize = rhythm.emphasisSize,
@@ -834,17 +825,14 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     fontSize = rhythm.bodySize,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable(interactionSource = null, indication = null) {
-                        uriHandler.openUri("https://github.com/Aunt13psychot1c/SwiftSlate/releases/latest")
+                        uriHandler.openUri("https://github.com/Aunt13psychot1c/Chaos-Bell/releases/latest")
                     }
                 )
             }
             Spacer(modifier = Modifier.height(rhythm.groupGap))
             SlateDivider()
             Spacer(modifier = Modifier.height(rhythm.groupGap))
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center
-            ) {
+            Column {
                 Text(
                     text = stringResource(R.string.settings_made_by),
                     fontSize = rhythm.bodySize,
