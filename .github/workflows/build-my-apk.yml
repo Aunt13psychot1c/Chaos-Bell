@@ -6,6 +6,10 @@ name: Build My APK
 # separate app (package com.musheer360.swiftslate.preview).
 on:
   workflow_dispatch:
+  # Test-compile every side branch automatically, so work-in-progress gets checked
+  # before it ever reaches main. Main itself only builds when someone taps Run workflow.
+  push:
+    branches-ignore: [main]
 
 permissions:
   contents: read
