@@ -840,6 +840,15 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                 )
                 Spacer(modifier = Modifier.height(rhythm.tightGap))
                 Text(
+                    text = stringResource(R.string.settings_buy_coffee),
+                    fontSize = rhythm.bodySize,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable(interactionSource = null, indication = null) {
+                        uriHandler.openUri("https://buymeacoffee.com/aunt13psychot1c")
+                    }
+                )
+                Spacer(modifier = Modifier.height(rhythm.tightGap))
+                Text(
                     text = stringResource(R.string.settings_sponsor),
                     fontSize = rhythm.bodySize,
                     color = MaterialTheme.colorScheme.primary,

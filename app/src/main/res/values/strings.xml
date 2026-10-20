@@ -90,7 +90,8 @@
     <string name="backup_import_cancel">Cancel</string>
     <string name="settings_check_updates">Check for updates</string>
     <string name="settings_made_by">Bell by Aunt13psychot1c, built on SwiftSlate by Musheer Alam</string>
-    <string name="settings_sponsor">Sponsor on GitHub</string>
+    <string name="settings_buy_coffee" translatable="false">☕ Buy Aunt13 a coffee</string>
+    <string name="settings_sponsor">Sponsor Musheer (SwiftSlate) on GitHub</string>
     <string name="commands_collapse">Collapse</string>
     <string name="commands_expand">Expand</string>
     <string name="commands_search_hint">Search commands…</string>
