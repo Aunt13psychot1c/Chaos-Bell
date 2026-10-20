@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.SystemClock
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
@@ -16,9 +17,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -44,6 +47,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -87,6 +92,9 @@ class ProcessTextActivity : ComponentActivity() {
     private var resultDelivered = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Edge-to-edge on every Android version, not only 15+ where it is forced: otherwise the
+        // window swallows the keyboard insets on older phones and the sheet can't lift above it.
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         // PROCESS_TEXT activities are always launched fresh with their Intent, so the selection
@@ -385,14 +393,21 @@ private fun ChatCard(state: UiState.Preview, onSend: (String) -> Unit) {
     // the chat grows, so the opener is captured once, when the card first appears.
     val opener = remember { state.opener ?: state.result }
 
-    LaunchedEffect(state.chat.size, state.thinking, state.chatError) {
+    // The history gives up height while the keyboard is open, so the box you type in stays on
+    // screen instead of being pushed down behind the keyboard on shorter phones.
+    val density = LocalDensity.current
+    val keyboard = with(density) { WindowInsets.ime.getBottom(density).toDp() }
+    val screen = LocalConfiguration.current.screenHeightDp.dp
+    val historyMax = (screen - keyboard - CHAT_CHROME_DP.dp).coerceIn(CHAT_HISTORY_MIN_DP.dp, CHAT_HISTORY_MAX_DP.dp)
+
+    LaunchedEffect(state.chat.size, state.thinking, state.chatError, keyboard) {
         scroll.animateScrollTo(scroll.maxValue)
     }
 
     SlateCard {
         Column(
             modifier = Modifier
-                .heightIn(max = 300.dp)
+                .heightIn(max = historyMax)
                 .verticalScroll(scroll)
         ) {
             Text(
@@ -514,3 +529,7 @@ private fun CommandRows(commands: List<Command>, onPick: (Command) -> Unit) {
 private val SlateButtonShape = RoundedCornerShape(10.dp)
 
 private const val ANIM_MS = 250
+/** Everything in the chat sheet besides the history: handle, title, type box, buttons, bars. */
+private const val CHAT_CHROME_DP = 360
+private const val CHAT_HISTORY_MIN_DP = 64
+private const val CHAT_HISTORY_MAX_DP = 300
