@@ -64,13 +64,25 @@ You can make your own commands too, and change the `?` to another symbol if you 
 
 ## Get her on your phone
 
-The easy way, no computer needed:
+No computer, no zip files. Just your phone.
 
-1. Open the **Actions** tab on this repo
-2. Tap **Build My APK**, then **Run workflow**
-3. When it finishes, download the APK from the run's Artifacts and install it
+**1. Download**
+Open **[the latest release](https://github.com/Aunt13psychot1c/Chaos-Bell/releases/latest)** and tap the file that ends in **.apk**.
 
-Then in the app: add an API key, turn on Bell's accessibility service when it asks, and start typing commands.
+**2. Install**
+Open the downloaded file. Android will say your browser isn't allowed to install apps yet. Tap **Settings**, switch on **Allow from this source**, go back, and tap **Install**.
+If Play Protect pops up a warning, tap **More details**, then **Install anyway**. Bell isn't from the Play Store yet, so Google just doesn't know her.
+
+**3. Let her work**
+Bell uses Android's accessibility service to see the command you type. Because she didn't come from a store, Android locks that switch the first time. To unlock it:
+- Go to **Settings > Apps > Chaos Bell**
+- Tap the **⋮** in the top corner, then **Allow restricted settings**
+- Now go to **Settings > Accessibility > Chaos Bell** and switch her on
+
+**4. Ring the bell**
+Open Chaos Bell, add an API key, then type something anywhere, add `?fix` or `?talk` on the end, and watch. 🔔
+
+**Updating later:** grab the newest .apk from the same Releases page and install it right over the old one. Your keys, commands, and settings stay put.
 
 ## Building from source
 
@@ -81,7 +93,7 @@ cd chaos-bell
 # APK lands in app/build/outputs/apk/preview/
 ```
 
-Needs JDK 21 and the Android SDK.
+Needs JDK 21 and the Android SDK. The `preview` build is signed with a throwaway debug key and installs as a separate "Chaos Bell Preview" app, handy for testing. Real releases come from the **Release Chaos Bell** workflow.
 
 ## Credits
 
