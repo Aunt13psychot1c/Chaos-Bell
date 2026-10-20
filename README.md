@@ -52,6 +52,27 @@ No keyboard to switch to. No app to open. Just type and ring the bell. 🔔
 
 You can make your own commands too, and change the `?` to another symbol if you like.
 
+**Translate cheat sheet.** Swap the `xx` in `?translate:xx` for a two-letter language code:
+
+| Code | Language | Code | Language |
+|---|---|---|---|
+| `es` | Spanish | `vi` | Vietnamese |
+| `fr` | French | `ar` | Arabic |
+| `it` | Italian | `ru` | Russian |
+| `de` | German | `uk` | Ukrainian |
+| `pt` | Portuguese | `hi` | Hindi |
+| `ja` | Japanese | `zh` | Chinese |
+| `ko` | Korean | `en` | English |
+
+Example: type `hey, thanks for listening!?translate:vi` and Bell swaps it into Vietnamese.
+
+**Just for fun.** Bell takes any 2 to 5 letter code, so you can get weird with it:
+
+- 💻 Code: `js` JavaScript, `ts` TypeScript, `py` Python 🐍, `go` Go, `rs` Rust 🦀, `rb` Ruby, `php` PHP, `cpp` C/C++, `sql` databases, `html` a web page. (`cs` is a coin flip between C# and Czech 😂)
+- 🌍 Fun human ones: `tlh` Klingon 🖖, `la` Latin, `eo` Esperanto, `haw` Hawaiian 🌺, `cy` Welsh 🐉, `ga` Irish ☘️, `yi` Yiddish, `sw` Swahili
+
+Results on the fun ones depend on your AI model, so expect some chaos.
+
 ## What makes her Bell
 
 - **Claude gets her own slot.** Add an Anthropic key and Bell talks to Claude directly. Gemini, Groq, and any OpenAI-compatible service work too.
