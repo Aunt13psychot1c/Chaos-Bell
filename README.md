@@ -79,10 +79,45 @@ Bell uses Android's accessibility service to see the command you type. Because s
 - Tap the **⋮** in the top corner, then **Allow restricted settings**
 - Now go to **Settings > Accessibility > Chaos Bell** and switch her on
 
-**4. Ring the bell**
-Open Chaos Bell, add an API key, then type something anywhere, add `?fix` or `?talk` on the end, and watch. 🔔
+**4. Give her a brain (your own API key)**
+Bell doesn't come with AI built in. You plug in your own key, so it's your account and your usage. See **[Get your own AI key](#get-your-own-ai-key)** below.
+
+**5. Ring the bell**
+Type something anywhere, add `?fix` or `?talk` on the end, and watch. 🔔
 
 **Updating later:** grab the newest .apk from the same Releases page and install it right over the old one. Your keys, commands, and settings stay put.
+
+## Get your own AI key
+
+Pick one provider. You can add more later.
+
+| Provider | Cost | Good for |
+|---|---|---|
+| ⚡ **Groq** | Free tier | Fast, easiest place to start |
+| 🔵 **Google Gemini** | Free tier | Solid all-rounder |
+| 🟣 **Claude (Anthropic)** | Paid | The smartest answers |
+| 🧩 **Custom** | Varies | Any OpenAI-compatible service (Fireworks, OpenRouter, your own server) |
+
+Bell's Keys screen has a **Get your API key ↗** link that jumps straight to the right page for the provider you picked.
+
+### Groq, step by step
+
+1. Make an account at **[console.groq.com](https://console.groq.com)** and log in.
+2. Go to **[API Keys](https://console.groq.com/keys)**, tap **Create API Key**, name it something like *Chaos Bell*, and **copy it right away**. Groq only shows it once.
+3. In Bell, go to **Settings > Model Provider** and pick **Groq**.
+4. On the **API Keys** screen, paste your key and tap **Add Key**. Bell tests it before saving.
+5. Back in **Settings > Model**, pick **openai/gpt-oss-120b** (the default).
+
+### "Your API key doesn't have access to this model"
+
+Groq lets a project limit which models it can use. If your project has a list and Bell's model isn't on it, Bell gets turned away. To fix it:
+
+1. In the Groq console, tap the **project name** at the top (next to *Personal*), then **Manage Projects**.
+2. Find the project your key lives in and tap **View** under *Rate Limits*.
+3. Under **Allowed Models**, tap **Edit**.
+4. Tick **openai/gpt-oss-120b** (and any others you want), then **Save**.
+
+Try your command again and she'll ring. 🔔
 
 ## Building from source
 
