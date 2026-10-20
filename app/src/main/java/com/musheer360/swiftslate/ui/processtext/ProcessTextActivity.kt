@@ -219,7 +219,8 @@ private fun ProcessTextSheet(
     val state: UiState? = viewModel?.uiState?.collectAsState()?.value
     if (selection != null && state is UiState.Initializing) return
 
-    SlateBottomSheet(onDismiss = onDismiss) {
+    val chatMode = selection?.chatMode == true
+    SlateBottomSheet(onDismiss = onDismiss, dismissible = !chatMode) {
         Column(
             modifier = Modifier
                 .padding(horizontal = 20.dp)
@@ -229,7 +230,7 @@ private fun ProcessTextSheet(
                 .animateContentSize(tween(ANIM_MS))
         ) {
             Text(
-                text = stringResource(R.string.process_text_title),
+                text = if (chatMode) "💬 Chat with Bell" else stringResource(R.string.process_text_title),
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
@@ -301,12 +302,13 @@ private fun ProcessTextSheet(
                         ) {
                             Text(stringResource(R.string.process_text_copy))
                         }
+                        // In chat mode there is no command list to go back to, so this closes.
                         Button(
-                            onClick = { viewModel.backToCommands() },
+                            onClick = { if (chatMode) onDismiss() else viewModel.backToCommands() },
                             shape = SlateButtonShape,
                             modifier = Modifier.weight(1f).heightIn(min = 48.dp)
                         ) {
-                            Text(stringResource(R.string.process_text_back))
+                            Text(if (chatMode) "Close" else stringResource(R.string.process_text_back))
                         }
                     }
                 }
@@ -381,7 +383,7 @@ private fun ChatCard(state: UiState.Preview, onSend: (String) -> Unit) {
     var draft by remember { mutableStateOf("") }
     // The first answer opens the conversation. [state.result] moves on to the latest reply as
     // the chat grows, so the opener is captured once, when the card first appears.
-    val opener = remember { state.result }
+    val opener = remember { state.opener ?: state.result }
 
     LaunchedEffect(state.chat.size, state.thinking, state.chatError) {
         scroll.animateScrollTo(scroll.maxValue)

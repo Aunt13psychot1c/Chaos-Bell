@@ -21,9 +21,11 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -66,6 +68,11 @@ import kotlin.math.roundToInt
 @Composable
 fun SlateBottomSheet(
     onDismiss: () -> Unit,
+    /**
+     * False for chat mode: a stray swipe or a tap above the sheet would throw the conversation
+     * away, so only the Back button and the sheet's own Close button close it.
+     */
+    dismissible: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) {
     var shown by remember { mutableStateOf(false) }
@@ -95,7 +102,7 @@ fun SlateBottomSheet(
             modifier = Modifier
                 .fillMaxSize()
                 .background(SCRIM_COLOR.copy(alpha = SCRIM_ALPHA * scrimAlpha))
-                .clickable(interactionSource = null, indication = null, onClick = close)
+                .clickable(interactionSource = null, indication = null, onClick = { if (dismissible) close() })
         )
 
         AnimatedVisibility(
@@ -104,7 +111,7 @@ fun SlateBottomSheet(
             enter = slideInVertically(tween(ANIM_MS)) { it } + fadeIn(tween(FADE_IN_MS)),
             exit = slideOutVertically(tween(ANIM_MS)) { it } + fadeOut(tween(FADE_OUT_MS))
         ) {
-            SheetSurface(onDismissRequest = close, content = content)
+            SheetSurface(onDismissRequest = close, dismissible = dismissible, content = content)
         }
     }
 }
@@ -112,6 +119,7 @@ fun SlateBottomSheet(
 @Composable
 private fun SheetSurface(
     onDismissRequest: () -> Unit,
+    dismissible: Boolean,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -152,6 +160,7 @@ private fun SheetSurface(
             .draggable(
                 orientation = Orientation.Vertical,
                 state = draggableState,
+                enabled = dismissible,
                 onDragStopped = { velocity ->
                     if (dragOffset.value >= dismissThresholdPx || velocity >= DISMISS_VELOCITY) {
                         onDismissRequest()
@@ -162,7 +171,8 @@ private fun SheetSurface(
             )
             // Keeps content clear of the navigation bar; the background above still runs to the
             // bottom edge of the screen.
-            .windowInsetsPadding(WindowInsets.navigationBars),
+            // and above the keyboard, so the chat box stays visible while typing.
+            .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         SheetHandle()

@@ -45,7 +45,9 @@ sealed interface UiState {
         val canInsert: Boolean,
         val chat: List<ChatTurn> = emptyList(),
         val thinking: Boolean = false,
-        val chatError: String? = null
+        val chatError: String? = null,
+        /** What the chat card shows on top; null means [result]. Set when a saved chat is restored. */
+        val opener: String? = null
     ) : UiState
     /** [retry] is null for failures that re-running cannot fix (e.g. nothing configured). */
     data class Error(val message: String, val retry: Command? = null) : UiState
@@ -87,6 +89,9 @@ class ProcessTextViewModel(
     private val commandManager by lazy { CommandManager(app) }
     private val statsManager by lazy { StatsManager(app) }
     private val geminiClient by lazy { GeminiClient() }
+    private val chatStore by lazy { ChatSessionStore(app) }
+    /** Settings chat and Help's Ask Bell keep separate conversations. */
+    private val chatKind = if (selection.text.isBlank()) "settings" else "help"
     private val openAIClient by lazy { OpenAICompatibleClient() }
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Initializing)
@@ -125,7 +130,18 @@ class ProcessTextViewModel(
             _uiState.value = if (selection.chatMode) {
                 // Opened from Settings or Help: skip the command list and go straight to a chat.
                 firstAnswer = CHAT_GREETING
-                UiState.Preview(CHAT_GREETING, canInsert = false)
+                val saved = try {
+                    withContext(Dispatchers.IO) { chatStore.load(chatKind) }
+                } catch (e: Exception) {
+                    Log.w(TAG, "restoring chat failed", e)
+                    emptyList()
+                }
+                UiState.Preview(
+                    result = saved.lastOrNull { !it.fromUser }?.text ?: CHAT_GREETING,
+                    canInsert = false,
+                    chat = saved,
+                    opener = CHAT_GREETING
+                )
             } else {
                 UiState.CommandList(commands)
             }
@@ -228,11 +244,14 @@ class ProcessTextViewModel(
                 }
                 val base = _uiState.value as? UiState.Preview ?: current
                 when (outcome) {
-                    is CommandOutcome.Success -> base.copy(
-                        result = outcome.text,
-                        chat = chat + ChatTurn(fromUser = false, text = outcome.text),
-                        thinking = false
-                    )
+                    is CommandOutcome.Success -> {
+                        val updated = chat + ChatTurn(fromUser = false, text = outcome.text)
+                        if (selection.chatMode) {
+                            try { withContext(Dispatchers.IO) { chatStore.save(chatKind, updated) } }
+                            catch (e: Exception) { Log.w(TAG, "saving chat failed", e) }
+                        }
+                        base.copy(result = outcome.text, chat = updated, thinking = false)
+                    }
                     is CommandOutcome.Refusal ->
                         base.copy(thinking = false, chatError = string(R.string.error_safety_blocked))
                     is CommandOutcome.Unavailable ->
