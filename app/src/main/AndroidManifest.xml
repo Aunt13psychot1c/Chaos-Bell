@@ -39,6 +39,7 @@
         <activity
             android:name=".ui.processtext.ProcessTextActivity"
             android:exported="true"
+            android:windowSoftInputMode="adjustResize"
             android:excludeFromRecents="true"
             android:theme="@style/Theme.SwiftSlate.Dialog">
             <intent-filter>

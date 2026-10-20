@@ -92,6 +92,7 @@ Changed your mind? Type `?undo` and your old text comes back.
 3. Tap **Chaos Bell**.
 4. Pick a command from the list.
 5. When she's done, tap **Replace** to swap the text, or **Copy** to keep her answer.
+6. Want to ask more? Type in the **Ask her more…** box under her answer and tap **Send**. You can keep chatting right there, and she remembers what you were talking about.
 
 This way works even in apps where typing a command doesn't, and even when Bell's main switch is off.
 

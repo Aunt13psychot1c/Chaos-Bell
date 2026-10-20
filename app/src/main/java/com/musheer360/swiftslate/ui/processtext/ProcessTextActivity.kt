@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,6 +30,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -45,6 +47,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -232,7 +235,12 @@ private fun ProcessTextSheet(
                     }
                 }
                 is UiState.Preview -> {
-                    ResultCard(result = s.result)
+                    // The answer box doubles as a chat: Bell's first answer on top, any
+                    // follow-ups below it, and a box at the bottom to ask her more.
+                    ChatCard(
+                        state = s,
+                        onSend = { viewModel.followUp(it) }
+                    )
                     if (confirmation != null) {
                         // Inside the sheet on purpose: ModalBottomSheet owns its own window, so
                         // anything drawn in the Activity's window sits behind it and would never
@@ -347,16 +355,89 @@ private fun FatalMessage(message: String, onDismiss: () -> Unit) {
 }
 
 @Composable
-private fun ResultCard(result: String) {
+private fun ChatCard(state: UiState.Preview, onSend: (String) -> Unit) {
+    val scroll = rememberScrollState()
+    var draft by remember { mutableStateOf("") }
+    // The first answer opens the conversation. [state.result] moves on to the latest reply as
+    // the chat grows, so the opener is captured once, when the card first appears.
+    val opener = remember { state.result }
+
+    LaunchedEffect(state.chat.size, state.thinking, state.chatError) {
+        scroll.animateScrollTo(scroll.maxValue)
+    }
+
     SlateCard {
-        Text(
-            text = result,
-            fontSize = 15.sp,
-            color = MaterialTheme.colorScheme.onSurface,
+        Column(
             modifier = Modifier
-                .heightIn(max = 240.dp)
-                .verticalScroll(rememberScrollState())
-        )
+                .heightIn(max = 300.dp)
+                .verticalScroll(scroll)
+        ) {
+            Text(
+                text = opener,
+                fontSize = 15.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            state.chat.forEach { turn ->
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = if (turn.fromUser) "You" else "Bell",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (turn.fromUser) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = if (turn.fromUser) TextAlign.End else TextAlign.Start
+                )
+                Text(
+                    text = turn.text,
+                    fontSize = 15.sp,
+                    color = if (turn.fromUser) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = if (turn.fromUser) TextAlign.End else TextAlign.Start
+                )
+            }
+            if (state.thinking) {
+                Spacer(Modifier.height(12.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                    Spacer(Modifier.width(10.dp))
+                    Text(
+                        text = "Bell is thinking…",
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            state.chatError?.let { err ->
+                Spacer(Modifier.height(10.dp))
+                Text(text = err, fontSize = 13.sp, color = MaterialTheme.colorScheme.error)
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            OutlinedTextField(
+                value = draft,
+                onValueChange = { draft = it },
+                placeholder = { Text("Ask her more…") },
+                maxLines = 4,
+                enabled = !state.thinking,
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(Modifier.width(8.dp))
+            TextButton(
+                onClick = {
+                    if (draft.isNotBlank()) {
+                        onSend(draft)
+                        draft = ""
+                    }
+                },
+                enabled = draft.isNotBlank() && !state.thinking
+            ) {
+                Text("Send", fontWeight = FontWeight.Bold)
+            }
+        }
     }
 }
 

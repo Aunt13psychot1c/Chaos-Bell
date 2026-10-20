@@ -103,6 +103,7 @@ private val SECTIONS = listOf(
             "2. In the little menu that pops up, tap the three dots ⋮ or the arrow for more.",
             "3. Tap Chaos Bell, then pick a command.",
             "4. Tap Replace to swap your text, or Copy to keep her answer.",
+            "5. Got more questions? Type in the Ask her more… box under her answer and tap Send. Keep chatting as long as you like.",
             "This works even in apps where typing a command doesn't, and even when Bell is switched off."
         )
     ),

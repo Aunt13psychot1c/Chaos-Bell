@@ -24,6 +24,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 
+/** One line of the popup's follow-up chat. */
+data class ChatTurn(val fromUser: Boolean, val text: String)
+
 sealed interface UiState {
     /**
      * Commands are still being read off disk. The sheet is not shown at all in this state: it
@@ -33,7 +36,17 @@ sealed interface UiState {
     data object Initializing : UiState
     data class CommandList(val commands: List<Command>) : UiState
     data class Loading(val command: Command) : UiState
-    data class Preview(val result: String, val canInsert: Boolean) : UiState
+    /**
+     * A finished answer. [result] is always Bell's latest reply (what Copy and Replace use);
+     * [chat] holds any follow-up back-and-forth typed into the popup after the first answer.
+     */
+    data class Preview(
+        val result: String,
+        val canInsert: Boolean,
+        val chat: List<ChatTurn> = emptyList(),
+        val thinking: Boolean = false,
+        val chatError: String? = null
+    ) : UiState
     /** [retry] is null for failures that re-running cannot fix (e.g. nothing configured). */
     data class Error(val message: String, val retry: Command? = null) : UiState
 }
@@ -50,7 +63,17 @@ class ProcessTextViewModel(
     private companion object {
         const val REQUEST_TIMEOUT_MS = 90_000L
         const val TAG = "ProcessTextViewModel"
+        /** How much of the conversation is resent with each follow-up, newest kept. */
+        const val MAX_CHAT_CONTEXT_CHARS = 6_000
+        const val FOLLOW_UP_PROMPT =
+            "You are Chaos Bell, chatting in a small pop-up. The text given to you holds what I " +
+            "highlighted, the conversation so far, and my new follow-up. Answer the follow-up " +
+            "directly and fully, like you're talking to a smart adult, using the highlighted " +
+            "text and the conversation for context. Reply with only your answer."
     }
+
+    /** The first answer in the popup, kept so follow-ups can carry it as context. */
+    private var firstAnswer: String = ""
 
     // All lazy: each constructor touches SharedPreferences (and, for KeyManager, the
     // Keystore), and this class is built on the main thread. First touch of each happens
@@ -132,6 +155,7 @@ class ProcessTextViewModel(
                     is CommandOutcome.Success -> {
                         try { withContext(Dispatchers.IO) { statsManager.recordUsage(command.trigger) } }
                         catch (e: Exception) { Log.w(TAG, "recording usage failed", e) }
+                        firstAnswer = outcome.text
                         UiState.Preview(outcome.text, canInsert = !selection.readOnly)
                     }
                     is CommandOutcome.Refusal ->
@@ -149,6 +173,68 @@ class ProcessTextViewModel(
             } finally {
                 inFlight.set(false)
             }
+        }
+    }
+
+    /**
+     * Sends a follow-up typed into the popup. Each follow-up carries the highlighted text and
+     * the conversation so far, so it works the same whichever command produced the first answer
+     * (Bell's own short-term memory only records answer-mode commands).
+     */
+    fun followUp(question: String) {
+        val q = question.trim()
+        val current = _uiState.value as? UiState.Preview ?: return
+        if (q.isEmpty() || current.thinking) return
+        if (!inFlight.compareAndSet(false, true)) return
+
+        val chat = current.chat + ChatTurn(fromUser = true, text = q)
+        _uiState.value = current.copy(chat = chat, thinking = true, chatError = null)
+
+        val transcript = buildString {
+            append("Bell: ").append(firstAnswer).append("\n")
+            chat.dropLast(1).forEach { t ->
+                append(if (t.fromUser) "Me: " else "Bell: ").append(t.text).append("\n")
+            }
+        }.takeLast(MAX_CHAT_CONTEXT_CHARS)
+        val payload = "Highlighted text:\n" + selection.text.take(MAX_CHAT_CONTEXT_CHARS) +
+            "\n\nConversation so far:\n" + transcript +
+            "\nMy follow-up: " + q
+
+        viewModelScope.launch {
+            val next: UiState = try {
+                val outcome = withTimeout(REQUEST_TIMEOUT_MS) {
+                    withContext(Dispatchers.IO) {
+                        runTextCommand(
+                            getApplication<Application>(), keyManager, geminiClient, openAIClient,
+                            FOLLOW_UP_PROMPT, payload, answerMode = true
+                        )
+                    }
+                }
+                val base = _uiState.value as? UiState.Preview ?: current
+                when (outcome) {
+                    is CommandOutcome.Success -> base.copy(
+                        result = outcome.text,
+                        chat = chat + ChatTurn(fromUser = false, text = outcome.text),
+                        thinking = false
+                    )
+                    is CommandOutcome.Refusal ->
+                        base.copy(thinking = false, chatError = string(R.string.error_safety_blocked))
+                    is CommandOutcome.Unavailable ->
+                        base.copy(thinking = false, chatError = outcome.message)
+                    is CommandOutcome.Failure ->
+                        base.copy(thinking = false, chatError = outcome.message)
+                }
+            } catch (_: TimeoutCancellationException) {
+                (_uiState.value as? UiState.Preview ?: current)
+                    .copy(thinking = false, chatError = string(R.string.toast_request_timed_out))
+            } catch (e: Exception) {
+                Log.w(TAG, "follow-up failed unexpectedly", e)
+                (_uiState.value as? UiState.Preview ?: current)
+                    .copy(thinking = false, chatError = string(R.string.error_bad_request))
+            } finally {
+                inFlight.set(false)
+            }
+            _uiState.value = next
         }
     }
 
