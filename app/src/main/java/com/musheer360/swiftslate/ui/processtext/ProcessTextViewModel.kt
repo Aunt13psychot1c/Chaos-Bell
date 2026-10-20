@@ -65,11 +65,14 @@ class ProcessTextViewModel(
         const val TAG = "ProcessTextViewModel"
         /** How much of the conversation is resent with each follow-up, newest kept. */
         const val MAX_CHAT_CONTEXT_CHARS = 6_000
+        /** Room for the whole Help manual when Ask Bell sends it along. */
+        const val MAX_BACKGROUND_CHARS = 20_000
         const val FOLLOW_UP_PROMPT =
             "You are Chaos Bell, chatting in a small pop-up. The text given to you holds what I " +
             "highlighted, the conversation so far, and my new follow-up. Answer the follow-up " +
             "directly and fully, like you're talking to a smart adult, using the highlighted " +
             "text and the conversation for context. Reply with only your answer."
+        const val CHAT_GREETING = "Hey! What's on your mind? 🔔"
     }
 
     /** The first answer in the popup, kept so follow-ups can carry it as context. */
@@ -119,7 +122,13 @@ class ProcessTextViewModel(
                 Log.w(TAG, "loading commands failed", e)
                 emptyList()
             }
-            _uiState.value = UiState.CommandList(commands)
+            _uiState.value = if (selection.chatMode) {
+                // Opened from Settings or Help: skip the command list and go straight to a chat.
+                firstAnswer = CHAT_GREETING
+                UiState.Preview(CHAT_GREETING, canInsert = false)
+            } else {
+                UiState.CommandList(commands)
+            }
         }
     }
 
@@ -196,8 +205,15 @@ class ProcessTextViewModel(
                 append(if (t.fromUser) "Me: " else "Bell: ").append(t.text).append("\n")
             }
         }.takeLast(MAX_CHAT_CONTEXT_CHARS)
-        val payload = "Highlighted text:\n" + selection.text.take(MAX_CHAT_CONTEXT_CHARS) +
-            "\n\nConversation so far:\n" + transcript +
+        val background = when {
+            !selection.chatMode -> "Highlighted text:\n" + selection.text.take(MAX_CHAT_CONTEXT_CHARS) + "\n\n"
+            selection.text.isNotBlank() ->
+                "Background (use this to answer questions about Chaos Bell):\n" +
+                    selection.text.take(MAX_BACKGROUND_CHARS) + "\n\n"
+            else -> ""
+        }
+        val payload = background +
+            "Conversation so far:\n" + transcript +
             "\nMy follow-up: " + q
 
         viewModelScope.launch {
