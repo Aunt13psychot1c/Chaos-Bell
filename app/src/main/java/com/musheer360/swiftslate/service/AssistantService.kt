@@ -526,7 +526,10 @@ class AssistantService : AccessibilityService() {
 
                 when (outcome) {
                     is CommandOutcome.Success -> {
-                        if (!replaceText(source, outcome.text)) {
+                        val finalText = if (command.answerMode) {
+                            ReplyFormat.withQuestion(originalText, outcome.text)
+                        } else outcome.text
+                        if (!replaceText(source, finalText)) {
                             // The field rejected the write. Restore the user's text, and don't
                             // record an undo point or a CONFIRM haptic for text that never landed.
                             replaceText(source, originalText)
