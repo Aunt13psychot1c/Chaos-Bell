@@ -73,11 +73,13 @@ Open **[the latest release](https://github.com/Aunt13psychot1c/Chaos-Bell/releas
 Open the downloaded file. Android will say your browser isn't allowed to install apps yet. Tap **Settings**, switch on **Allow from this source**, go back, and tap **Install**.
 If Play Protect pops up a warning, tap **More details**, then **Install anyway**. Bell isn't from the Play Store yet, so Google just doesn't know her.
 
-**3. Let her work**
-Bell uses Android's accessibility service to see the command you type. Because she didn't come from a store, Android locks that switch the first time. To unlock it:
-- Go to **Settings > Apps > Chaos Bell**
-- Tap the **⋮** in the top corner, then **Allow restricted settings**
-- Now go to **Settings > Accessibility > Chaos Bell** and switch her on
+**3. Let her work (the restricted-setting unlock)**
+Bell uses Android's accessibility service to see the command you type. Android locks that switch for any app that didn't come from a store, and it **hides the unlock until you've been told no once**. So the order matters:
+- Go to **Settings > Accessibility > Installed apps** and tap **Chaos Bell** (she'll look greyed out). You'll get a pop-up: **"Restricted setting"** or, on Samsung, **"App was denied access."** Tap **OK** / **Close**. This "no" is what unlocks the next step.
+- Now go to **Settings > Apps > Chaos Bell**, tap the **⋮** in the top corner, then **Allow restricted settings**, and confirm with your PIN or fingerprint.
+- Go back to **Settings > Accessibility > Installed apps > Chaos Bell** and switch her on.
+
+You only do this once. Updates keep the permission.
 
 **4. Give her a brain (your own API key)**
 Bell doesn't come with AI built in. You plug in your own key, so it's your account and your usage. See **[Get your own AI key](#get-your-own-ai-key)** below.
