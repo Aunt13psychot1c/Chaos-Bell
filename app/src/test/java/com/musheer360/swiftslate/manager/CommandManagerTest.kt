@@ -90,9 +90,9 @@ class CommandManagerTest {
     // --- getCommands ---
 
     @Test
-    fun getCommands_returnsTwentyBuiltInByDefault() {
+    fun getCommands_returnsTwentyOneBuiltInByDefault() {
         val commands = commandManager.getCommands()
-        assertEquals(20, commands.size)
+        assertEquals(21, commands.size)
     }
 
     @Test
@@ -117,7 +117,7 @@ class CommandManagerTest {
     fun getCommands_afterAddingCustom_includesIt() {
         commandManager.saveCustomCommand(Command("?myCmd", "do something"))
         val commands = commandManager.getCommands()
-        assertEquals(21, commands.size)
+        assertEquals(22, commands.size)
         assertTrue(commands.any { it.trigger == "?myCmd" })
     }
 
@@ -359,7 +359,7 @@ class CommandManagerTest {
     @Test
     fun answerCommands_areBuiltInAndInAnswerMode() {
         val byTrigger = commandManager.getCommands().associateBy { it.trigger }
-        for (t in listOf("?talk", "?huh", "?search", "?look")) {
+        for (t in listOf("?talk", "?notalk", "?huh", "?search", "?look")) {
             val cmd = byTrigger.getValue(t)
             assertTrue(cmd.isBuiltIn)
             assertTrue(cmd.answerMode)
@@ -368,6 +368,16 @@ class CommandManagerTest {
         assertTrue(byTrigger.getValue("?look").forceSearch)
         assertFalse(byTrigger.getValue("?talk").forceSearch)
         assertFalse(byTrigger.getValue("?fix").answerMode)
+        // ?notalk is ?talk with the Soul left out; everything else keeps it.
+        assertFalse(byTrigger.getValue("?notalk").useSoul)
+        assertTrue(byTrigger.getValue("?talk").useSoul)
+        assertFalse(byTrigger.getValue("?notalk").forceSearch)
+    }
+
+    @Test
+    fun notalk_isFoundWithoutCatchingTalk() {
+        assertEquals("?notalk", commandManager.findCommand("how are you?notalk")?.trigger)
+        assertEquals("?talk", commandManager.findCommand("how are you?talk")?.trigger)
     }
 
     @Test

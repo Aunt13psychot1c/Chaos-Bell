@@ -44,6 +44,7 @@ private const val STRUCTURED_OUTPUT_RETRY_MS = 86_400_000L // re-try structured 
  *   background check-ins pass false so they never crowd out the real conversation.
  * @param allowWebSearch false skips web search even when the setting is on (Ping uses this,
  *   so a check-in every half hour doesn't run a search each time).
+ * @param useSoul false leaves Bell's Soul out of an answer-mode prompt (?notalk).
  * @param onFirstAttempt run just before the first request actually goes out — after it is known
  *   that a usable key exists. The service starts its inline spinner here.
  */
@@ -59,6 +60,7 @@ suspend fun runTextCommand(
     forceSearch: Boolean = false,
     remember: Boolean = true,
     allowWebSearch: Boolean = true,
+    useSoul: Boolean = true,
     onFirstAttempt: () -> Unit = {}
 ): CommandOutcome {
     // keys_keystore_error rather than a "reinstall" message: the usual cause is the Keystore key
@@ -83,7 +85,7 @@ suspend fun runTextCommand(
     val memory = if (answerMode) BellMemory(context) else null
     // They can also set reminders: the model adds a [[remind ...]] line that is pulled out below.
     val fullPrompt = if (memory != null) {
-        val block = memory.contextBlock()
+        val block = memory.contextBlock(includeSoul = useSoul)
         val withReminders = prompt + "\n\n" + Reminders.instruction(System.currentTimeMillis())
         if (block.isEmpty()) withReminders else block + "Instruction: " + withReminders
     } else prompt

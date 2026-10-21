@@ -74,9 +74,9 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
      * The memory, written out for the AI to read before the command's own instruction, or
      * empty when there is nothing to remember yet.
      */
-    fun contextBlock(): String {
+    fun contextBlock(includeSoul: Boolean = true): String {
         val sb = StringBuilder()
-        val soulText = soul.trim()
+        val soulText = if (includeSoul) soul.trim() else ""
         if (soulText.isNotEmpty()) sb.append("Who you are (your soul, written by the user):\n").append(soulText).append("\n\n")
         val about = aboutMe.trim()
         if (about.isNotEmpty()) sb.append("About the user:\n").append(about).append("\n\n")

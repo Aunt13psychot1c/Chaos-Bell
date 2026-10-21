@@ -114,6 +114,7 @@ private val SECTIONS = listOf(
         listOf(
             "Commands that answer you:",
             "• ?talk  answers your question or does what you asked",
+            "• ?notalk  same as ?talk, but plain and normal, with her Soul switched off",
             "• ?huh  explains it like you're smart but new to it",
             "• ?search or ?look  checks the web first, then answers",
             "Commands that rewrite your words:",

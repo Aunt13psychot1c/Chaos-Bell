@@ -106,6 +106,7 @@ These talk back instead of changing your words.
 | Type this | What she does |
 |---|---|
 | `?talk` | Answers your question or does what you asked |
+| `?notalk` | Same as `?talk`, but plain and normal, with her Soul switched off |
 | `?huh` | Explains the text like you're smart but new to the topic |
 | `?search` or `?look` | Looks it up on the web first, then answers |
 
@@ -168,7 +169,7 @@ Tap the **list** icon (Commands) at the bottom, then **+**. Give it a name like 
 
 Open them from **Settings > 🧠 Soul & Ping**.
 
-- 💜 **Soul:** write who Bell is and how she acts. She reads it before every answer, in Chat, `?talk` and Ping.
+- 💜 **Soul:** write who Bell is and how she acts. She reads it before every answer, in Chat, `?talk` and Ping. When the chaos gets on your nerves, use `?notalk` for a plain answer.
 - 📡 **Ping:** turn it on and Bell checks in by herself every 15 minutes to 4 hours, only during the active hours you pick. If nothing needs saying she stays quiet. If something does, she sends you a notification. Tap **📡 Ping now** to try it. **What Ping did** lists every check-in in plain words, including why one failed.
 - 💸 Each Ping uses your AI key once, like one `?talk`.
 - ⏰ **Reminders:** in Chat or with `?talk`, say "remind me at 3pm to take my meds." Bell sets it, and a notification pops up at 3. You can see and delete reminders on the Soul & Ping screen.
