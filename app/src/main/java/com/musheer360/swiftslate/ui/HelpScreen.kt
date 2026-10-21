@@ -114,6 +114,7 @@ private val SECTIONS = listOf(
         listOf(
             "Commands that answer you:",
             "• ?talk  answers your question or does what you asked",
+            "• ?notalk  same as ?talk, but plain and normal, with her Soul switched off",
             "• ?huh  explains it like you're smart but new to it",
             "• ?search or ?look  checks the web first, then answers",
             "Commands that rewrite your words:",
@@ -130,6 +131,18 @@ private val SECTIONS = listOf(
             "• ?undo  puts your old text back",
             "• ?translate:es  translates (swap es for any language code: fr French, it Italian, vi Vietnamese, ar Arabic...)",
             "Make your own on the list icon (Commands) with the + button."
+        )
+    ),
+    HelpSection(
+        "🧠 Soul, Ping and reminders",
+        listOf(
+            "Open them from Settings > 🧠 Soul & Ping.",
+            "💜 Soul: write who Bell is and how she acts, like \"You're sassy and kind, you use glitter emoji, you never lecture.\" She reads it before every answer.",
+            "📡 Ping: turn it on and Bell checks in by herself every so often, only during the hours you pick. If nothing needs saying she stays quiet. If something does, she sends you a notification.",
+            "Tap 📡 Ping now to try it right away. What Ping did shows every check-in in plain words, including why one failed (like a bad key).",
+            "Each Ping uses your AI key once, like one ?talk, so a long gap between Pings costs less.",
+            "⏰ Reminders: in Chat or with ?talk, say something like \"remind me at 3pm to take my meds.\" Bell sets it and a notification pops up at 3. See or delete them on the Soul & Ping screen.",
+            "Notifications need to be allowed for Bell: Settings > Apps > Chaos Bell > Notifications."
         )
     ),
     HelpSection(

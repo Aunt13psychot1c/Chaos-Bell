@@ -513,7 +513,8 @@ class AssistantService : AccessibilityService() {
                     runTextCommand(
                         applicationContext, keyManager, client, openAIClient,
                         command.prompt, text,
-                        answerMode = command.answerMode, forceSearch = command.forceSearch
+                        answerMode = command.answerMode, forceSearch = command.forceSearch,
+                        useSoul = command.useSoul
                     ) { spinnerJob = startInlineSpinner(source, originalText) }
                 }
                 // From the first attempt onward the field holds the spinner glyph instead of the

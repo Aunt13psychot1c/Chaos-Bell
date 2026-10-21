@@ -101,6 +101,7 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
     val anthropicClient = remember { AnthropicClient() }
     val bellMemory = remember { BellMemory(context) }
     var showAboutMe by remember { mutableStateOf(false) }
+    var showPing by remember { mutableStateOf(false) }
 
     var triggerPrefix by remember { mutableStateOf(commandManager.getTriggerPrefix()) }
     var prefixError by remember { mutableStateOf<String?>(null) }
@@ -772,6 +773,23 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                 Text(text = "›", fontSize = rhythm.emphasisSize, color = MaterialTheme.colorScheme.primary)
             }
             SlateDivider()
+            // Bell's brain: her Soul, Ping check-ins and reminders, on their own full screen.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showPing = true }
+                    .padding(vertical = rhythm.groupGap),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "🧠 Soul & Ping",
+                    fontSize = rhythm.bodySize,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(text = "›", fontSize = rhythm.emphasisSize, color = MaterialTheme.colorScheme.primary)
+            }
+            SlateDivider()
             Spacer(modifier = Modifier.height(rhythm.groupGap))
             PaletteSwatchRow(
                 selected = PaletteStore.current,
@@ -880,6 +898,10 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                 )
             }
         }
+    }
+
+    if (showPing) {
+        PingScreen(onClose = { showPing = false })
     }
 
     if (showAboutMe) {

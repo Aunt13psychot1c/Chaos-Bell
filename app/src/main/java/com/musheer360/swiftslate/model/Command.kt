@@ -18,5 +18,7 @@ data class Command(
      */
     val answerMode: Boolean = false,
     /** Always search the web first, whatever the Web search switch says. */
-    val forceSearch: Boolean = false
+    val forceSearch: Boolean = false,
+    /** Answer-mode only: false leaves Bell's Soul out, for plain, normal answers (?notalk). */
+    val useSoul: Boolean = true
 )

@@ -172,7 +172,8 @@ class ProcessTextViewModel(
                         runTextCommand(
                             getApplication<Application>(), keyManager, geminiClient, openAIClient,
                             command.prompt, selection.text,
-                            answerMode = command.answerMode, forceSearch = command.forceSearch
+                            answerMode = command.answerMode, forceSearch = command.forceSearch,
+                            useSoul = command.useSoul
                         )
                     }
                 }
