@@ -12,6 +12,8 @@ import com.musheer360.swiftslate.api.OpenAICompatibleClient
 import com.musheer360.swiftslate.manager.BellMemory
 import com.musheer360.swiftslate.manager.KeyManager
 import com.musheer360.swiftslate.model.PrefKeys
+import com.musheer360.swiftslate.ping.PingScheduler
+import com.musheer360.swiftslate.ping.Reminders
 import com.musheer360.swiftslate.provider.Providers
 import com.musheer360.swiftslate.provider.Transport
 import java.util.Locale
@@ -38,6 +40,10 @@ private const val STRUCTURED_OUTPUT_RETRY_MS = 86_400_000L // re-try structured 
  * Knows nothing about how the result is delivered: no nodes, no toasts, no UI state. Suspends
  * on the caller's dispatcher and reads disk (prefs, Keystore), so call it off the main thread.
  *
+ * @param remember whether an answer-mode exchange goes into Bell's short-term memory. Ping's
+ *   background check-ins pass false so they never crowd out the real conversation.
+ * @param allowWebSearch false skips web search even when the setting is on (Ping uses this,
+ *   so a check-in every half hour doesn't run a search each time).
  * @param onFirstAttempt run just before the first request actually goes out — after it is known
  *   that a usable key exists. The service starts its inline spinner here.
  */
@@ -51,6 +57,8 @@ suspend fun runTextCommand(
     anthropicClient: AnthropicClient = AnthropicClient(),
     answerMode: Boolean = false,
     forceSearch: Boolean = false,
+    remember: Boolean = true,
+    allowWebSearch: Boolean = true,
     onFirstAttempt: () -> Unit = {}
 ): CommandOutcome {
     // keys_keystore_error rather than a "reinstall" message: the usual cause is the Keystore key
@@ -68,14 +76,16 @@ suspend fun runTextCommand(
     }
     val temperature = prefs.getFloat(PrefKeys.TEMPERATURE, DEFAULT_TEMPERATURE).toDouble()
     // ?search always searches, whatever the switch says.
-    val webSearch = forceSearch || prefs.getBoolean(PrefKeys.WEB_SEARCH, true)
+    val webSearch = forceSearch || (allowWebSearch && prefs.getBoolean(PrefKeys.WEB_SEARCH, true))
 
     // Answer-mode commands carry Bell's memory (About me + the last few exchanges) ahead of
     // their own instruction. Rewrite commands never see it.
     val memory = if (answerMode) BellMemory(context) else null
+    // They can also set reminders: the model adds a [[remind ...]] line that is pulled out below.
     val fullPrompt = if (memory != null) {
         val block = memory.contextBlock()
-        if (block.isEmpty()) prompt else block + "Instruction: " + prompt
+        val withReminders = prompt + "\n\n" + Reminders.instruction(System.currentTimeMillis())
+        if (block.isEmpty()) withReminders else block + "Instruction: " + withReminders
     } else prompt
     val useStructuredOutput = System.currentTimeMillis() -
         prefs.getLong(PrefKeys.STRUCTURED_OUTPUT_DISABLED_AT, 0L) > STRUCTURED_OUTPUT_RETRY_MS
@@ -121,14 +131,21 @@ suspend fun runTextCommand(
                     .putLong(PrefKeys.STRUCTURED_OUTPUT_DISABLED_AT, System.currentTimeMillis())
                     .apply()
             }
-            // Keep the truncation warning localized and shared by both entry points rather than
-            // leaving callers to duplicate it (or clients to inject an English-only string).
-            val outputText = if (generated.truncated) {
-                generated.text + "\n\n" + context.getString(R.string.note_response_truncated)
+            val replyText = if (answerMode) {
+                val (clean, reminders) = Reminders.extract(generated.text, System.currentTimeMillis())
+                reminders.forEach { PingScheduler.scheduleReminder(context, it) }
+                clean
             } else {
                 generated.text
             }
-            memory?.remember(text, generated.text)
+            // Keep the truncation warning localized and shared by both entry points rather than
+            // leaving callers to duplicate it (or clients to inject an English-only string).
+            val outputText = if (generated.truncated) {
+                replyText + "\n\n" + context.getString(R.string.note_response_truncated)
+            } else {
+                replyText
+            }
+            if (remember) memory?.remember(text, replyText)
             return CommandOutcome.Success(outputText)
         }
 

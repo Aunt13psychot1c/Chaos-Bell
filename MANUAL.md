@@ -164,6 +164,16 @@ Tap the **list** icon (Commands) at the bottom, then **+**. Give it a name like 
 
 ---
 
+## Part 5½: Soul, Ping and reminders 🧠
+
+Open them from **Settings > 🧠 Soul & Ping**.
+
+- 💜 **Soul:** write who Bell is and how she acts. She reads it before every answer, in Chat, `?talk` and Ping.
+- 📡 **Ping:** turn it on and Bell checks in by herself every 15 minutes to 4 hours, only during the active hours you pick. If nothing needs saying she stays quiet. If something does, she sends you a notification. Tap **📡 Ping now** to try it. **What Ping did** lists every check-in in plain words, including why one failed.
+- 💸 Each Ping uses your AI key once, like one `?talk`.
+- ⏰ **Reminders:** in Chat or with `?talk`, say "remind me at 3pm to take my meds." Bell sets it, and a notification pops up at 3. You can see and delete reminders on the Soul & Ping screen.
+- 🔔 Ping and reminders need notifications allowed: **Settings > Apps > Chaos Bell > Notifications**.
+
 ## Part 6: Something's wrong 🛟
 
 **Bell is greyed out in Accessibility and won't turn on.**

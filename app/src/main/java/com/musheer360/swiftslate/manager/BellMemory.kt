@@ -8,6 +8,7 @@ import org.json.JSONObject
 /**
  * Bell's small memory, used only by the answer-mode commands (?talk, ?huh, ?search):
  *
+ *  - **Soul**: who Bell is and how she acts, in the user's own words (also read by Ping).
  *  - **About me**: a few lines the user writes once (name, how they talk, what they are
  *    into), sent along so the AI always knows who it is talking to.
  *  - **Short-term memory**: the last few answer-mode exchanges, so a follow-up such as
@@ -23,9 +24,11 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
     companion object {
         const val PREFS_NAME = "bell_memory"
         private const val KEY_ABOUT_ME = "about_me"
+        private const val KEY_SOUL = "soul"
         private const val KEY_HISTORY = "history"
 
         const val MAX_ABOUT_ME_CHARS = 1_500
+        const val MAX_SOUL_CHARS = 4_000
         private const val MAX_EXCHANGES = 6
         private const val MAX_TEXT_CHARS = 600
         const val MEMORY_TTL_MS = 60 * 60 * 1000L // one hour
@@ -34,6 +37,11 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
     var aboutMe: String
         get() = try { prefs.getString(KEY_ABOUT_ME, "") ?: "" } catch (_: Exception) { "" }
         set(value) { prefs.edit().putString(KEY_ABOUT_ME, value.take(MAX_ABOUT_ME_CHARS)).apply() }
+
+    /** Who Bell is and how she acts, in the user's own words. Leads every answer-mode prompt. */
+    var soul: String
+        get() = try { prefs.getString(KEY_SOUL, "") ?: "" } catch (_: Exception) { "" }
+        set(value) { prefs.edit().putString(KEY_SOUL, value.take(MAX_SOUL_CHARS)).apply() }
 
     private data class Exchange(val time: Long, val asked: String, val answered: String)
 
@@ -68,6 +76,8 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
      */
     fun contextBlock(): String {
         val sb = StringBuilder()
+        val soulText = soul.trim()
+        if (soulText.isNotEmpty()) sb.append("Who you are (your soul, written by the user):\n").append(soulText).append("\n\n")
         val about = aboutMe.trim()
         if (about.isNotEmpty()) sb.append("About the user:\n").append(about).append("\n\n")
         val history = loadHistory()
