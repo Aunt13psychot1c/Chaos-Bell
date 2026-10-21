@@ -27,7 +27,7 @@ class BellMemoryTest {
     @Test
     fun about_me_and_recent_chat_are_handed_to_the_ai() {
         val m = memory()
-        m.aboutMe = "Davi, Queen of Chaos, talks fast."
+        m.aboutMe = "Queen of Chaos, talks fast."
         m.remember("weather today?", "Sunny and 70.")
         val block = m.contextBlock()
         assertTrue(block.contains("Queen of Chaos"))
@@ -38,12 +38,12 @@ class BellMemoryTest {
     @Test
     fun conversation_fades_after_an_hour_but_about_me_stays() {
         val m = memory()
-        m.aboutMe = "Davi"
+        m.aboutMe = "Queen"
         m.remember("q", "a")
         now += BellMemory.MEMORY_TTL_MS + 1
         val block = m.contextBlock()
         assertFalse(block.contains("User: q"))
-        assertTrue(block.contains("Davi"))
+        assertTrue(block.contains("Queen"))
     }
 
     @Test
@@ -65,11 +65,11 @@ class BellMemoryTest {
     @Test
     fun backup_carries_commands_and_memory_and_still_reads_old_backups() {
         val m = memory()
-        m.aboutMe = "Davi"
+        m.aboutMe = "Queen"
         val file = BellBackup.build("""[{"trigger":"?x","prompt":"p"}]""", m.export())
         val (commands, mem) = BellBackup.parse(file)
         assertTrue(commands.contains("?x"))
-        assertEquals("Davi", mem!!.getString("about_me"))
+        assertEquals("Queen", mem!!.getString("about_me"))
 
         val (oldCommands, oldMem) = BellBackup.parse("""[{"trigger":"?y","prompt":"p"}]""")
         assertTrue(oldCommands.contains("?y"))
