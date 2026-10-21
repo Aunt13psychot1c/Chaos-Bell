@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Bell launcher background: a plain bone-white tile (SwiftSlate's was black). -->
+<!-- Matches the paper-white behind the chaos star in ic_launcher_art. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:fillColor="#F4F1EC"
-        android:pathData="M0,0h108v108H0z" />
+    <path android:fillColor="#FFFBFBFB" android:pathData="M0,0h108v108h-108z" />
 </vector>
