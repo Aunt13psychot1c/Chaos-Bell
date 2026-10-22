@@ -165,15 +165,19 @@ Tap the **list** icon (Commands) at the bottom, then **+**. Give it a name like 
 
 ---
 
-## Part 5½: Soul, Ping and reminders 🧠
+## Part 5½: Soul, Heart, Ping and reminders 🧠
 
 Open them from **Settings > 🧠 Soul & Ping**.
 
-- 💜 **Soul:** write who Bell is and how she acts. She reads it before every answer, in Chat, `?talk` and Ping. When the chaos gets on your nerves, use `?notalk` for a plain answer.
-- 📡 **Ping:** turn it on and Bell checks in by herself every 15 minutes to 4 hours, only during the active hours you pick. If nothing needs saying she stays quiet. If something does, she sends you a notification. Tap **📡 Ping now** to try it. **What Ping did** lists every check-in in plain words, including why one failed.
-- 💸 Each Ping uses your AI key once, like one `?talk`.
-- ⏰ **Reminders:** in Chat or with `?talk`, say "remind me at 3pm to take my meds." Bell sets it, and a notification pops up at 3. You can see and delete reminders on the Soul & Ping screen.
-- 🔔 Ping and reminders need notifications allowed: **Settings > Apps > Chaos Bell > Notifications**.
+- 💜 **Soul:** write who Bell is and how she acts. She reads it before every answer, in Chat, `?talk` and check-ins. When the chaos gets on your nerves, use `?notalk` for a plain answer.
+- 💗 **Heart:** Bell's long-term memory, the things she keeps about you for good. See every one, delete any, or tell her something to keep yourself. **Forget all** asks you to tap twice.
+- 📡 **Ping, the attention check:** every few messages (off, or every 1, 2, 3, 5 or 10, you choose), Bell stops herself and asks: am I really listening to what you mean? Then she decides whether anything is worth keeping in her Heart. You never see the check, just a Bell who pays attention.
+- 🔔 **Check-ins:** turn them on and Bell messages you by herself every 15 minutes to 4 hours, only during the hours you pick, or stays quiet if there's nothing to say. Tap **🔔 Check in now** to try it. **What check-ins did** lists each one in plain words, including why one failed. Each check-in uses your AI key once, like one `?talk`.
+- ⏰ **Reminders:** in Chat or with `?talk`, say "remind me at 3pm to take my meds." Bell sets it, and a notification pops up at 3.
+- 💾 Your Soul and Heart travel in your backup file (**Settings > Export**).
+- 🔔 Check-ins and reminders need notifications allowed: **Settings > Apps > Chaos Bell > Notifications**.
+
+---
 
 ## Part 6: Something's wrong 🛟
 
