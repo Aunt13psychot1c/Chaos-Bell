@@ -134,14 +134,15 @@ private val SECTIONS = listOf(
         )
     ),
     HelpSection(
-        "🧠 Soul, Ping and reminders",
+        "🧠 Soul, Heart, Ping and reminders",
         listOf(
             "Open them from Settings > 🧠 Soul & Ping.",
             "💜 Soul: write who Bell is and how she acts, like \"You're sassy and kind, you use glitter emoji, you never lecture.\" She reads it before every answer.",
-            "📡 Ping: turn it on and Bell checks in by herself every so often, only during the hours you pick. If nothing needs saying she stays quiet. If something does, she sends you a notification.",
-            "Tap 📡 Ping now to try it right away. What Ping did shows every check-in in plain words, including why one failed (like a bad key).",
-            "Each Ping uses your AI key once, like one ?talk, so a long gap between Pings costs less.",
-            "⏰ Reminders: in Chat or with ?talk, say something like \"remind me at 3pm to take my meds.\" Bell sets it and a notification pops up at 3. See or delete them on the Soul & Ping screen.",
+            "💗 Heart: her long-term memory, the things she keeps about you for good. You can see every one, delete any, or tell her something to keep yourself.",
+            "📡 Ping: every few messages (you pick how many), Bell stops herself and checks: am I really listening to what you mean? Then she decides if anything is worth keeping in her Heart. You never see the check, you just get a Bell who pays attention.",
+            "🔔 Check-ins: turn them on and Bell messages you by herself every so often, only during the hours you pick, or stays quiet if there's nothing to say. Tap 🔔 Check in now to try it. Each check-in uses your AI key once, like one ?talk.",
+            "⏰ Reminders: in Chat or with ?talk, say something like \"remind me at 3pm to take my meds.\" Bell sets it and a notification pops up at 3.",
+            "Your Soul and Heart are saved in your backup file too (Settings > Export).",
             "Notifications need to be allowed for Bell: Settings > Apps > Chaos Bell > Notifications."
         )
     ),

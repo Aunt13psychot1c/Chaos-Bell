@@ -49,6 +49,8 @@ import java.util.Date
 import java.util.Locale
 
 private val INTERVALS = listOf(15, 30, 60, 120, 240)
+/** Attention Ping choices: every Nth conversation message, 0 = off. */
+private val PING_EVERY = listOf(0, 1, 2, 3, 5, 10)
 
 /**
  * Bell's brain: her Soul (who she is), Ping (her own check-ins) and the reminders she's set.
@@ -68,6 +70,10 @@ fun PingScreen(onClose: () -> Unit) {
     var endHour by remember { mutableFloatStateOf(store.endHour.toFloat()) }
     var prompt by remember { mutableStateOf(store.prompt) }
     var refresh by remember { mutableIntStateOf(0) }
+    var pingEveryIndex by remember { mutableIntStateOf(PING_EVERY.indexOf(memory.pingEvery).takeIf { it >= 0 } ?: 3) }
+    var newKeepsake by remember { mutableStateOf("") }
+    var confirmForgetAll by remember { mutableStateOf(false) }
+    val heart = remember(refresh) { memory.heart().reversed() }
     val log = remember(refresh) { store.log().reversed() }
     val reminders = remember(refresh) { store.reminders() }
 
@@ -102,7 +108,52 @@ fun PingScreen(onClose: () -> Unit) {
                     Hint("${soul.length}/${BellMemory.MAX_SOUL_CHARS}")
                 }
 
-                Section("📡 Ping") {
+                Section("💗 Heart") {
+                    Hint("Bell's long-term memory: the things she chose to keep about you for good. Every few messages in a conversation she stops for an attention Ping. She checks she's really listening, then decides if anything is worth keeping.")
+                    val every = PING_EVERY[pingEveryIndex]
+                    Text(
+                        when (every) {
+                            0 -> "Attention Ping: off"
+                            1 -> "Attention Ping: every message"
+                            else -> "Attention Ping: every $every messages"
+                        },
+                        fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Slider(
+                        value = pingEveryIndex.toFloat(),
+                        onValueChange = { pingEveryIndex = it.toInt() },
+                        onValueChangeFinished = { memory.pingEvery = PING_EVERY[pingEveryIndex] },
+                        valueRange = 0f..(PING_EVERY.size - 1).toFloat(),
+                        steps = PING_EVERY.size - 2
+                    )
+                    if (heart.isEmpty()) Hint("Nothing kept yet. Chat with her and she'll start remembering.")
+                    heart.forEach { k ->
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                            Column(Modifier.weight(1f)) {
+                                Text(k.text, fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface)
+                                Text(time(k.time), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            TextButton(onClick = { memory.forget(k.time); refresh++ }) { Text("🗑️") }
+                        }
+                    }
+                    OutlinedTextField(
+                        value = newKeepsake,
+                        onValueChange = { newKeepsake = it.take(com.musheer360.swiftslate.manager.BellMemory.MAX_KEEPSAKE_CHARS) },
+                        label = { Text("Tell her something to keep") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TextButton(onClick = { if (memory.keep(newKeepsake)) newKeepsake = ""; refresh++ }) { Text("💗 Keep it") }
+                        if (heart.isNotEmpty()) {
+                            TextButton(onClick = {
+                                if (confirmForgetAll) { memory.forgetHeart(); confirmForgetAll = false; refresh++ }
+                                else confirmForgetAll = true
+                            }) { Text(if (confirmForgetAll) "Tap again to forget everything" else "Forget all") }
+                        }
+                    }
+                }
+
+                Section("🔔 Check-ins") {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text("Bell checks in by herself", fontSize = 17.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -129,11 +180,11 @@ fun PingScreen(onClose: () -> Unit) {
                         valueRange = 0f..24f,
                         steps = 23
                     )
-                    Hint("Each Ping uses your AI key once, like one ?talk. Android may run it a few minutes late to save battery.")
+                    Hint("Each check-in uses your AI key once, like one ?talk. Android may run it a few minutes late to save battery.")
                     OutlinedTextField(
                         value = prompt,
                         onValueChange = { prompt = it.take(PingStore.MAX_PROMPT_CHARS); store.prompt = prompt },
-                        label = { Text("What Ping tells Bell") },
+                        label = { Text("What a check-in tells Bell") },
                         modifier = Modifier.fillMaxWidth().heightIn(min = 140.dp)
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -143,11 +194,11 @@ fun PingScreen(onClose: () -> Unit) {
                         onClick = { PingScheduler.runNow(context); refresh++ },
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)
-                    ) { Text("📡 Ping now (test it)") }
+                    ) { Text("🔔 Check in now (test it)") }
                 }
 
-                Section("📜 What Ping did") {
-                    if (log.isEmpty()) Hint("Nothing yet. Tap Ping now to try it.")
+                Section("📜 What check-ins did") {
+                    if (log.isEmpty()) Hint("Nothing yet. Tap Check in now to try it.")
                     log.take(15).forEach { e ->
                         Column(Modifier.padding(vertical = 4.dp)) {
                             Text("${e.status.badge} ${time(e.time)}", fontSize = 14.sp, fontWeight = FontWeight.SemiBold,

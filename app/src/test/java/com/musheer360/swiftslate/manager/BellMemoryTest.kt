@@ -79,4 +79,51 @@ class BellMemoryTest {
         m.import(JSONObject().put("about_me", "restored"))
         assertEquals("restored", m.aboutMe)
     }
+
+    @Test
+    fun heart_keeps_things_for_good_without_repeats() {
+        val m = memory()
+        assertTrue(m.keep("loves rave music"))
+        assertFalse(m.keep("  Loves   RAVE music "))
+        assertFalse(m.keep("   "))
+        now += BellMemory.MEMORY_TTL_MS * 24
+        assertEquals(listOf("loves rave music"), m.heart().map { it.text })
+        assertTrue(m.contextBlock().contains("- loves rave music"))
+    }
+
+    @Test
+    fun heart_forgets_one_or_all_and_makes_room_when_full() {
+        val m = memory()
+        m.keep("first"); m.keep("second")
+        m.forget(m.heart().first().time)
+        assertEquals(listOf("second"), m.heart().map { it.text })
+        repeat(BellMemory.MAX_KEEPSAKES + 5) { m.keep("fact $it") }
+        assertEquals(BellMemory.MAX_KEEPSAKES, m.heart().size)
+        assertFalse(m.heart().any { it.text == "second" })
+        m.forgetHeart()
+        assertTrue(m.heart().isEmpty())
+    }
+
+    @Test
+    fun attention_ping_lands_on_every_nth_message() {
+        val m = memory()
+        m.pingEvery = 3
+        assertEquals(listOf(false, false, true, false, false, true), List(6) { m.nextTurnIsPing() })
+        m.pingEvery = 0
+        assertFalse(List(5) { m.nextTurnIsPing() }.any { it })
+        m.pingEvery = 1
+        assertTrue(List(3) { m.nextTurnIsPing() }.all { it })
+    }
+
+    @Test
+    fun backup_carries_soul_and_heart() {
+        val m = memory()
+        m.soul = "Glitch Goddess"
+        m.keep("has a plush sloth")
+        val saved = m.export()
+        m.soul = ""; m.forgetHeart()
+        m.import(saved)
+        assertEquals("Glitch Goddess", m.soul)
+        assertEquals(listOf("has a plush sloth"), m.heart().map { it.text })
+    }
 }

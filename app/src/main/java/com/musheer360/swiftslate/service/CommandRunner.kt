@@ -12,6 +12,7 @@ import com.musheer360.swiftslate.api.OpenAICompatibleClient
 import com.musheer360.swiftslate.manager.BellMemory
 import com.musheer360.swiftslate.manager.KeyManager
 import com.musheer360.swiftslate.model.PrefKeys
+import com.musheer360.swiftslate.ping.Keepsakes
 import com.musheer360.swiftslate.ping.PingScheduler
 import com.musheer360.swiftslate.ping.Reminders
 import com.musheer360.swiftslate.provider.Providers
@@ -84,10 +85,14 @@ suspend fun runTextCommand(
     // their own instruction. Rewrite commands never see it.
     val memory = if (answerMode) BellMemory(context) else null
     // They can also set reminders: the model adds a [[remind ...]] line that is pulled out below.
+    // Every few real conversation messages (not Ping's background check-ins) carry the attention
+    // Ping, where Bell decides what to keep in her heart with [[remember: ...]] lines.
+    val attentionPing = memory != null && remember && memory.nextTurnIsPing()
     val fullPrompt = if (memory != null) {
         val block = memory.contextBlock(includeSoul = useSoul)
-        val withReminders = prompt + "\n\n" + Reminders.instruction(System.currentTimeMillis())
-        if (block.isEmpty()) withReminders else block + "Instruction: " + withReminders
+        var instruction = prompt + "\n\n" + Reminders.instruction(System.currentTimeMillis())
+        if (attentionPing) instruction += "\n\n" + Keepsakes.ATTENTION_PING
+        if (block.isEmpty()) instruction else block + "Instruction: " + instruction
     } else prompt
     val useStructuredOutput = System.currentTimeMillis() -
         prefs.getLong(PrefKeys.STRUCTURED_OUTPUT_DISABLED_AT, 0L) > STRUCTURED_OUTPUT_RETRY_MS
@@ -134,8 +139,10 @@ suspend fun runTextCommand(
                     .apply()
             }
             val replyText = if (answerMode) {
-                val (clean, reminders) = Reminders.extract(generated.text, System.currentTimeMillis())
+                val (noReminders, reminders) = Reminders.extract(generated.text, System.currentTimeMillis())
                 reminders.forEach { PingScheduler.scheduleReminder(context, it) }
+                val (clean, keepsakes) = Keepsakes.extract(noReminders)
+                keepsakes.forEach { memory?.keep(it) }
                 clean
             } else {
                 generated.text
