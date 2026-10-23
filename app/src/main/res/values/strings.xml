@@ -64,6 +64,9 @@
     <string name="about_me_hint">Your name, how you talk, what you\'re into. Bell uses it for ?talk, ?huh and ?search.</string>
     <string name="about_me_forget">Forget recent chat</string>
     <string name="service_status_paused">Paused</string>
+    <string name="service_status_not_running" translatable="false">Not running</string>
+    <string name="service_not_running_hint" translatable="false">Bell is switched on, but Android hasn\'t started her, so ?commands won\'t work. Turn her off and back on in Accessibility settings.</string>
+    <string name="error_paused" translatable="false">Bell is paused 💤 Resume her on the Dashboard.</string>
     <string name="service_pause">Pause</string>
     <string name="service_resume">Resume</string>
     <string name="settings_model_title">Model</string>

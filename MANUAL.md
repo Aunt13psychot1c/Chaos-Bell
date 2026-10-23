@@ -158,7 +158,7 @@ Tap the **list** icon (Commands) at the bottom, then **+**. Give it a name like 
 ## Part 5: Her extras
 
 - 🧠 **About you.** In Settings, tap **About you** and tell her about yourself. She uses it when she answers you, so her answers fit you better. She also remembers your last few back-and-forths for an hour, so follow-up questions make sense.
-- ⏸️ **Pause.** On the Dashboard. Bell ignores every command until you un-pause. Nothing gets sent anywhere while she's paused.
+- ⏸️ **Pause.** On the Dashboard. Hush mode: Bell ignores ?commands, the chat window and her check-ins until you resume her. Reminders still ring, the way Do Not Disturb still lets alarms through.
 - 🎨 **Colors.** Settings, under About you. Pick your look.
 - 💾 **Backup.** Settings, **Export** saves your custom commands to a file. **Import** brings them back.
 - 🔔 **Updates.** Bell checks for new versions and lets you know. Install the new one right over the old one. Nothing gets lost.
@@ -185,7 +185,7 @@ Open them from **Settings > 🧠 Soul & Ping**.
 Do Part 1, Step 4 in the exact order. You have to get told "no" once before the unlock shows up.
 
 **I typed a command and nothing happened.**
-- Check the Dashboard says Bell is **active** and not **paused**.
+- Check the Dashboard says Bell is **active**, not **paused** or **not running**. Not running means her switch is on but Android hasn't started her. Turn her off and back on in Accessibility settings.
 - Make sure the command is at the **very end** with no space after it.
 - You might be in an app that blocks typing commands (see Part 4). Try highlight and send.
 - Your phone may have put her to sleep. See Part 1, Step 5.

@@ -163,7 +163,7 @@ private val SECTIONS = listOf(
         "✨ Her extras",
         listOf(
             "• About you (Settings): tell her about yourself so her answers fit you. She also remembers your last few back-and-forths for an hour.",
-            "• Pause (Dashboard): she ignores every command until you un-pause. Nothing gets sent while paused.",
+            "• Pause (Dashboard): hush mode. She ignores ?commands, the chat window and her check-ins until you resume her. Reminders still ring, like alarms on Do Not Disturb.",
             "• Colors (Settings): pick your look.",
             "• Backup (Settings): Export saves your custom commands, Import brings them back.",
             "• Updates: Bell tells you when there's a new version. Install it right over this one, nothing gets lost."
@@ -174,7 +174,7 @@ private val SECTIONS = listOf(
         listOf(
             "Greyed out in Accessibility? Do setup step 4 in the exact order. You have to get told \"no\" once first.",
             "Typed a command and nothing happened?",
-            "• Check the Dashboard says active, not paused.",
+            "• Check the Dashboard says active, not paused or not running. Not running means Android hasn't started her: turn her off and back on in Accessibility.",
             "• The command has to be at the very end, no space after.",
             "• You may be in an app that blocks it. Try highlight and send.",
             "• Your phone may have put her to sleep. See setup step 5.",
