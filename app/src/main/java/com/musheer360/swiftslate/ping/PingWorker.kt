@@ -5,6 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.musheer360.swiftslate.api.GeminiClient
 import com.musheer360.swiftslate.api.OpenAICompatibleClient
+import com.musheer360.swiftslate.manager.BellPause
 import com.musheer360.swiftslate.manager.KeyManager
 import com.musheer360.swiftslate.service.CommandOutcome
 import com.musheer360.swiftslate.service.runTextCommand
@@ -27,6 +28,8 @@ class PingWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
 
         if (!forced) {
             if (!store.enabled) return@withContext Result.success()
+            // Paused means hush: no check-ins. Reminders run in ReminderWorker and still ring.
+            if (BellPause.isPaused(ctx)) return@withContext Result.success()
             val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
             if (!PingStore.isActive(hour, store.startHour, store.endHour)) return@withContext Result.success()
         }

@@ -32,8 +32,9 @@ object PrefKeys {
     const val CUSTOM_ENDPOINT = "custom_endpoint"
 
     /**
-     * Bell is paused (Boolean): typed ?commands are ignored and nothing is sent anywhere, but
-     * the accessibility permission and the saved keys stay put, so resuming is one tap.
+     * Bell is paused (Boolean): ?commands, the chat window and check-ins are ignored (see
+     * BellPause), but reminders still ring. The accessibility permission and the saved keys
+     * stay put, so resuming is one tap.
      */
     const val PAUSED = "paused"
 

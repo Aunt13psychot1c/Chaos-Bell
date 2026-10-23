@@ -4,6 +4,9 @@ import android.accessibilityservice.AccessibilityServiceInfo
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.database.ContentObserver
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -30,6 +33,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.musheer360.swiftslate.R
 import com.musheer360.swiftslate.model.PrefKeys
 import com.musheer360.swiftslate.SwiftSlateApp
+import com.musheer360.swiftslate.manager.BellPause
 import com.musheer360.swiftslate.manager.CommandManager
 import com.musheer360.swiftslate.manager.KeyManager
 import com.musheer360.swiftslate.manager.StatsManager
@@ -38,14 +42,27 @@ import com.musheer360.swiftslate.ui.components.ScreenTitle
 import com.musheer360.swiftslate.ui.components.SlateCard
 import com.musheer360.swiftslate.ui.components.SlateDivider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+private const val RUNNING_RECHECK_MS = 1_500L
+
+/** Bell's switch in Android's Accessibility settings is on (whether or not she is running yet). */
 private fun checkServiceEnabled(context: Context): Boolean {
+    val setting = try {
+        Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+    } catch (_: Exception) {
+        null
+    }
+    return BellPause.isSwitchedOn(setting, context.packageName)
+}
+
+/** Android has actually started Bell's service. FEEDBACK_ALL_MASK so the config's feedback type can't hide her. */
+private fun checkServiceRunning(context: Context): Boolean {
     val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-    val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)
-    return enabledServices.any {
+    return am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK).any {
         it.resolveInfo.serviceInfo.packageName == context.packageName
     }
 }
@@ -101,6 +118,7 @@ fun DashboardScreen(
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
     var isServiceEnabled by remember { mutableStateOf(checkServiceEnabled(context)) }
+    var isServiceRunning by remember { mutableStateOf(checkServiceRunning(context)) }
     val settingsPrefs = remember { context.getSharedPreferences("settings", Context.MODE_PRIVATE) }
     var paused by remember { mutableStateOf(try { settingsPrefs.getBoolean(PrefKeys.PAUSED, false) } catch (_: Exception) { false }) }
     // Not seeded from keyManager.getKeys(): that decrypts through AndroidKeyStore on the main
@@ -118,13 +136,18 @@ fun DashboardScreen(
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
+    // Watches Bell's own switch. The old AccessibilityStateChangeListener only fired when
+    // accessibility as a whole went on or off, so flipping just Bell was never noticed.
     DisposableEffect(context) {
-        val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        val listener = AccessibilityManager.AccessibilityStateChangeListener {
-            isServiceEnabled = checkServiceEnabled(context)
+        val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
+            override fun onChange(selfChange: Boolean) {
+                isServiceEnabled = checkServiceEnabled(context)
+                isServiceRunning = checkServiceRunning(context)
+            }
         }
-        am.addAccessibilityStateChangeListener(listener)
-        onDispose { am.removeAccessibilityStateChangeListener(listener) }
+        val uri = Settings.Secure.getUriFor(Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+        try { context.contentResolver.registerContentObserver(uri, false, observer) } catch (_: Exception) { }
+        onDispose { context.contentResolver.unregisterContentObserver(observer) }
     }
 
     LaunchedEffect(lifecycleOwner) {
@@ -138,11 +161,18 @@ fun DashboardScreen(
                 )
             }
             isServiceEnabled = newEnabled
+            isServiceRunning = checkServiceRunning(context)
             keyCount = newKeyCount
             monthlyRequests = statsManager.monthlyRequests
             favoriteCommand = statsManager.favoriteCommand
             dailyCounts = statsManager.dailyCounts()
             showKilledBanner = killed
+            // Back from Accessibility settings, Android starts the service a moment after the
+            // switch flips, so look again shortly.
+            if (newEnabled && !isServiceRunning) {
+                delay(RUNNING_RECHECK_MS)
+                isServiceRunning = checkServiceRunning(context)
+            }
         }
     }
 
@@ -187,7 +217,7 @@ fun DashboardScreen(
                             .clip(CircleShape)
                             .background(
                                 when {
-                                    !isServiceEnabled -> MaterialTheme.colorScheme.error
+                                    !isServiceEnabled || !isServiceRunning -> MaterialTheme.colorScheme.error
                                     paused -> MaterialTheme.colorScheme.tertiaryContainer
                                     else -> MaterialTheme.colorScheme.tertiary
                                 }
@@ -198,6 +228,7 @@ fun DashboardScreen(
                         text = when {
                             !isServiceEnabled -> stringResource(R.string.service_status_inactive)
                             paused -> stringResource(R.string.service_status_paused)
+                            !isServiceRunning -> stringResource(R.string.service_status_not_running)
                             else -> stringResource(R.string.service_status_active)
                         },
                         fontSize = rhythm.emphasisSize,
@@ -231,6 +262,14 @@ fun DashboardScreen(
                         Text(stringResource(if (paused) R.string.service_resume else R.string.service_pause))
                     }
                 }
+            }
+            if (isServiceEnabled && !isServiceRunning) {
+                Spacer(modifier = Modifier.height(rhythm.tightGap))
+                Text(
+                    text = stringResource(R.string.service_not_running_hint),
+                    fontSize = rhythm.bodySize,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
 
             Spacer(modifier = Modifier.height(rhythm.groupGap))

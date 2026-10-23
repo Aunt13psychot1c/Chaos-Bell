@@ -8,6 +8,7 @@ import com.musheer360.swiftslate.R
 import com.musheer360.swiftslate.SwiftSlateApp
 import com.musheer360.swiftslate.api.GeminiClient
 import com.musheer360.swiftslate.api.OpenAICompatibleClient
+import com.musheer360.swiftslate.manager.BellPause
 import com.musheer360.swiftslate.manager.CommandManager
 import com.musheer360.swiftslate.manager.StatsManager
 import com.musheer360.swiftslate.model.Command
@@ -149,6 +150,10 @@ class ProcessTextViewModel(
     }
 
     fun run(command: Command) {
+        if (BellPause.isPaused(getApplication<Application>())) {
+            _uiState.value = UiState.Error(string(R.string.error_paused))
+            return
+        }
         if (!inFlight.compareAndSet(false, true)) return
 
         // A snippet needs no request at all — resolve it without touching the network.
@@ -211,6 +216,10 @@ class ProcessTextViewModel(
         val q = question.trim()
         val current = _uiState.value as? UiState.Preview ?: return
         if (q.isEmpty() || current.thinking) return
+        if (BellPause.isPaused(getApplication<Application>())) {
+            _uiState.value = current.copy(chatError = string(R.string.error_paused))
+            return
+        }
         if (!inFlight.compareAndSet(false, true)) return
 
         val chat = current.chat + ChatTurn(fromUser = true, text = q)
