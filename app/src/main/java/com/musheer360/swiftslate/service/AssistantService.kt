@@ -20,7 +20,9 @@ import com.musheer360.swiftslate.api.GeminiClient
 import com.musheer360.swiftslate.api.OpenAICompatibleClient
 import com.musheer360.swiftslate.manager.CommandManager
 import com.musheer360.swiftslate.model.PrefKeys
+import com.musheer360.swiftslate.manager.BellMemory
 import com.musheer360.swiftslate.manager.KeyManager
+import com.musheer360.swiftslate.manager.SoulLibrary
 import com.musheer360.swiftslate.manager.StatsManager
 import com.musheer360.swiftslate.model.Command
 import com.musheer360.swiftslate.model.CommandType
@@ -285,6 +287,19 @@ class AssistantService : AccessibilityService() {
             cancelPendingProcessingReset()
             currentJob?.cancel()
             handleClipboardCommand(source, precedingText, command)
+            return
+        }
+
+        // ?soul swaps who's talking. Purely local: no AI call, no key needed.
+        if (command.isBuiltIn && command.trigger.endsWith("soul")) {
+            if (!isProcessing.compareAndSet(false, true)) {
+                source.safeRecycle()
+                return
+            }
+            startWatchdog()
+            cancelPendingProcessingReset()
+            currentJob?.cancel()
+            handleSoulCommand(source, precedingText)
             return
         }
 
@@ -626,6 +641,52 @@ class AssistantService : AccessibilityService() {
                 throw e
             } catch (e: Exception) {
                 showToast(getString(R.string.toast_undo_failed))
+            } finally {
+                withContext(NonCancellable + Dispatchers.Main) {
+                    if (currentJob === thisJob) {
+                        cancelWatchdog()
+                        scheduleProcessingReset()
+                    }
+                    recycleIfUnowned(source)
+                }
+            }
+        }
+    }
+
+    /**
+     * "jake ?soul" puts Jake on, "stan high ?soul" puts Stan on with the dial up, "low ?soul"
+     * just turns the dial, and "?soul" alone says who's on. The typed words are cleared from
+     * the box on a switch (?undo brings them back); an unknown name leaves the text alone.
+     */
+    private fun handleSoulCommand(source: AccessibilityNodeInfo, precedingText: String) {
+        currentJob = serviceScope.launch {
+            val thisJob = coroutineContext[Job]
+            try {
+                val memory = BellMemory(this@AssistantService)
+                val souls = withContext(Dispatchers.IO) { SoulLibrary.load(this@AssistantService) }
+                when (val pick = souls.resolve(precedingText, memory)) {
+                    is SoulLibrary.Switch.Status -> {
+                        replaceText(source, precedingText)
+                        showToast("On now: ${souls.nowLine(memory)}  ·  Try: ${souls.choices()}")
+                    }
+                    is SoulLibrary.Switch.Change -> {
+                        souls.apply(pick, memory)
+                        if (replaceText(source, "")) {
+                            lastOriginalText = precedingText
+                            lastUndoSourceId = sourceId(source)
+                        }
+                        performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                        showToast("${souls.nowLine(memory)} is talking now")
+                    }
+                    is SoulLibrary.Switch.Unknown -> {
+                        performHapticFeedback(HapticFeedbackConstants.REJECT)
+                        showToast("No soul called \"${pick.word}\". Try: ${souls.choices()}")
+                    }
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                showToast("Couldn't swap souls just now")
             } finally {
                 withContext(NonCancellable + Dispatchers.Main) {
                     if (currentJob === thisJob) {

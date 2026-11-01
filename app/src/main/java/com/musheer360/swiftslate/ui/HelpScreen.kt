@@ -128,6 +128,7 @@ private val SECTIONS = listOf(
             "• ?reply  writes a reply to a message",
             "Little tricks:",
             "• ?chaos  surprise me!",
+            "• ?soul  swaps who's talking: jake ?soul, mary ?soul, stan high ?soul. ?soul alone shows who's on.",
             "• ?undo  puts your old text back",
             "• ?translate:es  translates (swap es for any language code: fr French, it Italian, vi Vietnamese, ar Arabic...)",
             "Make your own on the list icon (Commands) with the + button."
@@ -137,12 +138,15 @@ private val SECTIONS = listOf(
         "🧠 Soul, Heart, Ping and reminders",
         listOf(
             "Open them from Settings > 🧠 Soul & Ping.",
-            "💜 Soul: write who Bell is and how she acts, like \"You're sassy and kind, you use glitter emoji, you never lecture.\" She reads it before every answer.",
+            "💜 Soul: who's talking. Pick 🔔 Bell (warm and witty), 🌷 Mary (grace and grit), ⚡ Jake (fast and loud) or 🧠 Stan (dry and sharp), and swap whenever your mood changes.",
+            "🎚️ Dial: turns the picked soul's attitude Low, Middle or High. Low Jake keeps it clean, High Jake cusses and flirts a little.",
+            "✨ My Soul: write your own, like \"You're sassy and kind, you use glitter emoji, you never lecture.\" Can't think what to write? Leave it empty, give it a name, and just set the 🎛️ knobs: Emoji, Serious and Chaos.",
+            "Quick swap from any app: type a name then ?soul, like jake ?soul. Add low or high to turn the dial too.",
             "💗 Heart: her long-term memory, the things she keeps about you for good. You can see every one, delete any, or tell her something to keep yourself.",
             "📡 Ping: every few messages (you pick how many), Bell stops herself and checks: am I really listening to what you mean? Then she decides if anything is worth keeping in her Heart. You never see the check, you just get a Bell who pays attention.",
             "🔔 Check-ins: turn them on and Bell messages you by herself every so often, only during the hours you pick, or stays quiet if there's nothing to say. Tap 🔔 Check in now to try it. Each check-in uses your AI key once, like one ?talk.",
             "⏰ Reminders: in Chat or with ?talk, say something like \"remind me at 3pm to take my meds.\" Bell sets it and a notification pops up at 3.",
-            "Your Soul and Heart are saved in your backup file too (Settings > Export).",
+            "Your Soul pick, dial, knobs and Heart are saved in your backup file too (Settings > Export).",
             "Notifications need to be allowed for Bell: Settings > Apps > Chaos Bell > Notifications."
         )
     ),
