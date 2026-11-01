@@ -11,6 +11,7 @@ import com.musheer360.swiftslate.api.SearchMode
 import com.musheer360.swiftslate.api.OpenAICompatibleClient
 import com.musheer360.swiftslate.manager.BellMemory
 import com.musheer360.swiftslate.manager.KeyManager
+import com.musheer360.swiftslate.manager.SoulLibrary
 import com.musheer360.swiftslate.model.PrefKeys
 import com.musheer360.swiftslate.ping.Keepsakes
 import com.musheer360.swiftslate.ping.PingScheduler
@@ -89,7 +90,11 @@ suspend fun runTextCommand(
     // Ping, where Bell decides what to keep in her heart with [[remember: ...]] lines.
     val attentionPing = memory != null && remember && memory.nextTurnIsPing()
     val fullPrompt = if (memory != null) {
-        val block = memory.contextBlock(includeSoul = useSoul)
+        // Whichever soul is on (Bell, Mary, Jake, Stan or the user's own) speaks for this answer.
+        val block = if (useSoul) {
+            val souls = SoulLibrary.load(context)
+            memory.contextBlock(includeSoul = true, soulText = souls.soulText(memory), speaker = souls.displayName(memory))
+        } else memory.contextBlock(includeSoul = false)
         var instruction = prompt + "\n\n" + Reminders.instruction(System.currentTimeMillis())
         if (attentionPing) instruction += "\n\n" + Keepsakes.ATTENTION_PING
         if (block.isEmpty()) instruction else block + "Instruction: " + instruction

@@ -30,6 +30,11 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
         private const val KEY_HEART = "heart"
         private const val KEY_PING_EVERY = "attention_every"
         private const val KEY_TURNS = "turns"
+        private const val KEY_SOUL_ACTIVE = "soul_active"
+        private const val KEY_SOUL_DIAL = "soul_dial"
+        private const val KEY_SOUL_NAME = "soul_custom_name"
+        private const val KEY_KNOB_PREFIX = "soul_knob_"
+        const val MAX_SOUL_NAME_CHARS = 30
 
         const val MAX_ABOUT_ME_CHARS = 1_500
         const val MAX_SOUL_CHARS = 4_000
@@ -52,6 +57,32 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
     var soul: String
         get() = try { prefs.getString(KEY_SOUL, "") ?: "" } catch (_: Exception) { "" }
         set(value) { prefs.edit().putString(KEY_SOUL, value.take(MAX_SOUL_CHARS)).apply() }
+
+    /** Which soul is talking (a ready-made id or [SoulLibrary.CUSTOM_ID]); null until picked. */
+    var activeSoul: String?
+        get() = try { prefs.getString(KEY_SOUL_ACTIVE, null)?.takeIf { it.isNotBlank() } } catch (_: Exception) { null }
+        set(value) { prefs.edit().putString(KEY_SOUL_ACTIVE, value?.trim()?.lowercase()).apply() }
+
+    /** The ready-made souls' attitude dial: low, middle or high. */
+    var soulDial: String
+        get() = try { prefs.getString(KEY_SOUL_DIAL, null)?.let(SoulLibrary::normalizeLevel) ?: "middle" } catch (_: Exception) { "middle" }
+        set(value) { prefs.edit().putString(KEY_SOUL_DIAL, SoulLibrary.normalizeLevel(value) ?: "middle").apply() }
+
+    /** What the user calls their own soul (blank means "My Soul"). */
+    var customSoulName: String
+        get() = try { prefs.getString(KEY_SOUL_NAME, "") ?: "" } catch (_: Exception) { "" }
+        set(value) { prefs.edit().putString(KEY_SOUL_NAME, value.take(MAX_SOUL_NAME_CHARS)).apply() }
+
+    /** One of My Soul's knobs (emoji, serious, chaos): low, middle, high, or null if untouched. */
+    fun knob(id: String): String? =
+        try { prefs.getString(KEY_KNOB_PREFIX + id, null)?.let(SoulLibrary::normalizeLevel) } catch (_: Exception) { null }
+
+    /** Sets a knob; null switches it back off. */
+    fun setKnob(id: String, level: String?) {
+        val clean = level?.let(SoulLibrary::normalizeLevel)
+        if (clean == null) prefs.edit().remove(KEY_KNOB_PREFIX + id).apply()
+        else prefs.edit().putString(KEY_KNOB_PREFIX + id, clean).apply()
+    }
 
     private data class Exchange(val time: Long, val asked: String, val answered: String)
 
@@ -135,11 +166,14 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
     /**
      * The memory, written out for the AI to read before the command's own instruction, or
      * empty when there is nothing to remember yet.
+     *
+     * @param soulText the active soul from [SoulLibrary]; null falls back to the written Soul.
+     * @param speaker the name the past replies are labelled with, so Jake doesn't think he's Bell.
      */
-    fun contextBlock(includeSoul: Boolean = true): String {
+    fun contextBlock(includeSoul: Boolean = true, soulText: String? = null, speaker: String = "Bell"): String {
         val sb = StringBuilder()
-        val soulText = if (includeSoul) soul.trim() else ""
-        if (soulText.isNotEmpty()) sb.append("Who you are (your soul, written by the user):\n").append(soulText).append("\n\n")
+        val soulTextClean = if (includeSoul) (soulText ?: soul).trim() else ""
+        if (soulTextClean.isNotEmpty()) sb.append("Who you are (your soul):\n").append(soulTextClean).append("\n\n")
         val about = aboutMe.trim()
         if (about.isNotEmpty()) sb.append("About the user:\n").append(about).append("\n\n")
         val heart = heart()
@@ -151,7 +185,7 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
         val history = loadHistory()
         if (history.isNotEmpty()) {
             sb.append("Recent conversation with the user, oldest first. Use it only if the new text follows on from it:\n")
-            history.forEach { sb.append("User: ").append(it.asked).append('\n').append("Bell: ").append(it.answered).append('\n') }
+            history.forEach { sb.append("User: ").append(it.asked).append('\n').append(speaker).append(": ").append(it.answered).append('\n') }
             sb.append('\n')
         }
         return sb.toString()
@@ -161,6 +195,11 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
     fun export(): JSONObject = JSONObject()
         .put("about_me", aboutMe)
         .put("soul", soul)
+        .put("souls", JSONObject()
+            .put("active", activeSoul ?: JSONObject.NULL)
+            .put("dial", soulDial)
+            .put("name", customSoulName)
+            .put("knobs", JSONObject().apply { SoulLibrary.KNOBS.forEach { id -> knob(id)?.let { put(id, it) } } }))
         .put("heart", JSONArray(try { prefs.getString(KEY_HEART, "[]") ?: "[]" } catch (_: Exception) { "[]" }))
         .put("history", JSONArray(try { prefs.getString(KEY_HISTORY, "[]") ?: "[]" } catch (_: Exception) { "[]" }))
 
@@ -169,6 +208,13 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
         aboutMe = json.optString("about_me", "")
         // Older backups have no soul or heart; leave the current ones alone rather than wiping them.
         if (json.has("soul")) soul = json.optString("soul", "")
+        json.optJSONObject("souls")?.let { s ->
+            activeSoul = if (s.isNull("active")) null else s.optString("active").ifBlank { null }
+            soulDial = s.optString("dial", "middle")
+            customSoulName = s.optString("name", "")
+            val knobs = s.optJSONObject("knobs")
+            SoulLibrary.KNOBS.forEach { id -> setKnob(id, knobs?.optString(id)?.ifBlank { null }) }
+        }
         json.optJSONArray("heart")?.let { prefs.edit().putString(KEY_HEART, it.toString()).apply() }
         val history = json.optJSONArray("history") ?: JSONArray()
         prefs.edit().putString(KEY_HISTORY, history.toString()).apply()

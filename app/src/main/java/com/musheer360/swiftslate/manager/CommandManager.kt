@@ -68,6 +68,7 @@ class CommandManager(context: Context) {
         "paste" to "Paste from clipboard.",
         "replace" to "Replace text with clipboard content.",
         "chaos" to "Surprise me: one random effect, taken all the way. ?undo puts it back.",
+        "soul" to "Swap who's talking: type a name first (jake ?soul), add low, middle or high for the dial (stan high ?soul), or ?soul alone to see who's on.",
         "translate:xx" to "Translate text to any language code (e.g. ?translate:es, ?translate:fr)."
     )
 

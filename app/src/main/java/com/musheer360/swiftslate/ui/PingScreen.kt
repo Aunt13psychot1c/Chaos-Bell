@@ -1,6 +1,7 @@
 package com.musheer360.swiftslate.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,11 +37,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.musheer360.swiftslate.manager.BellMemory
+import com.musheer360.swiftslate.manager.SoulLibrary
 import com.musheer360.swiftslate.ping.PingScheduler
 import com.musheer360.swiftslate.ping.PingStore
 import kotlinx.coroutines.delay
@@ -64,6 +67,11 @@ fun PingScreen(onClose: () -> Unit) {
     val store = remember { PingStore(context) }
 
     var soul by remember { mutableStateOf(memory.soul) }
+    val souls = remember { SoulLibrary.load(context) }
+    var activeSoul by remember { mutableStateOf(souls.activeId(memory)) }
+    var dial by remember { mutableStateOf<String?>(memory.soulDial) }
+    var customName by remember { mutableStateOf(memory.customSoulName) }
+    var knobs by remember { mutableStateOf(SoulLibrary.KNOBS.associateWith { memory.knob(it) }) }
     var enabled by remember { mutableStateOf(store.enabled) }
     var intervalIndex by remember { mutableIntStateOf(INTERVALS.indexOfFirst { it >= store.intervalMinutes }.coerceAtLeast(0)) }
     var startHour by remember { mutableFloatStateOf(store.startHour.toFloat()) }
@@ -98,14 +106,52 @@ fun PingScreen(onClose: () -> Unit) {
                 Text("🧠 Soul & Ping", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
 
                 Section("💜 Soul") {
-                    Hint("Who Bell is and how she acts. She reads this before every answer, in chat, ?talk and Ping.")
-                    OutlinedTextField(
-                        value = soul,
-                        onValueChange = { soul = it.take(BellMemory.MAX_SOUL_CHARS); memory.soul = soul },
-                        placeholder = { Text("Example: You're sassy, Southern and kind. You use glitter emoji. You never lecture.") },
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp)
-                    )
-                    Hint("${soul.length}/${BellMemory.MAX_SOUL_CHARS}")
+                    Hint("Who's talking. Pick one for your mood and swap any time. They read it before every answer, in chat, ?talk and Ping. Quick swap from any app: type a name and ?soul, like jake ?soul.")
+                    souls.souls.forEach { s ->
+                        SoulOption("${s.emoji} ${s.name}", s.tagline, activeSoul == s.id) {
+                            activeSoul = s.id; memory.activeSoul = s.id
+                        }
+                    }
+                    SoulOption(
+                        "${SoulLibrary.CUSTOM_EMOJI} ${customName.trim().ifEmpty { SoulLibrary.DEFAULT_CUSTOM_NAME }}",
+                        "Write your own, or just set the knobs",
+                        activeSoul == SoulLibrary.CUSTOM_ID
+                    ) { activeSoul = SoulLibrary.CUSTOM_ID; memory.activeSoul = SoulLibrary.CUSTOM_ID }
+
+                    val preset = souls.find(activeSoul)
+                    if (preset != null) {
+                        if (preset.intro.isNotBlank()) Hint("\"${preset.intro}\"")
+                        Text("🎚️ Dial", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                        LevelRow(listOf("Low", "Middle", "High"), dial) { picked ->
+                            val level = picked ?: "middle"
+                            dial = level; memory.soulDial = level
+                        }
+                        Hint("Turns their attitude down or up. Middle is how they were written.")
+                    } else {
+                        OutlinedTextField(
+                            value = customName,
+                            onValueChange = { customName = it.take(BellMemory.MAX_SOUL_NAME_CHARS); memory.customSoulName = customName },
+                            label = { Text("Name") },
+                            placeholder = { Text(SoulLibrary.DEFAULT_CUSTOM_NAME) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        OutlinedTextField(
+                            value = soul,
+                            onValueChange = { soul = it.take(BellMemory.MAX_SOUL_CHARS); memory.soul = soul },
+                            placeholder = { Text("Example: You're sassy, Southern and kind. You use glitter emoji. You never lecture. (Or leave this empty and just use the knobs.)") },
+                            modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp)
+                        )
+                        Hint("${soul.length}/${BellMemory.MAX_SOUL_CHARS}")
+                        SoulLibrary.KNOBS.forEach { id ->
+                            val k = souls.knobs[id] ?: return@forEach
+                            Text("🎛️ ${k.label}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                            LevelRow(listOf(k.lowLabel, "Middle", k.highLabel), knobs[id], allowOff = true) { picked ->
+                                knobs = knobs + (id to picked); memory.setKnob(id, picked)
+                            }
+                        }
+                        Hint("Tap a lit knob again to switch it off. Off knobs leave your words exactly as written.")
+                    }
                 }
 
                 Section("💗 Heart") {
@@ -238,6 +284,39 @@ private fun Section(title: String, content: @Composable () -> Unit) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(title, fontSize = 19.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             content()
+        }
+    }
+}
+
+/** One soul to pick: lit up when it's the one talking. */
+@Composable
+private fun SoulOption(title: String, tagline: String, selected: Boolean, onClick: () -> Unit) {
+    val content: @Composable () -> Unit = {
+        Column(Modifier.fillMaxWidth()) {
+            Text(title, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            if (tagline.isNotBlank()) Text(tagline, fontSize = 13.sp)
+        }
+    }
+    if (selected) Button(onClick = onClick, modifier = Modifier.fillMaxWidth()) { content() }
+    else OutlinedButton(onClick = onClick, modifier = Modifier.fillMaxWidth()) { content() }
+}
+
+/**
+ * Low / middle / high as three buttons. [selected] is "low", "middle", "high" or null. With
+ * [allowOff], tapping the lit one again hands back null (switched off).
+ */
+@Composable
+private fun LevelRow(labels: List<String>, selected: String?, allowOff: Boolean = false, onPick: (String?) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+        SoulLibrary.LEVELS.forEachIndexed { i, level ->
+            val lit = selected == level
+            val click = { onPick(if (lit && allowOff) null else level) }
+            val pad = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
+            val text: @Composable () -> Unit = {
+                Text(labels.getOrElse(i) { level }, fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 2)
+            }
+            if (lit) Button(onClick = click, contentPadding = pad, modifier = Modifier.weight(1f)) { text() }
+            else OutlinedButton(onClick = click, contentPadding = pad, modifier = Modifier.weight(1f)) { text() }
         }
     }
 }
