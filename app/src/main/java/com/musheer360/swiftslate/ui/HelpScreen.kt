@@ -142,6 +142,7 @@ private val SECTIONS = listOf(
             "🎚️ Dial: turns the picked soul's attitude Low, Middle or High. Low Jake keeps it clean, High Jake cusses and flirts a little.",
             "✨ My Soul: write your own, like \"You're sassy and kind, you use glitter emoji, you never lecture.\" Can't think what to write? Leave it empty, give it a name, and just set the 🎛️ knobs: Emoji, Serious and Chaos.",
             "Quick swap from any app: type a name then ?soul, like jake ?soul. Add low or high to turn the dial too.",
+            "🚨 Somewhere under the souls there's a vault. Do not break glass. Only use in cases of extreme boredom.",
             "💗 Heart: her long-term memory, the things she keeps about you for good. You can see every one, delete any, or tell her something to keep yourself.",
             "📡 Ping: every few messages (you pick how many), Bell stops herself and checks: am I really listening to what you mean? Then she decides if anything is worth keeping in her Heart. You never see the check, you just get a Bell who pays attention.",
             "🔔 Check-ins: turn them on and Bell messages you by herself every so often, only during the hours you pick, or stays quiet if there's nothing to say. Tap 🔔 Check in now to try it. Each check-in uses your AI key once, like one ?talk.",

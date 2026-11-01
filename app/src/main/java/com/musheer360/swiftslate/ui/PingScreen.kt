@@ -72,6 +72,8 @@ fun PingScreen(onClose: () -> Unit) {
     var dial by remember { mutableStateOf<String?>(memory.soulDial) }
     var customName by remember { mutableStateOf(memory.customSoulName) }
     var knobs by remember { mutableStateOf(SoulLibrary.KNOBS.associateWith { memory.knob(it) }) }
+    // The vault starts closed, unless a vault soul is the one talking.
+    var vaultOpen by remember { mutableStateOf(souls.find(activeSoul)?.vault == true) }
     var enabled by remember { mutableStateOf(store.enabled) }
     var intervalIndex by remember { mutableIntStateOf(INTERVALS.indexOfFirst { it >= store.intervalMinutes }.coerceAtLeast(0)) }
     var startHour by remember { mutableFloatStateOf(store.startHour.toFloat()) }
@@ -107,7 +109,7 @@ fun PingScreen(onClose: () -> Unit) {
 
                 Section("💜 Soul") {
                     Hint("Who's talking. Pick one for your mood and swap any time. They read it before every answer, in chat, ?talk and Ping. Quick swap from any app: type a name and ?soul, like jake ?soul.")
-                    souls.souls.forEach { s ->
+                    souls.regular.forEach { s ->
                         SoulOption("${s.emoji} ${s.name}", s.tagline, activeSoul == s.id) {
                             activeSoul = s.id; memory.activeSoul = s.id
                         }
@@ -117,6 +119,26 @@ fun PingScreen(onClose: () -> Unit) {
                         "Write your own, or just set the knobs",
                         activeSoul == SoulLibrary.CUSTOM_ID
                     ) { activeSoul = SoulLibrary.CUSTOM_ID; memory.activeSoul = SoulLibrary.CUSTOM_ID }
+
+                    // The Chaos Vault: closed until someone breaks the glass (or a vault soul is already on).
+                    if (souls.vault.isNotEmpty()) {
+                        if (!vaultOpen) {
+                            OutlinedButton(onClick = { vaultOpen = true }, modifier = Modifier.fillMaxWidth()) {
+                                Column(Modifier.fillMaxWidth()) {
+                                    Text("🚨 CHAOS VAULT · 🔨 BREAK GLASS", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                    Text("Do not break glass. Only use in cases of extreme boredom.", fontSize = 13.sp)
+                                }
+                            }
+                        } else {
+                            Text("🚨 Chaos Vault", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                            Hint("Not responsible for loud outbursts of laughter that wake everyone up at 3 am. Why are you up at 3 am?")
+                            souls.vault.forEach { s ->
+                                SoulOption("${s.emoji} ${s.name}", s.tagline, activeSoul == s.id) {
+                                    activeSoul = s.id; memory.activeSoul = s.id
+                                }
+                            }
+                        }
+                    }
 
                     val preset = souls.find(activeSoul)
                     if (preset != null) {

@@ -26,7 +26,8 @@ class SoulLibraryTest {
 
     @Test
     fun the_four_ready_made_souls_ship_in_the_app() {
-        assertEquals(listOf("bell", "mary", "jake", "stan"), souls.souls.map { it.id })
+        assertEquals(listOf("bell", "mary", "jake", "stan"), souls.regular.map { it.id })
+        assertEquals(listOf("alpaca", "goddess"), souls.vault.map { it.id })
         assertEquals(setOf("emoji", "serious", "chaos"), souls.knobs.keys)
     }
 
@@ -77,6 +78,17 @@ class SoulLibraryTest {
         assertTrue(souls.resolve("gandalf", m) is SoulLibrary.Switch.Unknown)
         m.customSoulName = "Glitch Goddess"
         assertEquals(SoulLibrary.Switch.Change(SoulLibrary.CUSTOM_ID, null), souls.resolve("glitch goddess", m))
+    }
+
+    @Test
+    fun vault_souls_answer_to_their_names_but_stay_out_of_the_hint() {
+        val m = memory()
+        assertEquals(SoulLibrary.Switch.Change("alpaca", "high"), souls.resolve("alpaca high", m))
+        assertEquals(SoulLibrary.Switch.Change("goddess", null), souls.resolve("goddess", m))
+        assertFalse(souls.choices().contains("alpaca"))
+        m.activeSoul = "alpaca"
+        assertTrue(souls.soulText(m).contains("Conversational Asshole"))
+        assertTrue(souls.soulText(m).contains("drop the act"))
     }
 
     @Test
