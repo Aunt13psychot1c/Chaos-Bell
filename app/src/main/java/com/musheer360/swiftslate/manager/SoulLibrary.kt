@@ -38,7 +38,9 @@ object SoulLibrary {
         val prompt: String,
         /** Always added, whatever the dial says (her guardrail line). */
         val always: String,
-        val dial: Map<String, String>
+        val dial: Map<String, String>,
+        /** Lives in the Chaos Vault: hidden behind BREAK GLASS, left out of the ?soul hint. */
+        val vault: Boolean = false
     )
 
     data class KnobLevel(val rule: String, val example: String)
@@ -71,6 +73,12 @@ object SoulLibrary {
 
     class Catalog(val souls: List<Soul>, val knobBase: String, val knobs: Map<String, Knob>) {
 
+        /** The everyday souls, shown in the picker. */
+        val regular: List<Soul> get() = souls.filter { !it.vault }
+
+        /** The Chaos Vault. Do not break glass. Only use in cases of extreme boredom. */
+        val vault: List<Soul> get() = souls.filter { it.vault }
+
         fun find(id: String?): Soul? = souls.firstOrNull { it.id == id }
 
         /**
@@ -82,7 +90,7 @@ object SoulLibrary {
             if (chosen == CUSTOM_ID) return CUSTOM_ID
             if (chosen != null && find(chosen) != null) return chosen
             if (memory.soul.isNotBlank()) return CUSTOM_ID
-            return souls.firstOrNull()?.id ?: CUSTOM_ID
+            return regular.firstOrNull()?.id ?: souls.firstOrNull()?.id ?: CUSTOM_ID
         }
 
         fun customName(memory: BellMemory): String = memory.customSoulName.trim().ifEmpty { DEFAULT_CUSTOM_NAME }
@@ -158,7 +166,8 @@ object SoulLibrary {
             else "${emoji(memory)} ${displayName(memory)} (${memory.soulDial})"
         }
 
-        fun choices(): String = (souls.map { it.id } + "mine").joinToString(", ")
+        /** The ?soul hint. Vault souls stay secret; typing their name still works. */
+        fun choices(): String = (regular.map { it.id } + "mine").joinToString(", ")
     }
 
     /** Parses the two asset files. Bad or missing parts are skipped, never thrown. */
@@ -179,7 +188,8 @@ object SoulLibrary {
                     intro = o.optString("intro"),
                     prompt = prompt,
                     always = o.optString("always"),
-                    dial = LEVELS.associateWith { dialObj?.optString(it).orEmpty() }
+                    dial = LEVELS.associateWith { dialObj?.optString(it).orEmpty() },
+                    vault = o.optBoolean("vault", false)
                 )
             }.distinctBy { it.id }
         } catch (_: Exception) { emptyList() }
