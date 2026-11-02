@@ -154,11 +154,12 @@ class AnthropicClient {
         model: String,
         temperature: Double,
         webSearch: Boolean,
-        answerMode: Boolean = false
+        answerMode: Boolean = false,
+        image: ImageInput? = null
     ): Result<GenerateResult> = withContext(Dispatchers.IO) {
         var useSearch = webSearch
         var sendTemperature = true
-        var result = doGenerate(prompt, text, apiKey, model, temperature, useSearch, sendTemperature, answerMode)
+        var result = doGenerate(prompt, text, apiKey, model, temperature, useSearch, sendTemperature, answerMode, image)
 
         repeat(2) {
             val msg = result.exceptionOrNull()?.message ?: return@repeat
@@ -168,14 +169,14 @@ class AnthropicClient {
                 sendTemperature && isTemperatureRejectedError(msg) -> sendTemperature = false
                 else -> return@repeat
             }
-            result = doGenerate(prompt, text, apiKey, model, temperature, useSearch, sendTemperature, answerMode)
+            result = doGenerate(prompt, text, apiKey, model, temperature, useSearch, sendTemperature, answerMode, image)
         }
 
         // Retry once for transient network/server errors (with 1.5s backoff), like the
         // other clients.
         if (result.isFailure && result.exceptionOrNull().isTransientNetwork()) {
             kotlinx.coroutines.delay(1500)
-            result = doGenerate(prompt, text, apiKey, model, temperature, useSearch, sendTemperature, answerMode)
+            result = doGenerate(prompt, text, apiKey, model, temperature, useSearch, sendTemperature, answerMode, image)
         }
 
         if (result.isFailure) {
@@ -194,7 +195,8 @@ class AnthropicClient {
         temperature: Double,
         webSearch: Boolean,
         sendTemperature: Boolean,
-        answerMode: Boolean = false
+        answerMode: Boolean = false,
+        image: ImageInput? = null
     ): JSONObject = JSONObject().apply {
         put("model", model.replace(Regex("[^a-zA-Z0-9._\\-/: ]"), ""))
         put("max_tokens", MAX_OUTPUT_TOKENS)
@@ -202,7 +204,11 @@ class AnthropicClient {
         put("messages", JSONArray().apply {
             put(JSONObject().apply {
                 put("role", "user")
-                put("content", ApiClientUtils.wrapUserText(text))
+                if (image == null) put("content", ApiClientUtils.wrapUserText(text))
+                // A picture goes first, then the words about it.
+                else put("content", JSONArray()
+                    .put(image.anthropicPart())
+                    .put(JSONObject().put("type", "text").put("text", ApiClientUtils.wrapUserText(text))))
             })
         })
         if (sendTemperature) put("temperature", clampTemperature(temperature))
@@ -225,7 +231,8 @@ class AnthropicClient {
         temperature: Double,
         webSearch: Boolean,
         sendTemperature: Boolean,
-        answerMode: Boolean
+        answerMode: Boolean,
+        image: ImageInput? = null
     ): Result<GenerateResult> {
         var connection: HttpURLConnection? = null
         return try {
@@ -239,7 +246,7 @@ class AnthropicClient {
             // whole command after 90 seconds, so stay under that.
             connection.readTimeout = if (webSearch) 80_000 else 60_000
 
-            val body = buildRequestBody(prompt, text, model, temperature, webSearch, sendTemperature, answerMode)
+            val body = buildRequestBody(prompt, text, model, temperature, webSearch, sendTemperature, answerMode, image)
             connection.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
 
             val code = connection.responseCode

@@ -7,6 +7,7 @@ import com.musheer360.swiftslate.api.ApiClientUtils
 import com.musheer360.swiftslate.api.ApiError
 import com.musheer360.swiftslate.api.ApiException
 import com.musheer360.swiftslate.api.GeminiClient
+import com.musheer360.swiftslate.api.ImageInput
 import com.musheer360.swiftslate.api.SearchMode
 import com.musheer360.swiftslate.api.OpenAICompatibleClient
 import com.musheer360.swiftslate.manager.BellMemory
@@ -63,6 +64,7 @@ suspend fun runTextCommand(
     remember: Boolean = true,
     allowWebSearch: Boolean = true,
     useSoul: Boolean = true,
+    image: ImageInput? = null,
     onFirstAttempt: () -> Unit = {}
 ): CommandOutcome {
     // keys_keystore_error rather than a "reinstall" message: the usual cause is the Keystore key
@@ -126,14 +128,14 @@ suspend fun runTextCommand(
                 useJsonObjectMode = provider.useJsonObjectMode(useStructuredOutput),
                 extraParams = provider.reasoningParams(model),
                 searchMode = if (webSearch) provider.searchMode(model) else SearchMode.NONE,
-                answerMode = answerMode, forceSearch = forceSearch)
+                answerMode = answerMode, forceSearch = forceSearch, image = image)
             Transport.ANTHROPIC_NATIVE -> anthropicClient.generate(
                 fullPrompt, text, key, model, temperature,
-                webSearch = webSearch, answerMode = answerMode)
+                webSearch = webSearch, answerMode = answerMode, image = image)
             Transport.GEMINI_NATIVE -> geminiClient.generate(
                 fullPrompt, text, key, model, temperature, useStructuredOutput,
                 thinkingLevel = provider.thinkingLevel(model),
-                webSearch = webSearch, answerMode = answerMode)
+                webSearch = webSearch, answerMode = answerMode, image = image)
         }
 
         result.onSuccess { generated ->
@@ -159,7 +161,8 @@ suspend fun runTextCommand(
             } else {
                 replyText
             }
-            if (remember) memory?.remember(text, replyText)
+            // Short-term memory is text only; a note keeps follow-ups making sense.
+            if (remember) memory?.remember(if (image != null) "[sent a picture] $text" else text, replyText)
             return CommandOutcome.Success(outputText)
         }
 

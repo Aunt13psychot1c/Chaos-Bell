@@ -106,6 +106,7 @@ private val SECTIONS = listOf(
             "3. Tap Chaos Bell, then pick a command.",
             "4. Tap Replace to swap your text, or Copy to keep her answer.",
             "5. Got more questions? Type in the Ask her more… box under her answer and tap Send. Keep chatting as long as you like.",
+            "📸 Pictures: tap 📎 in her chat to send a photo, or use Share ➡️ Chaos Bell from your gallery or any app. Ask what you want to know, or just send it and she'll tell you what she sees. Needs a model that can see, like Claude, Gemini or GPT-4o / 4.1.",
             "This works even in apps where typing a command doesn't, and even when Bell is switched off."
         )
     ),

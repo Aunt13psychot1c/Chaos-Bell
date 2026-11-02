@@ -319,9 +319,11 @@ class OpenAICompatibleClient {
         searchMode: SearchMode = SearchMode.NONE,
         searcher: WebSearcher = WebSearcher(),
         answerMode: Boolean = false,
-        forceSearch: Boolean = false
+        forceSearch: Boolean = false,
+        image: ImageInput? = null
     ): Result<GenerateResult> = withContext(Dispatchers.IO) {
-        if (searchMode == SearchMode.FUNCTION) {
+        // Pictures skip Bell's search round: tools plus images trip up too many models.
+        if (searchMode == SearchMode.FUNCTION && image == null) {
             val searched = generateWithSearch(prompt, text, apiKey, model, temperature, endpoint, extraParams, searcher, answerMode, forceSearch)
             if (searched != null) {
                 val cleaned = stripHttpPrefix(searched.map { it.text })
@@ -333,12 +335,12 @@ class OpenAICompatibleClient {
 
         // Answer-mode replies are free-form, so they never go through JSON mode.
         val jsonMode = useJsonObjectMode && !answerMode
-        var result = doGenerate(prompt, text, apiKey, model, temperature, endpoint, jsonMode, extraParams, answerMode = answerMode)
+        var result = doGenerate(prompt, text, apiKey, model, temperature, endpoint, jsonMode, extraParams, answerMode = answerMode, image = image)
 
         // Retry once for transient network/server errors (with 1.5s backoff)
         if (result.isFailure && result.exceptionOrNull().isTransientNetwork()) {
             kotlinx.coroutines.delay(1500)
-            result = doGenerate(prompt, text, apiKey, model, temperature, endpoint, jsonMode, extraParams, answerMode = answerMode)
+            result = doGenerate(prompt, text, apiKey, model, temperature, endpoint, jsonMode, extraParams, answerMode = answerMode, image = image)
         }
 
         val cleaned = stripHttpPrefix(result.map { it.text })
@@ -425,7 +427,8 @@ class OpenAICompatibleClient {
         tools: JSONArray? = null,
         toolChoice: String = "auto",
         followUp: JSONArray? = null,
-        answerMode: Boolean = false
+        answerMode: Boolean = false,
+        image: ImageInput? = null
     ): Result<GenerateResult> {
         if (EndpointValidator.validate(endpoint) != EndpointValidator.Error.NONE) {
             return Result.failure(Exception("Endpoint must be https:// or an http:// private-LAN address"))
@@ -458,7 +461,11 @@ class OpenAICompatibleClient {
                     })
                     put(JSONObject().apply {
                         put("role", "user")
-                        put("content", ApiClientUtils.wrapUserText(text))
+                        if (image == null) put("content", ApiClientUtils.wrapUserText(text))
+                        // Vision models take an array: the words, then the picture.
+                        else put("content", JSONArray()
+                            .put(JSONObject().put("type", "text").put("text", ApiClientUtils.wrapUserText(text)))
+                            .put(image.openAiPart()))
                     })
                     // The model's search request and Bell's results, on the second round.
                     if (followUp != null) for (i in 0 until followUp.length()) put(followUp.get(i))
