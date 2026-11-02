@@ -97,7 +97,7 @@ class ProcessTextActivity : ComponentActivity() {
 
     private var resultDelivered = false
 
-    /** The picture in a Share (ACTION_SEND image/*) intent, or null for anything else. */
+    /** The picture in a Share (ACTION_SEND, any image type) intent, or null for anything else. */
     @Suppress("DEPRECATION")
     private fun sharedImageUri(intent: Intent?): Uri? {
         if (intent?.action != Intent.ACTION_SEND) return null
