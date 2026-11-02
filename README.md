@@ -162,7 +162,7 @@ Made by **Aunt13Psychot1c**, Queen of Chaos.
 
 ## Support
 
-If Bell makes your life easier, [☕ buy me a coffee](https://buymeacoffee.com/aunt13psychot1c). It keeps the chaos running and the app free.
+If Bell makes your life easier, [🍕 buy me a pizza](https://buymeacoffee.com/aunt13psychot1c). It keeps the chaos running and the app free.
 
 ## License
 
