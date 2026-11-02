@@ -282,4 +282,25 @@ class ApiClientUtilsTest {
         assertEquals(emptyList<String>(), ApiClientUtils.parseModelIds("""{"data":[]}"""))
         assertEquals(emptyList<String>(), ApiClientUtils.parseModelIds("""{"something":"else"}"""))
     }
+
+    @Test
+    fun cloudflare_endpoints_are_recognised() {
+        val base = "https://api.cloudflare.com/client/v4/accounts/abc123/ai"
+        assertEquals(base, ApiClientUtils.cloudflareAiBase("$base/v1"))
+        assertEquals(base, ApiClientUtils.cloudflareAiBase("$base/v1/"))
+        assertEquals(base, ApiClientUtils.cloudflareAiBase("  $base/v1  "))
+        assertEquals(base, ApiClientUtils.cloudflareAiBase(base))
+        assertNull(ApiClientUtils.cloudflareAiBase("https://api.openai.com/v1"))
+        assertNull(ApiClientUtils.cloudflareAiBase("https://gateway.ai.cloudflare.com/v1/abc/gw/compat"))
+        assertNull(ApiClientUtils.cloudflareAiBase("https://api.cloudflare.com/client/v4/accounts/abc123/aistuff"))
+    }
+
+    @Test
+    fun cloudflare_model_list_and_errors_parse() {
+        val body = """{"success":true,"result":[{"name":"@cf/meta/llama-3.1-8b-instruct"},{"name":" @cf/qwen/qwen1.5-7b-chat-awq "},{"name":""},{"name":"@cf/meta/llama-3.1-8b-instruct"}]}"""
+        assertEquals(listOf("@cf/meta/llama-3.1-8b-instruct", "@cf/qwen/qwen1.5-7b-chat-awq"), ApiClientUtils.parseCloudflareModels(body))
+        assertEquals(emptyList<String>(), ApiClientUtils.parseCloudflareModels("nope"))
+        assertEquals("Authentication error", ApiClientUtils.extractCloudflareError("""{"success":false,"errors":[{"code":10000,"message":"Authentication error"}]}"""))
+        assertEquals("", ApiClientUtils.extractCloudflareError("{}"))
+    }
 }

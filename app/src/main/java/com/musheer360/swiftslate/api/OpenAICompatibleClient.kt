@@ -105,6 +105,24 @@ class OpenAICompatibleClient {
         if (EndpointValidator.validate(endpoint) != EndpointValidator.Error.NONE) {
             return@withContext Result.failure(Exception("Endpoint must be https:// or an http:// private-LAN address"))
         }
+        // Cloudflare Workers AI has no /models under its OpenAI-compatible base, so the usual
+        // check 404s and a good token was refused. Check it against Cloudflare's own list.
+        ApiClientUtils.cloudflareAiBase(endpoint)?.let { cf ->
+            return@withContext try {
+                val probe = httpGet("$cf/models/search?per_page=1", apiKey)
+                when (probe.code) {
+                    in 200..299 -> Result.success("Valid")
+                    429 -> Result.failure(Exception("Rate limited. Please try again later."))
+                    401, 403 -> Result.failure(Exception(
+                        ApiClientUtils.extractCloudflareError(probe.body).ifEmpty { "Invalid API key" } +
+                            " (Cloudflare tokens need the Workers AI permission)"))
+                    else -> Result.failure(Exception("Error ${probe.code}: " +
+                        ApiClientUtils.extractCloudflareError(probe.body).ifEmpty { "Check the account ID in the endpoint" }))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
         var connection: HttpURLConnection? = null
         try {
             val baseUrl = endpoint.trimEnd('/')
@@ -212,6 +230,21 @@ class OpenAICompatibleClient {
     suspend fun fetchModels(apiKey: String?, endpoint: String): Result<List<String>> = withContext(Dispatchers.IO) {
         if (EndpointValidator.validate(endpoint) != EndpointValidator.Error.NONE) {
             return@withContext Result.failure(Exception("Endpoint must be https:// or an http:// private-LAN address"))
+        }
+        // Cloudflare Workers AI: its text models come from /ai/models/search, not /models.
+        ApiClientUtils.cloudflareAiBase(endpoint)?.let { cf ->
+            return@withContext try {
+                val probe = httpGet("$cf/models/search?task=Text%20Generation&per_page=200", apiKey)
+                when (probe.code) {
+                    in 200..299 -> Result.success(ApiClientUtils.parseCloudflareModels(probe.body))
+                    401, 403 -> Result.failure(Exception(
+                        ApiClientUtils.extractCloudflareError(probe.body).ifEmpty { "Invalid API key" }))
+                    else -> Result.failure(Exception(
+                        ApiClientUtils.extractCloudflareError(probe.body).ifEmpty { "Unexpected error" }))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
         val baseUrl = endpoint.trimEnd('/')
         var lastDetail: String? = null

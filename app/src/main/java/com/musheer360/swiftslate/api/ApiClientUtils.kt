@@ -203,6 +203,44 @@ internal object ApiClientUtils {
         }
     }
 
+    private val CLOUDFLARE_AI = Regex(
+        "^(https://api\\.cloudflare\\.com/client/v4/accounts/[^/?#]+/ai)(?:[/?#].*)?$",
+        RegexOption.IGNORE_CASE
+    )
+
+    /**
+     * Cloudflare Workers AI serves chat at `/accounts/{id}/ai/v1` but has no `/models` there:
+     * its model list lives at `/accounts/{id}/ai/models/search`. Returns the account's
+     * `.../ai` base for a Workers AI endpoint, or null for anything else.
+     */
+    fun cloudflareAiBase(endpoint: String): String? =
+        CLOUDFLARE_AI.find(endpoint.trim())?.groupValues?.get(1)
+
+    /** Text-generation model names from Cloudflare's `{"result":[{"name":...}]}` list. */
+    fun parseCloudflareModels(json: String): List<String> {
+        if (json.isBlank()) return emptyList()
+        return try {
+            val arr = JSONObject(json).optJSONArray("result") ?: return emptyList()
+            val out = LinkedHashSet<String>()
+            for (i in 0 until arr.length()) {
+                arr.optJSONObject(i)?.optString("name")?.trim()?.takeIf { it.isNotEmpty() }?.let { out.add(it) }
+            }
+            out.toList()
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    /** Cloudflare puts its errors in `{"errors":[{"message":...}]}`. */
+    fun extractCloudflareError(errorBody: String): String {
+        if (errorBody.isBlank()) return ""
+        return try {
+            JSONObject(errorBody).optJSONArray("errors")?.optJSONObject(0)?.optString("message", "") ?: ""
+        } catch (_: Exception) {
+            ""
+        }
+    }
+
     fun sanitizeErrorForUser(responseCode: Int, errorBody: String, fallbackMessage: String): String {
         val apiMessage = extractApiErrorMessage(errorBody)
         return if (apiMessage.isNotEmpty()) apiMessage else fallbackMessage
