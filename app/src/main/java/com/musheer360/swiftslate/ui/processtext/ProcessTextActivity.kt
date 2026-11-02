@@ -5,14 +5,20 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -91,6 +97,18 @@ class ProcessTextActivity : ComponentActivity() {
 
     private var resultDelivered = false
 
+    /** The picture in a Share (ACTION_SEND image/*) intent, or null for anything else. */
+    @Suppress("DEPRECATION")
+    private fun sharedImageUri(intent: Intent?): Uri? {
+        if (intent?.action != Intent.ACTION_SEND) return null
+        if (intent.type?.startsWith("image/") != true) return null
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+        } else {
+            intent.getParcelableExtra(Intent.EXTRA_STREAM)
+        } ?: intent.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.uri
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Edge-to-edge on every Android version, not only 15+ where it is forced: otherwise the
         // window swallows the keyboard insets on older phones and the sheet can't lift above it.
@@ -105,8 +123,12 @@ class ProcessTextActivity : ComponentActivity() {
                 ?.takeIf { it.containsKey(Intent.EXTRA_PROCESS_TEXT_READONLY) }
                 ?.getBoolean(Intent.EXTRA_PROCESS_TEXT_READONLY)
         )
-        val chatMode = intent?.getBooleanExtra(EXTRA_CHAT_MODE, false) == true
-        val selection = if (chatMode) {
+        val sharedImage = sharedImageUri(intent)
+        val chatMode = intent?.getBooleanExtra(EXTRA_CHAT_MODE, false) == true || sharedImage != null
+        val selection = if (sharedImage != null) {
+            // Shared from the gallery or another app's Share button: straight into a chat.
+            Selection(text = "", readOnly = true, chatMode = true, sharedImage = sharedImage)
+        } else if (chatMode) {
             Selection(
                 text = intent?.getStringExtra(EXTRA_CHAT_BACKGROUND).orEmpty(),
                 readOnly = true,
@@ -269,7 +291,9 @@ private fun ProcessTextSheet(
                     // follow-ups below it, and a box at the bottom to ask her more.
                     ChatCard(
                         state = s,
-                        onSend = { viewModel.followUp(it) }
+                        onSend = { viewModel.followUp(it) },
+                        onPickPicture = { viewModel.attachImage(it) },
+                        onClearPicture = { viewModel.clearImage() }
                     )
                     if (confirmation != null) {
                         // Inside the sheet on purpose: ModalBottomSheet owns its own window, so
@@ -386,9 +410,19 @@ private fun FatalMessage(message: String, onDismiss: () -> Unit) {
 }
 
 @Composable
-private fun ChatCard(state: UiState.Preview, onSend: (String) -> Unit) {
+private fun ChatCard(
+    state: UiState.Preview,
+    onSend: (String) -> Unit,
+    onPickPicture: (Uri) -> Unit,
+    onClearPicture: () -> Unit
+) {
     val scroll = rememberScrollState()
     var draft by remember { mutableStateOf("") }
+    // The system photo picker: no storage permission needed, works back to Android 6 via a fallback.
+    val pickPicture = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) onPickPicture(uri)
+    }
+    val canSend = (draft.isNotBlank() || state.pictureAttached) && !state.thinking && !state.preparingPicture
     // The first answer opens the conversation. [state.result] moves on to the latest reply as
     // the chat grows, so the opener is captured once, when the card first appears.
     val opener = remember { state.opener ?: state.result }
@@ -453,11 +487,33 @@ private fun ChatCard(state: UiState.Preview, onSend: (String) -> Unit) {
             }
         }
         Spacer(Modifier.height(12.dp))
+        if (state.preparingPicture || state.pictureAttached) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 6.dp)) {
+                Text(
+                    text = if (state.preparingPicture) "📸 Getting the picture ready…" else "📸 Picture attached",
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f)
+                )
+                if (state.pictureAttached) {
+                    TextButton(onClick = onClearPicture, enabled = !state.thinking) { Text("✕ Remove") }
+                }
+            }
+        }
         Row(verticalAlignment = Alignment.CenterVertically) {
+            TextButton(
+                onClick = {
+                    pickPicture.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                },
+                enabled = !state.thinking && !state.preparingPicture,
+                contentPadding = PaddingValues(horizontal = 6.dp)
+            ) {
+                Text("📎", fontSize = 20.sp)
+            }
             OutlinedTextField(
                 value = draft,
                 onValueChange = { draft = it },
-                placeholder = { Text("Ask her more…") },
+                placeholder = { Text(if (state.pictureAttached) "Ask about the picture…" else "Ask her more…") },
                 maxLines = 4,
                 enabled = !state.thinking,
                 shape = RoundedCornerShape(10.dp),
@@ -466,12 +522,12 @@ private fun ChatCard(state: UiState.Preview, onSend: (String) -> Unit) {
             Spacer(Modifier.width(8.dp))
             TextButton(
                 onClick = {
-                    if (draft.isNotBlank()) {
+                    if (canSend) {
                         onSend(draft)
                         draft = ""
                     }
                 },
-                enabled = draft.isNotBlank() && !state.thinking
+                enabled = canSend
             ) {
                 Text("Send", fontWeight = FontWeight.Bold)
             }

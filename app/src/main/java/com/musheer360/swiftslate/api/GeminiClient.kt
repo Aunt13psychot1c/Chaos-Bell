@@ -172,12 +172,13 @@ class GeminiClient {
         useStructuredOutput: Boolean = false,
         thinkingLevel: String? = null,
         webSearch: Boolean = false,
-        answerMode: Boolean = false
+        answerMode: Boolean = false,
+        image: ImageInput? = null
     ): Result<GenerateResult> = withContext(Dispatchers.IO) {
         // Google Search grounding cannot be combined with structured (JSON) output, so a
         // searching request goes out as plain text.
         var search = webSearch
-        var result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput && !search && !answerMode, thinkingLevel, search, answerMode)
+        var result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput && !search && !answerMode, thinkingLevel, search, answerMode, image)
 
         // Models or keys without Google Search grounding answer 400; run the command anyway,
         // just without the search.
@@ -185,13 +186,13 @@ class GeminiClient {
                 it.startsWith("HTTP_400") && (it.contains("search", ignoreCase = true) || it.contains("tool", ignoreCase = true))
             }) {
             search = false
-            result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput && !answerMode, thinkingLevel, search, answerMode)
+            result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput && !answerMode, thinkingLevel, search, answerMode, image)
         }
 
         // Retry once for transient network/server errors (with 1.5s backoff)
         if (result.isFailure && result.exceptionOrNull().isTransientNetwork()) {
             kotlinx.coroutines.delay(1500)
-            result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput && !search && !answerMode, thinkingLevel, search, answerMode)
+            result = doGenerate(prompt, text, apiKey, model, temperature, useStructuredOutput && !search && !answerMode, thinkingLevel, search, answerMode, image)
         }
 
         val cleaned = stripHttpPrefix(result.map { it.text })
@@ -217,7 +218,8 @@ class GeminiClient {
         withStructured: Boolean,
         thinkingLevel: String? = null,
         webSearch: Boolean = false,
-        answerMode: Boolean = false
+        answerMode: Boolean = false,
+        image: ImageInput? = null
     ): Result<GenerateResult> {
         var connection: HttpURLConnection? = null
         return try {
@@ -242,6 +244,8 @@ class GeminiClient {
                 put("contents", JSONArray().apply {
                     put(JSONObject().apply {
                         put("parts", JSONArray().apply {
+                            // A picture goes first, then the words about it.
+                            if (image != null) put(image.geminiPart())
                             put(JSONObject().apply {
                                 put("text", ApiClientUtils.wrapUserText(text))
                             })

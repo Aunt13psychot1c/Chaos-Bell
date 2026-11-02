@@ -1,12 +1,14 @@
 package com.musheer360.swiftslate.ui.processtext
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.musheer360.swiftslate.R
 import com.musheer360.swiftslate.SwiftSlateApp
 import com.musheer360.swiftslate.api.GeminiClient
+import com.musheer360.swiftslate.api.ImageInput
 import com.musheer360.swiftslate.api.OpenAICompatibleClient
 import com.musheer360.swiftslate.manager.BellPause
 import com.musheer360.swiftslate.manager.CommandManager
@@ -48,7 +50,11 @@ sealed interface UiState {
         val thinking: Boolean = false,
         val chatError: String? = null,
         /** What the chat card shows on top; null means [result]. Set when a saved chat is restored. */
-        val opener: String? = null
+        val opener: String? = null,
+        /** A picture is ready to go out with the next message. */
+        val pictureAttached: Boolean = false,
+        /** A picture is being shrunk and readied. */
+        val preparingPicture: Boolean = false
     ) : UiState
     /** [retry] is null for failures that re-running cannot fix (e.g. nothing configured). */
     data class Error(val message: String, val retry: Command? = null) : UiState
@@ -76,7 +82,16 @@ class ProcessTextViewModel(
             "directly and fully, like you're talking to a smart adult, using the highlighted " +
             "text and the conversation for context. Reply with only your answer."
         const val CHAT_GREETING = "Hey! What's on your mind? 🔔"
+        const val PICTURE_GREETING = "Ooh, a picture! 📸 What do you want to know about it?"
+        /** Sent when a picture goes out with nothing typed. */
+        const val DEFAULT_PICTURE_QUESTION = "What's in this picture?"
+        const val PICTURE_UNREADABLE = "Couldn't open that picture 🙈 Try another one?"
+        const val PICTURE_NOT_SEEN =
+            "This model can't see pictures 🙈 Switch to one that can, like Claude, Gemini, or a GPT-4o / 4.1 style model."
     }
+
+    /** The picture waiting to go out with the next message. Kept out of [UiState] on purpose: it's megabytes of text. */
+    private var pendingImage: ImageInput? = null
 
     /** The first answer in the popup, kept so follow-ups can carry it as context. */
     private var firstAnswer: String = ""
@@ -137,16 +152,49 @@ class ProcessTextViewModel(
                     Log.w(TAG, "restoring chat failed", e)
                     emptyList()
                 }
+                // Shared from the gallery or another app: open with the picture already attached.
+                val greeting = if (selection.sharedImage != null) PICTURE_GREETING else CHAT_GREETING
+                firstAnswer = greeting
                 UiState.Preview(
-                    result = saved.lastOrNull { !it.fromUser }?.text ?: CHAT_GREETING,
+                    result = saved.lastOrNull { !it.fromUser }?.text ?: greeting,
                     canInsert = false,
                     chat = saved,
-                    opener = CHAT_GREETING
+                    opener = greeting
                 )
             } else {
                 UiState.CommandList(commands)
             }
+            selection.sharedImage?.let { attachImage(it) }
         }
+    }
+
+    /** Readies a picked or shared picture to go out with the next message. */
+    fun attachImage(uri: Uri) {
+        val current = _uiState.value as? UiState.Preview ?: return
+        if (current.thinking || current.preparingPicture) return
+        _uiState.value = current.copy(preparingPicture = true, chatError = null)
+        viewModelScope.launch {
+            val image = try {
+                withContext(Dispatchers.IO) { ImagePrep.load(getApplication(), uri) }
+            } catch (e: Exception) {
+                Log.w(TAG, "reading picture failed", e)
+                null
+            }
+            pendingImage = image
+            val base = _uiState.value as? UiState.Preview ?: return@launch
+            _uiState.value = base.copy(
+                preparingPicture = false,
+                pictureAttached = image != null,
+                chatError = if (image == null) PICTURE_UNREADABLE else null
+            )
+        }
+    }
+
+    /** Takes the attached picture back off. */
+    fun clearImage() {
+        pendingImage = null
+        val current = _uiState.value as? UiState.Preview ?: return
+        _uiState.value = current.copy(pictureAttached = false)
     }
 
     fun run(command: Command) {
@@ -213,17 +261,20 @@ class ProcessTextViewModel(
      * (Bell's own short-term memory only records answer-mode commands).
      */
     fun followUp(question: String) {
-        val q = question.trim()
         val current = _uiState.value as? UiState.Preview ?: return
-        if (q.isEmpty() || current.thinking) return
+        val image = pendingImage
+        // A picture can go out on its own; Bell gets a sensible question to go with it.
+        val q = question.trim().ifEmpty { if (image != null) DEFAULT_PICTURE_QUESTION else "" }
+        if (q.isEmpty() || current.thinking || current.preparingPicture) return
         if (BellPause.isPaused(getApplication<Application>())) {
             _uiState.value = current.copy(chatError = string(R.string.error_paused))
             return
         }
         if (!inFlight.compareAndSet(false, true)) return
 
-        val chat = current.chat + ChatTurn(fromUser = true, text = q)
-        _uiState.value = current.copy(chat = chat, thinking = true, chatError = null)
+        val chat = current.chat + ChatTurn(fromUser = true, text = if (image != null) "📸 $q" else q)
+        pendingImage = null
+        _uiState.value = current.copy(chat = chat, thinking = true, chatError = null, pictureAttached = false)
 
         val transcript = buildString {
             append("Bell: ").append(firstAnswer).append("\n")
@@ -248,7 +299,7 @@ class ProcessTextViewModel(
                     withContext(Dispatchers.IO) {
                         runTextCommand(
                             getApplication<Application>(), keyManager, geminiClient, openAIClient,
-                            FOLLOW_UP_PROMPT, payload, answerMode = true
+                            FOLLOW_UP_PROMPT, payload, answerMode = true, image = image
                         )
                     }
                 }
@@ -266,8 +317,10 @@ class ProcessTextViewModel(
                         base.copy(thinking = false, chatError = string(R.string.error_safety_blocked))
                     is CommandOutcome.Unavailable ->
                         base.copy(thinking = false, chatError = outcome.message)
-                    is CommandOutcome.Failure ->
-                        base.copy(thinking = false, chatError = outcome.message)
+                    is CommandOutcome.Failure -> base.copy(
+                        thinking = false,
+                        chatError = if (image != null && looksLikeNoVision(outcome.message)) PICTURE_NOT_SEEN else outcome.message
+                    )
                 }
             } catch (_: TimeoutCancellationException) {
                 (_uiState.value as? UiState.Preview ?: current)
@@ -290,4 +343,11 @@ class ProcessTextViewModel(
     }
 
     private fun string(resId: Int) = getApplication<Application>().getString(resId)
+
+    /** Providers word "this model can't take images" many ways; these cover the usual ones. */
+    private fun looksLikeNoVision(message: String): Boolean {
+        val m = message.lowercase()
+        return listOf("image", "vision", "multimodal", "multi-modal", "image_url", "inline_data", "must be a string")
+            .any { it in m }
+    }
 }
