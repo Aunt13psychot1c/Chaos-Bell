@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.aunt13psychot1c.bell"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 36
         versionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull() ?: 1
         versionName = (project.findProperty("versionName") as String?) ?: "$baseVersion-dev"
