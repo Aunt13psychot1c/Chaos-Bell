@@ -543,7 +543,7 @@ class AssistantService : AccessibilityService() {
                 when (outcome) {
                     is CommandOutcome.Success -> {
                         val finalText = if (command.answerMode) {
-                            ReplyFormat.withQuestion(originalText, outcome.text)
+                            ReplyFormat.withQuestion(originalText, outcome.text, speakerName(command.useSoul))
                         } else outcome.text
                         if (!replaceText(source, finalText)) {
                             // The field rejected the write. Restore the user's text, and don't
@@ -658,6 +658,20 @@ class AssistantService : AccessibilityService() {
      * just turns the dial, and "?soul" alone says who's on. The typed words are cleared from
      * the box on a switch (?undo brings them back); an unknown name leaves the text alone.
      */
+    /** Who signs an answer: the soul that's on, or plain Bell when the soul is off (?notalk). */
+    private suspend fun speakerName(useSoul: Boolean): String {
+        if (!useSoul) return "Bell"
+        return try {
+            withContext(Dispatchers.IO) {
+                SoulLibrary.load(this@AssistantService).displayName(BellMemory(this@AssistantService))
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            "Bell"
+        }
+    }
+
     private fun handleSoulCommand(source: AccessibilityNodeInfo, precedingText: String) {
         currentJob = serviceScope.launch {
             val thisJob = coroutineContext[Job]

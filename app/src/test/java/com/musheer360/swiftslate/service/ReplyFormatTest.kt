@@ -17,4 +17,16 @@ class ReplyFormatTest {
     fun empty_question_returns_just_the_answer() {
         assertEquals("Hi!", ReplyFormat.withQuestion("   ", "Hi!"))
     }
+
+    @Test
+    fun signsWithTheSoulThatIsTalking() {
+        assertEquals(
+            "You: \"who are you\"\n${ReplyFormat.DIVIDER}\nStan: Stan.",
+            ReplyFormat.withQuestion("who are you", "Stan.", "Stan")
+        )
+        assertEquals(
+            "You: \"hi\"\n${ReplyFormat.DIVIDER}\nBell: Hey!",
+            ReplyFormat.withQuestion("hi", "Hey!", "  ")
+        )
+    }
 }
