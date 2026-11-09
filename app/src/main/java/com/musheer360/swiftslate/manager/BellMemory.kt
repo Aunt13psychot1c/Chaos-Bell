@@ -37,7 +37,8 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
         const val MAX_SOUL_NAME_CHARS = 30
 
         const val MAX_ABOUT_ME_CHARS = 1_500
-        const val MAX_SOUL_CHARS = 4_000
+        // Room for big hand-written personas (Frog needed three squashes to fit 4,000).
+        const val MAX_SOUL_CHARS = 12_000
         private const val MAX_EXCHANGES = 6
         private const val MAX_TEXT_CHARS = 600
         const val MEMORY_TTL_MS = 60 * 60 * 1000L // one hour
