@@ -78,6 +78,12 @@ class SoulLibraryTest {
         assertTrue(souls.resolve("gandalf", m) is SoulLibrary.Switch.Unknown)
         m.customSoulName = "Glitch Goddess"
         assertEquals(SoulLibrary.Switch.Change(SoulLibrary.CUSTOM_ID, null), souls.resolve("glitch goddess", m))
+        m.customSoulName = "Ghost Girl"; m.soul = "boo"; m.saveToShelf()
+        m.customSoulName = "Frog"; m.soul = "ribbit"; m.saveToShelf()
+        assertEquals(SoulLibrary.Switch.Change(SoulLibrary.SHELF_PREFIX + "Ghost Girl", null), souls.resolve("ghost girl", m))
+        assertTrue(souls.apply(souls.resolve("ghost girl", m) as SoulLibrary.Switch.Change, m))
+        assertEquals("Ghost Girl", m.customSoulName)
+        assertEquals(SoulLibrary.Switch.Change(SoulLibrary.SHELF_PREFIX + "Frog", "high"), souls.resolve("frog high", m))
     }
 
     @Test

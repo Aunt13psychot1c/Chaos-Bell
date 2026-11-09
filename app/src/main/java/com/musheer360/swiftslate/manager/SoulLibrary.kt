@@ -21,6 +21,8 @@ object SoulLibrary {
     const val CUSTOM_ID = "custom"
     const val DEFAULT_CUSTOM_NAME = "My Soul"
     const val CUSTOM_EMOJI = "✨"
+    /** A [Switch.Change] soul id that means "load this saved soul off the shelf". */
+    const val SHELF_PREFIX = "shelf:"
     val LEVELS = listOf("low", "middle", "high")
     val KNOBS = listOf("emoji", "serious", "chaos")
 
@@ -136,6 +138,10 @@ object SoulLibrary {
             val customName = customName(memory).lowercase()
             // A multi-word custom name typed whole ("glitch goddess ?soul").
             if (clean.lowercase() == customName) return Switch.Change(CUSTOM_ID, null)
+            // A saved soul typed whole, spaces and all ("ghost girl ?soul").
+            if (find(clean.lowercase()) == null) {
+                memory.findOnShelf(clean)?.let { return Switch.Change(SHELF_PREFIX + it.name, null) }
+            }
             var soulId: String? = null
             var level: String? = null
             for (raw in clean.split(Regex("[\\s,]+"))) {
@@ -143,7 +149,8 @@ object SoulLibrary {
                 if (word.isEmpty() || word in FILLER_WORDS) continue
                 val lvl = normalizeLevel(word)
                 val soul = souls.firstOrNull { it.id == word || it.name.lowercase() == word }?.id
-                    ?: if (word in CUSTOM_WORDS || word == customName.replace(" ", "")) CUSTOM_ID else null
+                    ?: (if (word in CUSTOM_WORDS || word == customName.replace(" ", "")) CUSTOM_ID else null)
+                    ?: memory.findOnShelf(word)?.let { SHELF_PREFIX + it.name }
                 when {
                     soul != null && soulId == null -> soulId = soul
                     lvl != null && level == null -> level = lvl
@@ -153,10 +160,19 @@ object SoulLibrary {
             return if (soulId == null && level == null) Switch.Status else Switch.Change(soulId, level)
         }
 
-        /** Saves a [Switch.Change]. */
-        fun apply(change: Switch.Change, memory: BellMemory) {
-            change.soulId?.let { memory.activeSoul = it }
+        /**
+         * Saves a [Switch.Change]. Returns false, changing nothing, when a saved soul couldn't
+         * be loaded because the My Soul box holds an unsaved one and the shelf is full.
+         */
+        fun apply(change: Switch.Change, memory: BellMemory): Boolean {
+            val id = change.soulId
+            if (id != null && id.startsWith(SHELF_PREFIX)) {
+                if (!memory.loadFromShelf(id.removePrefix(SHELF_PREFIX))) return false
+            } else if (id != null) {
+                memory.activeSoul = id
+            }
             change.level?.let { memory.soulDial = it }
+            return true
         }
 
         /** "⚡ Jake (middle)" or "✨ My Soul". */
@@ -167,7 +183,10 @@ object SoulLibrary {
         }
 
         /** The ?soul hint. Vault souls stay secret; typing their name still works. */
-        fun choices(): String = (regular.map { it.id } + "mine").joinToString(", ")
+        fun choices(memory: BellMemory? = null): String {
+            val saved = memory?.shelf()?.map { it.name.lowercase() }.orEmpty()
+            return (regular.map { it.id } + saved + "mine").distinct().joinToString(", ")
+        }
     }
 
     /** Parses the two asset files. Bad or missing parts are skipped, never thrown. */

@@ -681,10 +681,14 @@ class AssistantService : AccessibilityService() {
                 when (val pick = souls.resolve(precedingText, memory)) {
                     is SoulLibrary.Switch.Status -> {
                         replaceText(source, precedingText)
-                        showToast("On now: ${souls.nowLine(memory)}  ·  Try: ${souls.choices()}")
+                        showToast("On now: ${souls.nowLine(memory)}  ·  Try: ${souls.choices(memory)}")
                     }
                     is SoulLibrary.Switch.Change -> {
-                        souls.apply(pick, memory)
+                        if (!souls.apply(pick, memory)) {
+                            performHapticFeedback(HapticFeedbackConstants.REJECT)
+                            showToast("Shelf's full (${BellMemory.MAX_SHELF} souls). Save or delete one in Soul & Ping first, so your current soul isn't lost.")
+                            return@launch
+                        }
                         if (replaceText(source, "")) {
                             lastOriginalText = precedingText
                             lastUndoSourceId = sourceId(source)
@@ -694,7 +698,7 @@ class AssistantService : AccessibilityService() {
                     }
                     is SoulLibrary.Switch.Unknown -> {
                         performHapticFeedback(HapticFeedbackConstants.REJECT)
-                        showToast("No soul called \"${pick.word}\". Try: ${souls.choices()}")
+                        showToast("No soul called \"${pick.word}\". Try: ${souls.choices(memory)}")
                     }
                 }
             } catch (e: CancellationException) {

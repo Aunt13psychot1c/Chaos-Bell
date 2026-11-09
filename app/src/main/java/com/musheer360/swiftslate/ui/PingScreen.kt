@@ -72,6 +72,9 @@ fun PingScreen(onClose: () -> Unit) {
     var dial by remember { mutableStateOf<String?>(memory.soulDial) }
     var customName by remember { mutableStateOf(memory.customSoulName) }
     var knobs by remember { mutableStateOf(SoulLibrary.KNOBS.associateWith { memory.knob(it) }) }
+    var shelf by remember { mutableStateOf(memory.shelf()) }
+    var shelfMessage by remember { mutableStateOf<String?>(null) }
+    var confirmRemove by remember { mutableStateOf<String?>(null) }
     // The vault starts closed, unless a vault soul is the one talking.
     var vaultOpen by remember { mutableStateOf(souls.find(activeSoul)?.vault == true) }
     var enabled by remember { mutableStateOf(store.enabled) }
@@ -119,6 +122,39 @@ fun PingScreen(onClose: () -> Unit) {
                         "Write your own, or just set the knobs",
                         activeSoul == SoulLibrary.CUSTOM_ID
                     ) { activeSoul = SoulLibrary.CUSTOM_ID; memory.activeSoul = SoulLibrary.CUSTOM_ID }
+
+                    // 📚 The shelf: up to five of the user's own souls, tap one to put it on.
+                    if (shelf.isNotEmpty()) {
+                        Text("📚 My Souls shelf (${shelf.size}/${BellMemory.MAX_SHELF})", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                        shelf.forEach { saved ->
+                            val on = activeSoul == SoulLibrary.CUSTOM_ID && customName.trim().equals(saved.name, ignoreCase = true)
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                                Column(Modifier.weight(1f)) {
+                                    SoulOption("📗 ${saved.name}", if (on) "On now" else "Tap to swap in", on) {
+                                        confirmRemove = null
+                                        if (memory.loadFromShelf(saved.name)) {
+                                            soul = memory.soul
+                                            customName = memory.customSoulName
+                                            knobs = SoulLibrary.KNOBS.associateWith { memory.knob(it) }
+                                            activeSoul = SoulLibrary.CUSTOM_ID
+                                            shelfMessage = null
+                                        } else {
+                                            shelfMessage = "Shelf's full. Your soul in the box isn't saved yet, so delete one first to keep it safe."
+                                        }
+                                        shelf = memory.shelf()
+                                    }
+                                }
+                                TextButton(onClick = {
+                                    if (confirmRemove == saved.name) {
+                                        memory.removeFromShelf(saved.name)
+                                        shelf = memory.shelf()
+                                        confirmRemove = null
+                                    } else confirmRemove = saved.name
+                                }) { Text(if (confirmRemove == saved.name) "Sure? 🗑️" else "🗑️") }
+                            }
+                        }
+                        Hint("Quick swap from any app works for these too: frog ?soul")
+                    }
 
                     // The Chaos Vault: closed until someone breaks the glass (or a vault soul is already on).
                     if (souls.vault.isNotEmpty()) {
@@ -173,7 +209,29 @@ fun PingScreen(onClose: () -> Unit) {
                             }
                         }
                         Hint("Tap a lit knob again to switch it off. Off knobs leave your words exactly as written.")
+                        OutlinedButton(onClick = {
+                            shelfMessage = when (memory.saveToShelf()) {
+                                BellMemory.ShelfResult.ADDED -> "💾 Saved to your shelf."
+                                BellMemory.ShelfResult.UPDATED -> "💾 Updated on your shelf."
+                                BellMemory.ShelfResult.FULL -> "Shelf's full (${BellMemory.MAX_SHELF}). Delete one to make room."
+                                BellMemory.ShelfResult.EMPTY -> "Write something or set a knob first."
+                            }
+                            shelf = memory.shelf()
+                        }, modifier = Modifier.fillMaxWidth()) { Text("💾 Save to shelf") }
+                        OutlinedButton(onClick = {
+                            if (memory.startNewSoul()) {
+                                soul = ""
+                                customName = ""
+                                knobs = SoulLibrary.KNOBS.associateWith { null }
+                                shelfMessage = "✨ Fresh box. Your last one is safe on the shelf."
+                            } else {
+                                shelfMessage = "Shelf's full (${BellMemory.MAX_SHELF}). Delete one first so this soul isn't lost."
+                            }
+                            shelf = memory.shelf()
+                        }, modifier = Modifier.fillMaxWidth()) { Text("✨ Start a new soul") }
+                        Hint("Save keeps this soul on your shelf (same name updates it). Start a new soul saves this one first, then gives you an empty box.")
                     }
+                    shelfMessage?.let { Hint(it) }
                 }
 
                 Section("💗 Heart") {
