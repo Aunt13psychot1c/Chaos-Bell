@@ -34,6 +34,9 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
         private const val KEY_SOUL_DIAL = "soul_dial"
         private const val KEY_SOUL_NAME = "soul_custom_name"
         private const val KEY_KNOB_PREFIX = "soul_knob_"
+        private const val KEY_SHELF = "soul_shelf"
+        /** How many of the user's own souls can sit on the shelf at once. */
+        const val MAX_SHELF = 5
         const val MAX_SOUL_NAME_CHARS = 30
 
         const val MAX_ABOUT_ME_CHARS = 1_500
@@ -84,6 +87,108 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
         if (clean == null) prefs.edit().remove(KEY_KNOB_PREFIX + id).apply()
         else prefs.edit().putString(KEY_KNOB_PREFIX + id, clean).apply()
     }
+
+    /** One of the user's own souls, saved on the shelf: name, words and knob levels. */
+    data class SavedSoul(val name: String, val text: String, val knobs: Map<String, String>)
+
+    /** What happened when saving to the shelf. */
+    enum class ShelfResult { ADDED, UPDATED, FULL, EMPTY }
+
+    /** The user's saved souls, in the order they were first saved. */
+    fun shelf(): List<SavedSoul> {
+        val raw = try { prefs.getString(KEY_SHELF, "[]") ?: "[]" } catch (_: Exception) { "[]" }
+        return parseShelf(try { JSONArray(raw) } catch (_: Exception) { JSONArray() })
+    }
+
+    private fun parseShelf(arr: JSONArray): List<SavedSoul> = (0 until arr.length()).mapNotNull { i ->
+        val o = arr.optJSONObject(i) ?: return@mapNotNull null
+        val name = o.optString("name").trim().take(MAX_SOUL_NAME_CHARS)
+        if (name.isEmpty()) return@mapNotNull null
+        val k = o.optJSONObject("knobs")
+        val knobs = SoulLibrary.KNOBS.mapNotNull { id ->
+            k?.optString(id)?.let(SoulLibrary::normalizeLevel)?.let { id to it }
+        }.toMap()
+        SavedSoul(name, o.optString("text").take(MAX_SOUL_CHARS), knobs)
+    }.distinctBy { it.name.lowercase() }.take(MAX_SHELF)
+
+    private fun shelfJson(shelf: List<SavedSoul>): JSONArray {
+        val arr = JSONArray()
+        shelf.forEach { soul ->
+            val knobs = JSONObject()
+            soul.knobs.forEach { (id, level) -> knobs.put(id, level) }
+            arr.put(JSONObject().put("name", soul.name).put("text", soul.text).put("knobs", knobs))
+        }
+        return arr
+    }
+
+    private fun saveShelf(shelf: List<SavedSoul>) =
+        prefs.edit().putString(KEY_SHELF, shelfJson(shelf).toString()).apply()
+
+    /** The soul in the My Soul box right now, as it would sit on the shelf. */
+    private fun currentCustom(): SavedSoul = SavedSoul(
+        customSoulName.trim().ifEmpty { SoulLibrary.DEFAULT_CUSTOM_NAME },
+        soul,
+        SoulLibrary.KNOBS.mapNotNull { id -> knob(id)?.let { id to it } }.toMap()
+    )
+
+    private fun SavedSoul.isBlank() = text.isBlank() && knobs.isEmpty()
+
+    /**
+     * Puts the My Soul box on the shelf. Same name (any case) updates that spot; a new name
+     * takes a free spot, or comes back [ShelfResult.FULL] when all [MAX_SHELF] are taken.
+     */
+    @Synchronized fun saveToShelf(): ShelfResult {
+        val current = currentCustom()
+        if (current.isBlank()) return ShelfResult.EMPTY
+        val shelf = shelf()
+        val at = shelf.indexOfFirst { it.name.equals(current.name, ignoreCase = true) }
+        return when {
+            at >= 0 -> { saveShelf(shelf.toMutableList().also { it[at] = current }); ShelfResult.UPDATED }
+            shelf.size >= MAX_SHELF -> ShelfResult.FULL
+            else -> { saveShelf(shelf + current); ShelfResult.ADDED }
+        }
+    }
+
+    /** The saved soul with this name (any case, spaces ignored), or null. */
+    fun findOnShelf(name: String): SavedSoul? {
+        val want = name.lowercase().replace(Regex("\\s+"), "")
+        if (want.isEmpty()) return null
+        return shelf().firstOrNull { it.name.lowercase().replace(Regex("\\s+"), "") == want }
+    }
+
+    /**
+     * Puts a saved soul in the My Soul box and switches to it. Whatever was in the box is
+     * tucked onto the shelf first so it's never lost. Returns false, changing nothing, when
+     * the box holds an unsaved soul and the shelf has no room for it.
+     */
+    @Synchronized fun loadFromShelf(name: String): Boolean {
+        if (findOnShelf(name) == null) return false
+        // Tuck the box away first (same name just updates its spot, keeping fresh edits).
+        if (!currentCustom().isBlank() && saveToShelf() == ShelfResult.FULL) return false
+        val pick = findOnShelf(name) ?: return false
+        soul = pick.text
+        customSoulName = pick.name
+        SoulLibrary.KNOBS.forEach { id -> setKnob(id, pick.knobs[id]) }
+        activeSoul = SoulLibrary.CUSTOM_ID
+        return true
+    }
+
+    /**
+     * Saves the My Soul box to the shelf, then empties it for a fresh soul. Returns false,
+     * changing nothing, when the box holds an unsaved soul and the shelf is full.
+     */
+    @Synchronized fun startNewSoul(): Boolean {
+        if (!currentCustom().isBlank() && saveToShelf() == ShelfResult.FULL) return false
+        soul = ""
+        customSoulName = ""
+        SoulLibrary.KNOBS.forEach { id -> setKnob(id, null) }
+        activeSoul = SoulLibrary.CUSTOM_ID
+        return true
+    }
+
+    /** Takes a soul off the shelf. The My Soul box is left as it is. */
+    @Synchronized fun removeFromShelf(name: String) =
+        saveShelf(shelf().filterNot { it.name.equals(name, ignoreCase = true) })
 
     private data class Exchange(val time: Long, val asked: String, val answered: String)
 
@@ -200,7 +305,8 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
             .put("active", activeSoul ?: JSONObject.NULL)
             .put("dial", soulDial)
             .put("name", customSoulName)
-            .put("knobs", JSONObject().apply { SoulLibrary.KNOBS.forEach { id -> knob(id)?.let { put(id, it) } } }))
+            .put("knobs", JSONObject().apply { SoulLibrary.KNOBS.forEach { id -> knob(id)?.let { put(id, it) } } })
+            .put("shelf", shelfJson(shelf())))
         .put("heart", JSONArray(try { prefs.getString(KEY_HEART, "[]") ?: "[]" } catch (_: Exception) { "[]" }))
         .put("history", JSONArray(try { prefs.getString(KEY_HISTORY, "[]") ?: "[]" } catch (_: Exception) { "[]" }))
 
@@ -215,6 +321,8 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
             customSoulName = s.optString("name", "")
             val knobs = s.optJSONObject("knobs")
             SoulLibrary.KNOBS.forEach { id -> setKnob(id, knobs?.optString(id)?.ifBlank { null }) }
+            // Older backups have no shelf; keep the current one rather than emptying it.
+            s.optJSONArray("shelf")?.let { saveShelf(parseShelf(it)) }
         }
         json.optJSONArray("heart")?.let { prefs.edit().putString(KEY_HEART, it.toString()).apply() }
         val history = json.optJSONArray("history") ?: JSONArray()

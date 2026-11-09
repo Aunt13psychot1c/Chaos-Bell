@@ -126,4 +126,48 @@ class BellMemoryTest {
         assertEquals("Glitch Goddess", m.soul)
         assertEquals(listOf("has a plush sloth"), m.heart().map { it.text })
     }
+
+    @Test
+    fun souls_go_on_the_shelf_and_come_back() {
+        val m = memory()
+        assertEquals(BellMemory.ShelfResult.EMPTY, m.saveToShelf())
+        m.customSoulName = "Frog"
+        m.soul = "You are Frog."
+        m.setKnob("chaos", "high")
+        assertEquals(BellMemory.ShelfResult.ADDED, m.saveToShelf())
+        m.soul = "You are Frog, ALL HAIL GALDRUX."
+        assertEquals(BellMemory.ShelfResult.UPDATED, m.saveToShelf())
+
+        assertTrue(m.startNewSoul())
+        assertEquals("", m.soul)
+        m.customSoulName = "Ghost"
+        m.soul = "You are a ghost."
+        // Loading Frog tucks Ghost onto the shelf first.
+        assertTrue(m.loadFromShelf("frog"))
+        assertEquals("Frog", m.customSoulName)
+        assertEquals("You are Frog, ALL HAIL GALDRUX.", m.soul)
+        assertEquals("high", m.knob("chaos"))
+        assertEquals(listOf("Frog", "Ghost"), m.shelf().map { it.name })
+
+        // Backups carry the shelf.
+        val backup = m.export()
+        m.removeFromShelf("ghost")
+        assertEquals(listOf("Frog"), m.shelf().map { it.name })
+        m.import(backup)
+        assertEquals(listOf("Frog", "Ghost"), m.shelf().map { it.name })
+    }
+
+    @Test
+    fun a_full_shelf_never_loses_the_soul_in_the_box() {
+        val m = memory()
+        (1..BellMemory.MAX_SHELF).forEach { n ->
+            m.customSoulName = "Soul $n"; m.soul = "number $n"
+            assertEquals(BellMemory.ShelfResult.ADDED, m.saveToShelf())
+        }
+        m.customSoulName = "Extra"; m.soul = "one too many"
+        assertEquals(BellMemory.ShelfResult.FULL, m.saveToShelf())
+        assertFalse(m.loadFromShelf("Soul 1"))
+        assertFalse(m.startNewSoul())
+        assertEquals("one too many", m.soul)
+    }
 }

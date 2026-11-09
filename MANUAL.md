@@ -174,7 +174,8 @@ Open them from **Settings > 🧠 Soul & Ping**.
 - 📡 **Ping, the attention check:** every few messages (off, or every 1, 2, 3, 5 or 10, you choose), Bell stops herself and asks: am I really listening to what you mean? Then she decides whether anything is worth keeping in her Heart. You never see the check, just a Bell who pays attention.
 - 🔔 **Check-ins:** turn them on and Bell messages you by herself every 15 minutes to 4 hours, only during the hours you pick, or stays quiet if there's nothing to say. Tap **🔔 Check in now** to try it. **What check-ins did** lists each one in plain words, including why one failed. Each check-in uses your AI key once, like one `?talk`.
 - ⏰ **Reminders:** in Chat or with `?talk`, say "remind me at 3pm to take my meds." Bell sets it, and a notification pops up at 3.
-- 💾 Your Soul and Heart travel in your backup file (**Settings > Export**).
+- 📚 **My Souls shelf:** write your own soul, then tap **💾 Save to shelf** to keep it. Keep up to 5. **✨ Start a new soul** saves the one you're on and gives you an empty box. Tap a saved soul to swap it back in, or swap from any app by typing its name and `?soul` (like `frog ?soul`).
+- 💾 Your Soul, saved souls and Heart travel in your backup file (**Settings > Export**).
 - 🔔 Check-ins and reminders need notifications allowed: **Settings > Apps > Chaos Bell > Notifications**.
 
 ---
