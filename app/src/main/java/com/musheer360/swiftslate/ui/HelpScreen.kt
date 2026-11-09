@@ -186,6 +186,7 @@ private val SECTIONS = listOf(
             "• Your phone may have put her to sleep. See setup step 5.",
             "\"Doesn't have access to this model\" (Groq)? In the Groq console tap your project name, Manage Projects, View, then under Allowed Models tap Edit, check the model and Save.",
             "\"Invalid API key\"? Make a new key and add it again.",
+            "💀 Model list blank, or \"Out of credits or deleted key?\" in Settings? Your key ran out of free credits, got deleted, or was typed wrong. Check it on the provider's website, or make a new key and add it on the Keys screen.",
             "\"Rate limited\"? You hit the free limit. Wait a minute, or add a second key."
         )
     ),

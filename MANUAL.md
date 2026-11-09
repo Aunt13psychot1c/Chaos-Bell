@@ -196,6 +196,9 @@ Your Groq project is blocking that model. In the Groq console: tap your **projec
 **It says "Invalid API key."**
 The key was copied wrong or deleted. Make a new one and add it again.
 
+**The model list is blank, or Settings says "Out of credits or deleted key?"**
+Bell couldn't load the models for your provider. Usually the key ran out of free credits, got deleted, or was copied wrong. Check the key on the provider's website, or make a new one and add it on the **Keys** screen.
+
 **It says "rate limited."**
 You've hit the free limit for now. Wait a minute and try again, or add a second key.
 

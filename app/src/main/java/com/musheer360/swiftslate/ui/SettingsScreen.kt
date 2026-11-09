@@ -95,6 +95,9 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
     var isFetchingGeminiModels by remember { mutableStateOf(false) }
     var isFetchingGroqModels by remember { mutableStateOf(false) }
     var isFetchingAnthropicModels by remember { mutableStateOf(false) }
+    // Providers whose last model-list fetch failed outright. Shows the dead key note under
+    // that provider's dropdown, since a blank list is the only sign of a dead key otherwise.
+    val modelFetchFailed = remember { mutableStateMapOf<String, Boolean>() }
     var apiKeys by remember { mutableStateOf<List<String>>(emptyList()) }
     val openAIClient = remember { OpenAICompatibleClient() }
     val geminiClient = remember { GeminiClient() }
@@ -116,7 +119,6 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
     val fetchingModelsMsg = stringResource(R.string.settings_fetch_models_loading)
     val modelsLoadedMsg = stringResource(R.string.settings_fetch_models_success)
     val modelsEmptyMsg = stringResource(R.string.settings_fetch_models_empty)
-    val modelsFailedMsg = stringResource(R.string.settings_fetch_models_failed)
     val signinRequiredMsg = stringResource(R.string.error_provider_auth_required)
 
     // Registered keys are decrypted through the Keystore — load off the main thread, as
@@ -152,6 +154,7 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
             val models = result.getOrNull().orEmpty()
             val success = result.isSuccess && models.isNotEmpty()
             val currentModels = if (isGemini) geminiModelList else groqModelList
+            modelFetchFailed[type] = result.isFailure
             val toCache = if (success) models else (ProviderModelsCache.get(type)?.models ?: currentModels)
             ProviderModelsCache.put(type, ProviderModelsCache.Entry(toCache, attempted = true))
             if (isGemini) {
@@ -189,6 +192,7 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
             val models = result.getOrNull().orEmpty()
             val success = result.isSuccess && models.isNotEmpty()
             val toCache = if (success) models else (ProviderModelsCache.get(ProviderType.ANTHROPIC)?.models ?: anthropicModelList)
+            modelFetchFailed[ProviderType.ANTHROPIC] = result.isFailure
             ProviderModelsCache.put(ProviderType.ANTHROPIC, ProviderModelsCache.Entry(toCache, attempted = true))
             isFetchingAnthropicModels = false
             if (success) {
@@ -408,6 +412,9 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     isFetching = isFetchingGeminiModels,
                     fetchingText = fetchingModelsMsg
                 )
+                if (modelFetchFailed[ProviderType.GEMINI] == true && !isFetchingGeminiModels) {
+                    DeadKeyNote()
+                }
             } else if (providerType == ProviderType.GROQ) {
                 Text(
                     text = stringResource(R.string.settings_model_title),
@@ -436,6 +443,9 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     isFetching = isFetchingGroqModels,
                     fetchingText = fetchingModelsMsg
                 )
+                if (modelFetchFailed[ProviderType.GROQ] == true && !isFetchingGroqModels) {
+                    DeadKeyNote()
+                }
             } else if (providerType == ProviderType.ANTHROPIC) {
                 Text(
                     text = stringResource(R.string.settings_model_title),
@@ -464,6 +474,9 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     isFetching = isFetchingAnthropicModels,
                     fetchingText = fetchingModelsMsg
                 )
+                if (modelFetchFailed[ProviderType.ANTHROPIC] == true && !isFetchingAnthropicModels) {
+                    DeadKeyNote()
+                }
             } else {
                 Text(
                     text = stringResource(R.string.settings_endpoint_title),
@@ -601,7 +614,7 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                                     fetchMessage = if (raw.contains(ApiClientUtils.SIGNIN_REQUIRED_MARKER)) {
                                         signinRequiredMsg
                                     } else {
-                                        modelsFailedMsg
+                                        DEAD_KEY_MESSAGE
                                     }
                                     fetchSuccess = false
                                 }
@@ -1071,5 +1084,19 @@ private fun AboutMeDialog(memory: BellMemory, onClose: () -> Unit) {
         dismissButton = {
             TextButton(onClick = onClose) { Text(stringResource(R.string.commands_cancel)) }
         }
+    )
+}
+
+/** What Bell says when a provider's model list won't load, the usual sign of a dead key. */
+private const val DEAD_KEY_MESSAGE =
+    "💀 Couldn't load the models. Out of credits or deleted key? Check your key on the provider's site, or make a new one and add it on the Keys screen."
+
+@Composable
+private fun DeadKeyNote() {
+    Text(
+        text = DEAD_KEY_MESSAGE,
+        color = MaterialTheme.colorScheme.error,
+        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+        modifier = Modifier.padding(top = 4.dp)
     )
 }
