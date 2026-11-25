@@ -22,7 +22,6 @@ import com.musheer360.swiftslate.manager.CommandManager
 import com.musheer360.swiftslate.model.PrefKeys
 import com.musheer360.swiftslate.manager.BellMemory
 import com.musheer360.swiftslate.manager.KeyManager
-import com.musheer360.swiftslate.manager.ErrorLog
 import com.musheer360.swiftslate.manager.SoulLibrary
 import com.musheer360.swiftslate.manager.StatsManager
 import com.musheer360.swiftslate.model.Command
@@ -115,7 +114,6 @@ class AssistantService : AccessibilityService() {
     private companion object {
         const val TAG = "SwiftSlateService"
         const val TRIGGER_REFRESH_INTERVAL_MS = 5_000L
-        private val SOULISH = Regex("[^\\p{L}\\p{N}\\s]\\s?soul\\s*$", RegexOption.IGNORE_CASE)
         const val PROCESSING_WATCHDOG_MS = 120_000L
         const val FOCUS_FALLBACK_MIN_INTERVAL_MS = 300L
         val SPINNER_FRAMES = arrayOf("◐", "◓", "◑", "◒")
@@ -222,14 +220,8 @@ class AssistantService : AccessibilityService() {
             source.safeRecycle()
             return
         }
-        // Only "?soul"-looking endings (a symbol, maybe a space, then soul), not every word "soul".
-        val soulish = SOULISH.containsMatchIn(text)
-        if (handlePendingProcessTextReplacement(event, source, text)) {
-            if (soulish) soulTrace("grabbed by a waiting pop-up reply")
-            return
-        }
+        if (handlePendingProcessTextReplacement(event, source, text)) return
         if (isProcessing.get()) {
-            if (soulish) soulTrace("Bell was still busy with something else")
             source.safeRecycle()
             return
         }
@@ -249,7 +241,6 @@ class AssistantService : AccessibilityService() {
         val replaced = lastReplacedText
         if (replaced != null && text == replaced &&
             System.currentTimeMillis() - lastReplacedAt < 1000) {
-            if (soulish) soulTrace("skipped as an echo of her last edit")
             source.safeRecycle()
             return
         }
@@ -261,14 +252,12 @@ class AssistantService : AccessibilityService() {
         val lastChar = text[text.length - 1]
         if (!triggerLastChars.contains(lastChar.lowercaseChar())) {
             if (!lastChar.isLetterOrDigit() || !text.contains(cachedTranslatePrefix, ignoreCase = true)) {
-                if (soulish) soulTrace("last letter '$lastChar' isn't a trigger ending (${triggerLastChars.size} known)")
                 source.safeRecycle()
                 return
             }
         }
 
         val command = commandManager.findCommand(text) ?: run {
-            if (soulish) soulTrace("no command matched the end \"${text.takeLast(12)}\" (prefix '$cachedPrefix')")
             source.safeRecycle()
             return
         }
@@ -301,13 +290,9 @@ class AssistantService : AccessibilityService() {
             return
         }
 
-        if (soulish && !(command.isBuiltIn && command.trigger.endsWith("soul"))) {
-            soulTrace("matched a different command: ${command.trigger}${if (command.isBuiltIn) "" else " (one of yours)"}")
-        }
         // ?soul swaps who's talking. Purely local: no AI call, no key needed.
         if (command.isBuiltIn && command.trigger.endsWith("soul")) {
             if (!isProcessing.compareAndSet(false, true)) {
-                soulTrace("Bell was busy right as it landed")
                 source.safeRecycle()
                 return
             }
@@ -687,18 +672,7 @@ class AssistantService : AccessibilityService() {
         }
     }
 
-    /**
-     * Tattletale for the ?soul mystery: says out loud (and in Recent errors) how far a typed
-     * ?soul got, so a silent failure shows where it stopped. Only fires when the text ends in "soul".
-     */
-    private fun soulTrace(step: String) {
-        ErrorLog.record(this, "?soul trace", step)
-        serviceScope.launch { try { showToast("🔍 ?soul: $step") } catch (_: Exception) {} }
-    }
-
     private fun handleSoulCommand(source: AccessibilityNodeInfo, precedingText: String) {
-        performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-        ErrorLog.record(this, "?soul trace", "heard it, words before: \"${precedingText.trim().take(60)}\"")
         currentJob = serviceScope.launch {
             val thisJob = coroutineContext[Job]
             try {
