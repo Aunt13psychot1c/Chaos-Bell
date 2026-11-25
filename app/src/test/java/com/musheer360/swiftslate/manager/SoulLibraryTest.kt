@@ -27,7 +27,7 @@ class SoulLibraryTest {
     @Test
     fun the_four_ready_made_souls_ship_in_the_app() {
         assertEquals(listOf("bell", "mary", "jake", "stan"), souls.regular.map { it.id })
-        assertEquals(listOf("alpaca", "goddess"), souls.vault.map { it.id })
+        assertEquals(listOf("goddess"), souls.vault.map { it.id })
         assertEquals(setOf("emoji", "serious", "chaos"), souls.knobs.keys)
     }
 
@@ -89,12 +89,12 @@ class SoulLibraryTest {
     @Test
     fun vault_souls_answer_to_their_names_but_stay_out_of_the_hint() {
         val m = memory()
-        assertEquals(SoulLibrary.Switch.Change("alpaca", "high"), souls.resolve("alpaca high", m))
-        assertEquals(SoulLibrary.Switch.Change("goddess", null), souls.resolve("goddess", m))
-        assertFalse(souls.choices().contains("alpaca"))
-        m.activeSoul = "alpaca"
-        assertTrue(souls.soulText(m).contains("Conversational Asshole"))
-        assertTrue(souls.soulText(m).contains("drop the act"))
+        assertEquals(SoulLibrary.Switch.Change("goddess", "high"), souls.resolve("goddess high", m))
+        assertFalse(souls.choices().contains("goddess"))
+        m.activeSoul = "goddess"
+        assertTrue(souls.soulText(m).isNotBlank())
+        // The vault ALPACA impostor is gone for good; the real one lives on the shelf.
+        assertEquals(null, souls.find("alpaca"))
     }
 
     @Test
