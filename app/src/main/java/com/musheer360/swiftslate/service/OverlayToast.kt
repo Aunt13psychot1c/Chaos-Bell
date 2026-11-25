@@ -56,7 +56,7 @@ class OverlayToast(private val context: Context, private val handler: Handler) {
             }
             gravity = Gravity.CENTER
             alpha = 0f
-            translationY = dp(TOAST_SLIDE_DISTANCE_DP).toFloat()
+            translationY = -dp(TOAST_SLIDE_DISTANCE_DP).toFloat()
         }
 
         val params = WindowManager.LayoutParams(
@@ -66,8 +66,10 @@ class OverlayToast(private val context: Context, private val handler: Handler) {
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
             PixelFormat.TRANSLUCENT
         ).apply {
-            gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-            y = dp(TOAST_BOTTOM_MARGIN_DP)
+            // Top of the screen: at the bottom the keyboard sat right on top of every message,
+            // so ?soul (and everything else) looked like it did nothing.
+            gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+            y = dp(TOAST_TOP_MARGIN_DP)
             windowAnimations = 0
         }
 
@@ -78,7 +80,7 @@ class OverlayToast(private val context: Context, private val handler: Handler) {
             AnimatorSet().apply {
                 playTogether(
                     ObjectAnimator.ofFloat(textView, View.ALPHA, 0f, 1f),
-                    ObjectAnimator.ofFloat(textView, View.TRANSLATION_Y, dp(TOAST_SLIDE_DISTANCE_DP).toFloat(), 0f)
+                    ObjectAnimator.ofFloat(textView, View.TRANSLATION_Y, -dp(TOAST_SLIDE_DISTANCE_DP).toFloat(), 0f)
                 )
                 duration = TOAST_ANIM_DURATION_MS
                 interpolator = DecelerateInterpolator()
@@ -124,7 +126,7 @@ class OverlayToast(private val context: Context, private val handler: Handler) {
                 dismissAnimator = AnimatorSet().apply {
                     playTogether(
                         ObjectAnimator.ofFloat(view, View.ALPHA, view.alpha, 0f),
-                        ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, view.translationY, dp(TOAST_SLIDE_DISTANCE_DP).toFloat())
+                        ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, view.translationY, -dp(TOAST_SLIDE_DISTANCE_DP).toFloat())
                     )
                     duration = TOAST_ANIM_DURATION_MS
                     interpolator = DecelerateInterpolator()
@@ -147,7 +149,8 @@ class OverlayToast(private val context: Context, private val handler: Handler) {
         // the in-app one cannot drift apart. See SlateToastTokens.
         private const val TOAST_BACKGROUND_COLOR = SlateToastTokens.BACKGROUND_ARGB
         private const val TOAST_DURATION_MS = SlateToastTokens.DURATION_MS
-        private const val TOAST_BOTTOM_MARGIN_DP = SlateToastTokens.BOTTOM_MARGIN_DP
+        // Clears the status bar and most notches.
+        private const val TOAST_TOP_MARGIN_DP = 56
         private const val TOAST_ANIM_DURATION_MS = SlateToastTokens.ANIM_DURATION_MS.toLong()
         private const val TOAST_SLIDE_DISTANCE_DP = SlateToastTokens.SLIDE_DISTANCE_DP
     }
