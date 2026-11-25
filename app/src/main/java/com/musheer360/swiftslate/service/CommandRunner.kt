@@ -11,6 +11,7 @@ import com.musheer360.swiftslate.api.ImageInput
 import com.musheer360.swiftslate.api.SearchMode
 import com.musheer360.swiftslate.api.OpenAICompatibleClient
 import com.musheer360.swiftslate.manager.BellMemory
+import com.musheer360.swiftslate.manager.ErrorLog
 import com.musheer360.swiftslate.manager.KeyManager
 import com.musheer360.swiftslate.manager.SoulLibrary
 import com.musheer360.swiftslate.model.PrefKeys
@@ -215,6 +216,8 @@ suspend fun runTextCommand(
     val waitMs = keyManager.getShortestWaitTimeMs()
     val failedKey = lastFailedKey
     val raw = lastErrorMsg
+    // Keep what the server really said, so a vague toast can be checked in Recent errors.
+    ErrorLog.record(context, "Command · $model", raw ?: "No key could be tried (all resting or missing)")
     return CommandOutcome.Failure(
         when {
             // Prefer the message carrying the actual wait time, but only when the last error
@@ -230,6 +233,9 @@ suspend fun runTextCommand(
                 val mapped = ErrorMessages.map(raw)
                 if (mapped == R.string.error_invalid_key && failedKey != null && keyManager.getKeys().size > 1) {
                     context.getString(R.string.error_invalid_key_with_hint, "••••" + failedKey.takeLast(4))
+                } else if (mapped == R.string.error_bad_request && raw.isNotBlank() && !raw.trimStart().startsWith("{")) {
+                    // The catch-all used to hide the real reason. Say what the server said.
+                    context.getString(mapped) + " The server said: \"" + raw.trim().take(160) + "\""
                 } else {
                     context.getString(mapped)
                 }
