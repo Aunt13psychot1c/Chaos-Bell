@@ -65,6 +65,8 @@ suspend fun runTextCommand(
     allowWebSearch: Boolean = true,
     useSoul: Boolean = true,
     image: ImageInput? = null,
+    /** What goes into short-term memory as "what the user asked"; null means [text]. */
+    rememberAs: String? = null,
     onFirstAttempt: () -> Unit = {}
 ): CommandOutcome {
     // keys_keystore_error rather than a "reinstall" message: the usual cause is the Keystore key
@@ -162,7 +164,8 @@ suspend fun runTextCommand(
                 replyText
             }
             // Short-term memory is text only; a note keeps follow-ups making sense.
-            if (remember) memory?.remember(if (image != null) "[sent a picture] $text" else text, replyText)
+            val asked = rememberAs ?: text
+            if (remember) memory?.remember(if (image != null) "[sent a picture] $asked" else asked, replyText)
             return CommandOutcome.Success(outputText)
         }
 

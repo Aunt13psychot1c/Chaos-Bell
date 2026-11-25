@@ -50,6 +50,12 @@ class CommandManagerTest {
     }
 
     @Test
+    fun findCommand_ignoresCase() {
+        assertEquals("?soul", commandManager.findCommand("jake ?Soul")?.trigger)
+        assertEquals("?fix", commandManager.findCommand("hello?FIX")?.trigger)
+    }
+
+    @Test
     fun findCommand_noTrigger_returnsNull() {
         assertNull(commandManager.findCommand("just some plain text"))
     }

@@ -139,7 +139,7 @@ class AssistantService : AccessibilityService() {
         cachedPrefix = commandManager.getTriggerPrefix()
         cachedTranslatePrefix = "${cachedPrefix}translate:"
         val cmds = commandManager.getCommands()
-        triggerLastChars = cmds.mapNotNull { it.trigger.lastOrNull() }.toSet()
+        triggerLastChars = cmds.mapNotNull { it.trigger.lastOrNull()?.lowercaseChar() }.toSet()
         lastTriggerRefresh = System.currentTimeMillis()
     }
 
@@ -250,8 +250,8 @@ class AssistantService : AccessibilityService() {
         }
 
         val lastChar = text[text.length - 1]
-        if (!triggerLastChars.contains(lastChar)) {
-            if (!lastChar.isLetterOrDigit() || !text.contains(cachedTranslatePrefix)) {
+        if (!triggerLastChars.contains(lastChar.lowercaseChar())) {
+            if (!lastChar.isLetterOrDigit() || !text.contains(cachedTranslatePrefix, ignoreCase = true)) {
                 source.safeRecycle()
                 return
             }
@@ -703,8 +703,12 @@ class AssistantService : AccessibilityService() {
                 }
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: Exception) {
-                showToast("Couldn't swap souls just now")
+            } catch (e: Throwable) {
+                // Throwable, not Exception: an Error slipping past here used to vanish into the
+                // service's silent crash handler, so ?soul just did nothing. Now it says why.
+                Log.w(TAG, "?soul failed", e)
+                performHapticFeedback(HapticFeedbackConstants.REJECT)
+                showToast("?soul hit a snag: ${e.javaClass.simpleName}: ${e.message.orEmpty().take(120)}")
             } finally {
                 withContext(NonCancellable + Dispatchers.Main) {
                     if (currentJob === thisJob) {
