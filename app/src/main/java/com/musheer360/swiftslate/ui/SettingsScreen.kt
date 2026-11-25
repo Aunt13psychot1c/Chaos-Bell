@@ -38,6 +38,8 @@ import kotlinx.coroutines.withContext
 import com.musheer360.swiftslate.manager.BellBackup
 import com.musheer360.swiftslate.manager.BellMemory
 import com.musheer360.swiftslate.manager.CommandManager
+import com.musheer360.swiftslate.manager.ErrorLog
+import com.musheer360.swiftslate.service.KeyTrouble
 import com.musheer360.swiftslate.manager.KeyManager
 import com.musheer360.swiftslate.manager.ProviderModelsCache
 import com.musheer360.swiftslate.model.GeminiModels
@@ -97,13 +99,15 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
     var isFetchingAnthropicModels by remember { mutableStateOf(false) }
     // Providers whose last model-list fetch failed outright. Shows the dead key note under
     // that provider's dropdown, since a blank list is the only sign of a dead key otherwise.
-    val modelFetchFailed = remember { mutableStateMapOf<String, Boolean>() }
+    // Why a provider's model list failed to load, in plain words (null = it loaded fine).
+    val modelFetchFailed = remember { mutableStateMapOf<String, String?>() }
     var apiKeys by remember { mutableStateOf<List<String>>(emptyList()) }
     val openAIClient = remember { OpenAICompatibleClient() }
     val geminiClient = remember { GeminiClient() }
     val anthropicClient = remember { AnthropicClient() }
     val bellMemory = remember { BellMemory(context) }
     var showAboutMe by remember { mutableStateOf(false) }
+    var showErrors by remember { mutableStateOf(false) }
     var showPing by remember { mutableStateOf(false) }
 
     var triggerPrefix by remember { mutableStateOf(commandManager.getTriggerPrefix()) }
@@ -154,7 +158,10 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
             val models = result.getOrNull().orEmpty()
             val success = result.isSuccess && models.isNotEmpty()
             val currentModels = if (isGemini) geminiModelList else groqModelList
-            modelFetchFailed[type] = result.isFailure
+            modelFetchFailed[type] = result.exceptionOrNull()?.let { e ->
+                ErrorLog.record(context, "Model list ($type)", e.message ?: e.javaClass.simpleName)
+                KeyTrouble.explain(e)
+            }
             val toCache = if (success) models else (ProviderModelsCache.get(type)?.models ?: currentModels)
             ProviderModelsCache.put(type, ProviderModelsCache.Entry(toCache, attempted = true))
             if (isGemini) {
@@ -192,7 +199,10 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
             val models = result.getOrNull().orEmpty()
             val success = result.isSuccess && models.isNotEmpty()
             val toCache = if (success) models else (ProviderModelsCache.get(ProviderType.ANTHROPIC)?.models ?: anthropicModelList)
-            modelFetchFailed[ProviderType.ANTHROPIC] = result.isFailure
+            modelFetchFailed[ProviderType.ANTHROPIC] = result.exceptionOrNull()?.let { e ->
+                ErrorLog.record(context, "Model list (Claude)", e.message ?: e.javaClass.simpleName)
+                KeyTrouble.explain(e)
+            }
             ProviderModelsCache.put(ProviderType.ANTHROPIC, ProviderModelsCache.Entry(toCache, attempted = true))
             isFetchingAnthropicModels = false
             if (success) {
@@ -412,8 +422,8 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     isFetching = isFetchingGeminiModels,
                     fetchingText = fetchingModelsMsg
                 )
-                if (modelFetchFailed[ProviderType.GEMINI] == true && !isFetchingGeminiModels) {
-                    DeadKeyNote()
+                modelFetchFailed[ProviderType.GEMINI]?.let { why ->
+                    if (!isFetchingGeminiModels) DeadKeyNote(why)
                 }
             } else if (providerType == ProviderType.GROQ) {
                 Text(
@@ -443,8 +453,8 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     isFetching = isFetchingGroqModels,
                     fetchingText = fetchingModelsMsg
                 )
-                if (modelFetchFailed[ProviderType.GROQ] == true && !isFetchingGroqModels) {
-                    DeadKeyNote()
+                modelFetchFailed[ProviderType.GROQ]?.let { why ->
+                    if (!isFetchingGroqModels) DeadKeyNote(why)
                 }
             } else if (providerType == ProviderType.ANTHROPIC) {
                 Text(
@@ -474,8 +484,8 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                     isFetching = isFetchingAnthropicModels,
                     fetchingText = fetchingModelsMsg
                 )
-                if (modelFetchFailed[ProviderType.ANTHROPIC] == true && !isFetchingAnthropicModels) {
-                    DeadKeyNote()
+                modelFetchFailed[ProviderType.ANTHROPIC]?.let { why ->
+                    if (!isFetchingAnthropicModels) DeadKeyNote(why)
                 }
             } else {
                 Text(
@@ -611,10 +621,12 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
                                 }.onFailure { e ->
                                     customModels = emptyList()
                                     val raw = e.message ?: ""
+                                    ErrorLog.record(context, "Model list (Custom)", raw.ifEmpty { e.javaClass.simpleName })
                                     fetchMessage = if (raw.contains(ApiClientUtils.SIGNIN_REQUIRED_MARKER)) {
                                         signinRequiredMsg
                                     } else {
-                                        DEAD_KEY_MESSAGE
+                                        // Only blame the key when the provider says so.
+                                        KeyTrouble.explain(e)
                                     }
                                     fetchSuccess = false
                                 }
@@ -758,6 +770,23 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
             ) {
                 Text(
                     text = stringResource(R.string.about_me_title),
+                    fontSize = rhythm.bodySize,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(text = "›", fontSize = rhythm.emphasisSize, color = MaterialTheme.colorScheme.primary)
+            }
+            SlateDivider()
+            // Bell's diary of what went wrong, with what the server really said.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showErrors = true }
+                    .padding(vertical = rhythm.groupGap),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "📜 Recent errors",
                     fontSize = rhythm.bodySize,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f)
@@ -919,6 +948,10 @@ fun SettingsScreen(commandManager: CommandManager, prefs: SharedPreferences, key
 
     if (showAboutMe) {
         AboutMeDialog(memory = bellMemory, onClose = { showAboutMe = false })
+    }
+
+    if (showErrors) {
+        ErrorLogDialog(log = remember { ErrorLog(context) }, onClose = { showErrors = false })
     }
 
     if (showImportConfirm) {
@@ -1087,16 +1120,52 @@ private fun AboutMeDialog(memory: BellMemory, onClose: () -> Unit) {
     )
 }
 
-/** What Bell says when a provider's model list won't load, the usual sign of a dead key. */
-private const val DEAD_KEY_MESSAGE =
-    "💀 Couldn't load the models. Out of credits or deleted key? Check your key on the provider's site, or make a new one and add it on the Keys screen."
-
+/** Why a provider's model list won't load, from [KeyTrouble.explain]. */
 @Composable
-private fun DeadKeyNote() {
+private fun DeadKeyNote(why: String) {
     Text(
-        text = DEAD_KEY_MESSAGE,
+        text = why,
         color = MaterialTheme.colorScheme.error,
         fontSize = MaterialTheme.typography.bodySmall.fontSize,
         modifier = Modifier.padding(top = 4.dp)
+    )
+}
+
+/** The last few errors, newest first, with what the server really said. */
+@Composable
+private fun ErrorLogDialog(log: ErrorLog, onClose: () -> Unit) {
+    var entries by remember { mutableStateOf(log.entries().reversed()) }
+    val format = remember { java.text.SimpleDateFormat("MMM d, h:mm a", java.util.Locale.getDefault()) }
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text("📜 Recent errors") },
+        text = {
+            Column(modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
+                if (entries.isEmpty()) {
+                    Text("Nothing's gone wrong lately. ✨", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                entries.forEach { e ->
+                    Text(
+                        text = format.format(java.util.Date(e.time)) + "  ·  " + e.where,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                    Text(
+                        text = e.what,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onClose) { Text(stringResource(android.R.string.ok)) }
+        },
+        dismissButton = {
+            if (entries.isNotEmpty()) {
+                TextButton(onClick = { log.clear(); entries = emptyList() }) { Text("Clear") }
+            }
+        }
     )
 }

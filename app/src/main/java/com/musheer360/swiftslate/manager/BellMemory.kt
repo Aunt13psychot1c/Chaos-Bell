@@ -39,12 +39,14 @@ class BellMemory(private val prefs: SharedPreferences, private val clock: () -> 
         const val MAX_SHELF = 5
         const val MAX_SOUL_NAME_CHARS = 30
 
-        const val MAX_ABOUT_ME_CHARS = 1_500
+        const val MAX_ABOUT_ME_CHARS = 5_000
         // Room for big hand-written personas (Frog needed three squashes to fit 4,000).
         const val MAX_SOUL_CHARS = 12_000
-        private const val MAX_EXCHANGES = 6
-        private const val MAX_TEXT_CHARS = 600
-        const val MEMORY_TTL_MS = 60 * 60 * 1000L // one hour
+        // Enough back-and-forth to hold a real conversation, even with long, ranty souls.
+        const val MAX_EXCHANGES = 10
+        const val MAX_TEXT_CHARS = 1_500
+        // A day, so a chat survives wandering off to another app (or another AI) and back.
+        const val MEMORY_TTL_MS = 24 * 60 * 60 * 1000L
         const val MAX_KEEPSAKES = 60
         const val MAX_KEEPSAKE_CHARS = 200
         const val DEFAULT_PING_EVERY = 3

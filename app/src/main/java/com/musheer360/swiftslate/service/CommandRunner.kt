@@ -11,6 +11,7 @@ import com.musheer360.swiftslate.api.ImageInput
 import com.musheer360.swiftslate.api.SearchMode
 import com.musheer360.swiftslate.api.OpenAICompatibleClient
 import com.musheer360.swiftslate.manager.BellMemory
+import com.musheer360.swiftslate.manager.ErrorLog
 import com.musheer360.swiftslate.manager.KeyManager
 import com.musheer360.swiftslate.manager.SoulLibrary
 import com.musheer360.swiftslate.model.PrefKeys
@@ -65,6 +66,8 @@ suspend fun runTextCommand(
     allowWebSearch: Boolean = true,
     useSoul: Boolean = true,
     image: ImageInput? = null,
+    /** What goes into short-term memory as "what the user asked"; null means [text]. */
+    rememberAs: String? = null,
     onFirstAttempt: () -> Unit = {}
 ): CommandOutcome {
     // keys_keystore_error rather than a "reinstall" message: the usual cause is the Keystore key
@@ -162,7 +165,8 @@ suspend fun runTextCommand(
                 replyText
             }
             // Short-term memory is text only; a note keeps follow-ups making sense.
-            if (remember) memory?.remember(if (image != null) "[sent a picture] $text" else text, replyText)
+            val asked = rememberAs ?: text
+            if (remember) memory?.remember(if (image != null) "[sent a picture] $asked" else asked, replyText)
             return CommandOutcome.Success(outputText)
         }
 
@@ -212,6 +216,8 @@ suspend fun runTextCommand(
     val waitMs = keyManager.getShortestWaitTimeMs()
     val failedKey = lastFailedKey
     val raw = lastErrorMsg
+    // Keep what the server really said, so a vague toast can be checked in Recent errors.
+    ErrorLog.record(context, "Command · $model", raw ?: "No key could be tried (all resting or missing)")
     return CommandOutcome.Failure(
         when {
             // Prefer the message carrying the actual wait time, but only when the last error
@@ -227,6 +233,9 @@ suspend fun runTextCommand(
                 val mapped = ErrorMessages.map(raw)
                 if (mapped == R.string.error_invalid_key && failedKey != null && keyManager.getKeys().size > 1) {
                     context.getString(R.string.error_invalid_key_with_hint, "••••" + failedKey.takeLast(4))
+                } else if (mapped == R.string.error_bad_request && raw.isNotBlank() && !raw.trimStart().startsWith("{")) {
+                    // The catch-all used to hide the real reason. Say what the server said.
+                    context.getString(mapped) + " The server said: \"" + raw.trim().take(160) + "\""
                 } else {
                     context.getString(mapped)
                 }

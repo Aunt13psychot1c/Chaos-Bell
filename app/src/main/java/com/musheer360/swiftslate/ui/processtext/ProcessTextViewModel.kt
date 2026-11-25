@@ -10,8 +10,10 @@ import com.musheer360.swiftslate.SwiftSlateApp
 import com.musheer360.swiftslate.api.GeminiClient
 import com.musheer360.swiftslate.api.ImageInput
 import com.musheer360.swiftslate.api.OpenAICompatibleClient
+import com.musheer360.swiftslate.manager.BellMemory
 import com.musheer360.swiftslate.manager.BellPause
 import com.musheer360.swiftslate.manager.CommandManager
+import com.musheer360.swiftslate.manager.SoulLibrary
 import com.musheer360.swiftslate.manager.StatsManager
 import com.musheer360.swiftslate.model.Command
 import com.musheer360.swiftslate.model.CommandType
@@ -77,7 +79,7 @@ class ProcessTextViewModel(
         /** Room for the whole Help manual when Ask Bell sends it along. */
         const val MAX_BACKGROUND_CHARS = 20_000
         const val FOLLOW_UP_PROMPT =
-            "You are Chaos Bell, chatting in a small pop-up. The text given to you holds what I " +
+            "You're chatting with me in Chaos Bell's small pop-up, as whoever your soul says you are. The text given to you holds what I " +
             "highlighted, the conversation so far, and my new follow-up. Answer the follow-up " +
             "directly and fully, like you're talking to a smart adult, using the highlighted " +
             "text and the conversation for context. Reply with only your answer."
@@ -276,10 +278,16 @@ class ProcessTextViewModel(
         pendingImage = null
         _uiState.value = current.copy(chat = chat, thinking = true, chatError = null, pictureAttached = false)
 
+        // Sign the old replies with whoever's talking (Alfred, Mary, Frog...), not always
+        // "Bell", so the soul knows those words were its own.
+        val speaker = try {
+            val app = getApplication<Application>()
+            SoulLibrary.load(app).displayName(BellMemory(app))
+        } catch (_: Exception) { "Bell" }
         val transcript = buildString {
-            append("Bell: ").append(firstAnswer).append("\n")
+            append(speaker).append(": ").append(firstAnswer).append("\n")
             chat.dropLast(1).forEach { t ->
-                append(if (t.fromUser) "Me: " else "Bell: ").append(t.text).append("\n")
+                append(if (t.fromUser) "Me: " else "$speaker: ").append(t.text).append("\n")
             }
         }.takeLast(MAX_CHAT_CONTEXT_CHARS)
         val background = when {
@@ -299,7 +307,10 @@ class ProcessTextViewModel(
                     withContext(Dispatchers.IO) {
                         runTextCommand(
                             getApplication<Application>(), keyManager, geminiClient, openAIClient,
-                            FOLLOW_UP_PROMPT, payload, answerMode = true, image = image
+                            FOLLOW_UP_PROMPT, payload, answerMode = true, image = image,
+                            // Remember the actual question, not the front of the transcript
+                            // (which used to push the real question out of Bell's memory).
+                            rememberAs = q
                         )
                     }
                 }

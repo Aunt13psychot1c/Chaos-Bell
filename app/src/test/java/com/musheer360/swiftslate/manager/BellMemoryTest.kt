@@ -36,7 +36,7 @@ class BellMemoryTest {
     }
 
     @Test
-    fun conversation_fades_after_an_hour_but_about_me_stays() {
+    fun conversation_fades_after_a_day_but_about_me_stays() {
         val m = memory()
         m.aboutMe = "Queen"
         m.remember("q", "a")
@@ -49,10 +49,10 @@ class BellMemoryTest {
     @Test
     fun only_the_newest_few_exchanges_are_kept() {
         val m = memory()
-        repeat(10) { m.remember("question $it", "answer $it") }
+        repeat(BellMemory.MAX_EXCHANGES + 10) { m.remember("question $it", "answer $it") }
         val block = m.contextBlock()
-        assertFalse(block.contains("question 3"))
-        assertTrue(block.contains("question 9"))
+        assertFalse(block.contains("question 3\n"))
+        assertTrue(block.contains("question ${BellMemory.MAX_EXCHANGES + 9}"))
     }
 
     @Test

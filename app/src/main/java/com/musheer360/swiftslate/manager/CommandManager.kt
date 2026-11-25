@@ -346,7 +346,8 @@ class CommandManager(context: Context) {
         val commands = getCommands()
         for (cmd in commands) {  // Already sorted by trigger length in getCommands()
             if (cmd.trigger.endsWith("translate:xx")) continue
-            if (text.endsWith(cmd.trigger)) {
+            // Ignore case: keyboards and voice typing love to turn ?soul into ?Soul.
+            if (text.endsWith(cmd.trigger, ignoreCase = true)) {
                 return cmd
             }
         }
@@ -355,7 +356,7 @@ class CommandManager(context: Context) {
         // (e.g. "en", "fr", "zh", "pt-BR" without hyphen). Open-ended to support ISO 639 codes
         // without maintaining a hardcoded list. The AI model handles invalid codes gracefully.
         val translatePrefix = "${prefix}translate:"
-        val translateIdx = text.lastIndexOf(translatePrefix)
+        val translateIdx = text.lastIndexOf(translatePrefix, ignoreCase = true)
         if (translateIdx >= 0) {
             val langPart = text.substring(translateIdx + translatePrefix.length)
             if (langPart.length in 2..5 && langPart.all { it in 'a'..'z' || it in 'A'..'Z' || it in '0'..'9' }) {
